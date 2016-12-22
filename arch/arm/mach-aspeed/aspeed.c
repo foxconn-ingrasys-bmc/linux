@@ -148,6 +148,7 @@ static void __init do_common_setup(void)
 static void __init do_barreleye_setup(void)
 {
 	u32 reg;
+
 	do_common_setup();
 
 	/* Setup PNOR address mapping for 64M flash */
@@ -160,6 +161,7 @@ static void __init do_barreleye_setup(void)
 
 	/* SCU setup */
 	writel(0x01C00000, AST_IO(AST_BASE_SCU | 0x88));
+
 	/* To enable GPIOE0 pass through function debounce mode */
 	writel(0x010FFFFF, AST_IO(AST_BASE_SCU | 0xA8));
 
@@ -264,9 +266,15 @@ static void __init aspeed_init_early(void)
 {
 	u32 reg;
 
+	/* Unlock SCU */
+	writel(SCU_PASSWORD, AST_IO(AST_BASE_SCU));
+
+	/* Reset AHB bridges */
+	writel(0x02, AST_IO(AST_BASE_SCU | 0x04));
+
 	// XXX UART stuff to fix to pinmux & co
 	writel(0x02010023, AST_IO(AST_BASE_LPC | 0x9c));
-	writel(SCU_PASSWORD, AST_IO(AST_BASE_SCU)); // UNLOCK SCU
+	writel(0xcb000000, AST_IO(AST_BASE_SCU | 0x80));
 	//writel(0xcb000000, AST_IO(AST_BASE_SCU | 0x80));
 	writel(0x20000000, AST_IO(AST_BASE_SCU | 0x80)); //config GPIOF0, GPIOF1, GPIOF3, GPIOF7 to gpio pin
 	writel(0x00fff0c0, AST_IO(AST_BASE_SCU | 0x84));

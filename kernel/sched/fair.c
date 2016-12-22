@@ -687,8 +687,6 @@ void init_entity_runnable_average(struct sched_entity *se)
 	/* when this task enqueue'ed, it will contribute to its cfs_rq's load_avg */
 }
 
-static inline unsigned long cfs_rq_runnable_load_avg(struct cfs_rq *cfs_rq);
-static inline unsigned long cfs_rq_load_avg(struct cfs_rq *cfs_rq);
 #else
 void init_entity_runnable_average(struct sched_entity *se)
 {
@@ -1193,8 +1191,6 @@ static void task_numa_assign(struct task_numa_env *env,
 {
 	if (env->best_task)
 		put_task_struct(env->best_task);
-	if (p)
-		get_task_struct(p);
 
 	env->best_task = p;
 	env->best_imp = imp;
@@ -1262,20 +1258,30 @@ static void task_numa_compare(struct task_numa_env *env,
 	long imp = env->p->numa_group ? groupimp : taskimp;
 	long moveimp = imp;
 	int dist = env->dist;
+	bool assigned = false;
 
 	rcu_read_lock();
 
 	raw_spin_lock_irq(&dst_rq->lock);
 	cur = dst_rq->curr;
 	/*
-	 * No need to move the exiting task, and this ensures that ->curr
-	 * wasn't reaped and thus get_task_struct() in task_numa_assign()
-	 * is safe under RCU read lock.
-	 * Note that rcu_read_lock() itself can't protect from the final
-	 * put_task_struct() after the last schedule().
+	 * No need to move the exiting task or idle task.
 	 */
 	if ((cur->flags & PF_EXITING) || is_idle_task(cur))
 		cur = NULL;
+	else {
+		/*
+		 * The task_struct must be protected here to protect the
+		 * p->numa_faults access in the task_weight since the
+		 * numa_faults could already be freed in the following path:
+		 * finish_task_switch()
+		 *     --> put_task_struct()
+		 *         --> __put_task_struct()
+		 *             --> task_numa_free()
+		 */
+		get_task_struct(cur);
+	}
+
 	raw_spin_unlock_irq(&dst_rq->lock);
 
 	/*
@@ -1359,6 +1365,7 @@ balance:
 		 */
 		if (!load_too_imbalanced(src_load, dst_load, env)) {
 			imp = moveimp - 1;
+			put_task_struct(cur);
 			cur = NULL;
 			goto assign;
 		}
@@ -1384,9 +1391,16 @@ balance:
 		env->dst_cpu = select_idle_sibling(env->p, env->dst_cpu);
 
 assign:
+	assigned = true;
 	task_numa_assign(env, cur, imp);
 unlock:
 	rcu_read_unlock();
+	/*
+	 * The dst_rq->curr isn't assigned. The protection for task_struct is
+	 * finished.
+	 */
+	if (cur && !assigned)
+		put_task_struct(cur);
 }
 
 static void task_numa_find_cpu(struct task_numa_env *env,
@@ -4594,19 +4608,24 @@ static long effective_load(struct task_group *tg, int cpu, long wl, long wg)
 		return wl;
 
 	for_each_sched_entity(se) {
-		long w, W;
+		struct cfs_rq *cfs_rq = se->my_q;
+		long W, w = cfs_rq_load_avg(cfs_rq);
 
-		tg = se->my_q->tg;
+		tg = cfs_rq->tg;
 
 		/*
 		 * W = @wg + \Sum rw_j
 		 */
-		W = wg + calc_tg_weight(tg, se->my_q);
+		W = wg + atomic_long_read(&tg->load_avg);
+
+		/* Ensure \Sum rw_j >= rw_i */
+		W -= cfs_rq->tg_load_avg_contrib;
+		W += w;
 
 		/*
 		 * w = rw_i + @wl
 		 */
-		w = cfs_rq_load_avg(se->my_q) + wl;
+		w += wl;
 
 		/*
 		 * wl = S * s'_i; see (2)
