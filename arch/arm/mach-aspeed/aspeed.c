@@ -189,13 +189,16 @@ static void __init do_sthelens_setup(void)
         u32 reg;
         do_common_setup();
 
+        /*config GPIOF0, GPIOF1, GPIOF3, GPIOF7 to gpio pin */
+        writel(0x20000000, AST_IO(AST_BASE_SCU | 0x80));
+
         /* Setup PNOR address mapping for 64M flash */
         writel(0x30000C00, AST_IO(AST_BASE_LPC | 0x88));
         writel(0xFC0003FF, AST_IO(AST_BASE_LPC | 0x8C));
 
         /* GPIO setup */
         writel(0x9E82FCE7, AST_IO(AST_BASE_GPIO | 0x00));
-        writel(0x0370E677, AST_IO(AST_BASE_GPIO | 0x04));
+        writel(0x0370E077, AST_IO(AST_BASE_GPIO | 0x04));
 
         /* SCU setup */
         writel(0x01C0007E, AST_IO(AST_BASE_SCU | 0x88));
@@ -211,7 +214,7 @@ static void __init do_sthelens_setup(void)
         reg = readl(AST_IO(AST_BASE_GPIO | 0x20));
         reg |= 0xCFC8F7FD;
         writel(reg, AST_IO(AST_BASE_GPIO | 0x20));
-        writel(0xC738F20A, AST_IO(AST_BASE_GPIO | 0x24));
+        writel(0xC738F50A, AST_IO(AST_BASE_GPIO | 0x24)); //GPIOF0=>output, GPIOF1=>input, GPIOF2=>output
         writel(0x0031FFAF, AST_IO(AST_BASE_GPIO | 0x80));
 
         /* Select TIMER3 as debounce timer */
@@ -221,7 +224,7 @@ static void __init do_sthelens_setup(void)
         /* Set debounce timer to 480000 cycles, with a pclk of 48MHz,
          * corresponds to 20 ms. This time was found by experimentation */
         writel(0x000EA600, AST_IO(AST_BASE_GPIO | 0x58));
-        /* Config GPIOC6 & C7 as output high to provent board reset*/
+        /* Config GPIOC6 & C7 & Q7 as output high to provent board reset*/
         reg = readl(AST_IO(AST_BASE_GPIO | 0x0));
         reg |= (1<<23)| (1<<22);
         writel(reg, AST_IO(AST_BASE_GPIO | 0x0));
@@ -230,6 +233,18 @@ static void __init do_sthelens_setup(void)
         reg |= (1<<23)| (1<<22);
         writel(reg, AST_IO(AST_BASE_GPIO | 0x4));
 
+        reg = readl(AST_IO(AST_BASE_GPIO | 0x84));
+        reg |= (1<<7);
+        writel(reg, AST_IO(AST_BASE_GPIO | 0x84));
+
+        /* Config GPIOM3 as output, GPIOM4 as output high */
+        reg = readl(AST_IO(AST_BASE_GPIO | 0x7C));
+        reg |= (1<<3)| (1<<4);
+        writel(reg, AST_IO(AST_BASE_GPIO | 0x7C));
+
+        reg = readl(AST_IO(AST_BASE_GPIO | 0x78));
+        reg |= (1<<4);
+        writel(reg, AST_IO(AST_BASE_GPIO | 0x78));
 }
 static void __init do_palmetto_setup(void)
 {
