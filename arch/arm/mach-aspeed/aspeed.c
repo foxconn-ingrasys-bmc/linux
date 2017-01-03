@@ -36,6 +36,7 @@ static void __init ast_add_all_devices(void)
 static void __init aspeed_dt_init(void)
 {
 	of_platform_populate(NULL, of_default_bus_match_table, NULL, NULL);
+	ast_add_all_devices();
 }
 
 static const struct of_device_id aspeed_clk_match[] __initconst = {
