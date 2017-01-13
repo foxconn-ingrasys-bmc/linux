@@ -1513,12 +1513,10 @@ ast_show_pwm_speed(struct device *dev, struct device_attribute *attr, char *sysf
 			return sprintf(sysfsbuf, "%d (0:M/1:N/2:O)\n",ast_get_pwm_type(ast_pwm_tacho, sensor_attr->index));
 			break;
 		case 2: //rising
-			return sprintf(sysfsbuf, "%x : unit limit (0~%d)\n",ast_get_pwm_duty_rising(ast_pwm_tacho, sensor_attr->index),
-						ast_get_pwm_clock_unit(ast_pwm_tacho, ast_get_pwm_type(ast_pwm_tacho, sensor_attr->index)));
+			return sprintf(sysfsbuf, "%d\n",ast_get_pwm_duty_rising(ast_pwm_tacho, sensor_attr->index));
 			break;						
 		case 3: //falling
-			return sprintf(sysfsbuf, "%x : unit limit (0~%d)\n",ast_get_pwm_duty_falling(ast_pwm_tacho, sensor_attr->index),
-						ast_get_pwm_clock_unit(ast_pwm_tacho, ast_get_pwm_type(ast_pwm_tacho, sensor_attr->index)));			
+			return sprintf(sysfsbuf, "%d\n",ast_get_pwm_duty_falling(ast_pwm_tacho, sensor_attr->index));
 			break;			
 		default:
 			return -EINVAL;
