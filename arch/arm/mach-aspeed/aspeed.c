@@ -18,7 +18,9 @@ typedef void (init_fnc_t) (void);
 extern void __init ast_add_device_pwm_fan(void);
 
 init_fnc_t __initdata *init_all_device[] = {
+#ifdef CONFIG_PWM_AST_ASPEED
 	ast_add_device_pwm_fan,
+#endif
 	NULL,
 };
 
