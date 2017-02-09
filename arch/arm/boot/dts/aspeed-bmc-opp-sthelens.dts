@@ -59,6 +59,12 @@
 		};
 		apb {
 			i2c: i2c@1e78a040 {
+				i2c1: i2c-bus@80 {
+					GPIO-MUX5@70 {
+							compatible = "nxp,pca9548";
+							reg = <0x70>;
+					};
+				};
 				i2c2: i2c-bus@c0 {
 					i2c-switch@76 {
 							compatible = "nxp,pca9548";
