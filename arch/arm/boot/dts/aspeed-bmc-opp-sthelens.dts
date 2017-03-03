@@ -163,7 +163,14 @@
                                                                                 reg = <0x77>;
                                         };
 					};
-			};
+                    i2c4: i2c-bus@140 {
+                        eeprom@50 {
+                            compatible = "atmel,24c256";
+                            reg = <0x50>;
+                            pagesize = <64>;
+                        };
+			        };
+                     };
 		};
 	};
 
