@@ -86,52 +86,49 @@
                 			};
                 			i2c@5 {
                         			reg = <0x05>;
-                        	};
+                        			lm75@48 {
+                              		compatible = "national,lm75";
+                               		reg = <0x48>;
+                        			};
+                              lm75@49 {
+                                  compatible = "national,lm75";
+                                  reg = <0x49>;
+                              };
+                              lm75@4a {
+                                  compatible = "national,lm75";
+                                  reg = <0x4a>;
+                              };
+                              lm75@4b {
+                                  compatible = "national,lm75";
+                                  reg = <0x4b>;
+                              };
+                              lm75@4c {
+                                  compatible = "national,lm75";
+                                  reg = <0x4c>;
+                              };
+                              lm75@4d {
+                                  compatible = "national,lm75";
+                                  reg = <0x4d>;
+                              };
+                              lm75@4e {
+                                  compatible = "national,lm75";
+                                  reg = <0x4e>;
+                              };
+                              lm75@4f {
+                                  compatible = "national,lm75";
+                                  reg = <0x4f>;
+                              };
+                			};
                 			i2c@6 {
                         			reg = <0x06>;
                 			};
                 			i2c@7 {
                         			reg = <0x07>;
-                        	};
+                      };
         			};
           i2c-switch@77 {
 							compatible = "nxp,pca9548";
 							reg = <0x77>;
-                			i2c@0 {
-                        			reg = <0x02>;
-                        			lm75@48 {
-                                			compatible = "national,lm75";
-                                			reg = <0x48>;
-                        			};
-                                    lm75@49 {
-                                            compatible = "national,lm75";
-                                            reg = <0x49>;
-                                    };
-                                    lm75@4a {
-                                            compatible = "national,lm75";
-                                            reg = <0x4a>;
-                                    };
-                                    lm75@4b {
-                                            compatible = "national,lm75";
-                                            reg = <0x4b>;
-                                    };
-                                    lm75@4c {
-                                            compatible = "national,lm75";
-                                            reg = <0x4c>;
-                                    };
-                                    lm75@4d {
-                                            compatible = "national,lm75";
-                                            reg = <0x4d>;
-                                    };
-                                    lm75@4e {
-                                            compatible = "national,lm75";
-                                            reg = <0x4e>;
-                                    };
-                                    lm75@4f {
-                                            compatible = "national,lm75";
-                                            reg = <0x4f>;
-                                    };
-                			};
                 			i2c@1 {
                         			#address-cells = <1>;
                         			#size-cells = <0>;
@@ -139,7 +136,6 @@
 
 							/* PCAL9538 */
                 			};
-
                 			i2c@3 {
                         			#address-cells = <1>;
                         			#size-cells = <0>;
