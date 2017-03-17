@@ -19,6 +19,7 @@
 		        reg = <0x1e680000 0x180>;
 		        no-hw-checksum;
 		        interrupts = <3>;
+		        status = "disabled";
 		};
 
 		fmc@1e620000 {
