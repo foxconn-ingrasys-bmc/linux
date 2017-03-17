@@ -12,7 +12,6 @@
 		        reg = <0x1e660000 0x180>;
 		        interrupts = <2>;
 		        no-hw-checksum;
-		        status = "disabled";
 		};
 
 		mac1: ethernet@1e680000 {
