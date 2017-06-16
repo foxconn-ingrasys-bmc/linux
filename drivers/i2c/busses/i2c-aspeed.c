@@ -610,7 +610,7 @@ static int ast_i2c_wait_bus_not_busy(struct ast_i2c_bus *bus)
 	if (ast_i2c_read(bus, I2C_CMD_REG) & AST_I2CD_BUS_BUSY_STS) {
 		if (bus->adap.nr<8 && bus->adap.nr>=0){
 			g_event_count[bus->adap.nr]++;
-			sprintf(g_i2c_event_writeBuff[bus->adap.nr], "%d\n0x%2X\n%d\n%d",bus->adap.nr,ast_i2c_read(bus, I2C_CMD_REG),g_event_count[bus->adap.nr],1);
+			sprintf(g_i2c_event_writeBuff[bus->adap.nr], "%d\n0x%2X\n%d\n%d",bus->adap.nr,sts,g_event_count[bus->adap.nr],1);
 		}
         else
             dev_dbg(bus->dev, "Not support bus ID\n");
@@ -626,7 +626,7 @@ static int ast_i2c_wait_bus_not_busy(struct ast_i2c_bus *bus)
     if (!(ast_i2c_read(bus, I2C_CMD_REG) & AST_I2CD_BUS_BUSY_STS)) {
 		if (bus->adap.nr<8 && bus->adap.nr>=0){
 			g_event_count[bus->adap.nr]++;
-			sprintf(g_i2c_event_writeBuff[bus->adap.nr], "%d\n0x%2X\n%d\n%d",bus->adap.nr,ast_i2c_read(bus, I2C_CMD_REG),g_event_count[bus->adap.nr],0);
+			sprintf(g_i2c_event_writeBuff[bus->adap.nr], "%d\n0x%2X\n%d\n%d",bus->adap.nr,sts,g_event_count[bus->adap.nr],0);
 		}
         else
             dev_dbg(bus->dev, "Not support bus ID\n");
