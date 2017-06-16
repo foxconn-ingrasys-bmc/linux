@@ -277,46 +277,46 @@ struct ast_i2c_controller {
 	struct irq_domain	*irq_domain;
 };
 
-static char g_i2c_event_writeBuff[8][100];
-static int g_event_count[8];
+static char g_i2c_recovery_writeBuff[8][100];
+static int g_recovery_count[8];
 
 static int i2c_recovery_proc_show0(struct seq_file *m, void *v) {
-	seq_printf(m, "%s",g_i2c_event_writeBuff[0]);
+	seq_printf(m, "%s",g_i2c_recovery_writeBuff[0]);
 	return 0;
 }
 
 static int i2c_recovery_proc_show1(struct seq_file *m, void *v) {
-	seq_printf(m, "%s",g_i2c_event_writeBuff[1]);
+	seq_printf(m, "%s",g_i2c_recovery_writeBuff[1]);
 	return 0;
 }
 
 static int i2c_recovery_proc_show2(struct seq_file *m, void *v) {
-	seq_printf(m, "%s",g_i2c_event_writeBuff[2]);
+	seq_printf(m, "%s",g_i2c_recovery_writeBuff[2]);
 	return 0;
 }
 
 static int i2c_recovery_proc_show3(struct seq_file *m, void *v) {
-	seq_printf(m, "%s",g_i2c_event_writeBuff[3]);
+	seq_printf(m, "%s",g_i2c_recovery_writeBuff[3]);
 	return 0;
 }
 
 static int i2c_recovery_proc_show4(struct seq_file *m, void *v) {
-	seq_printf(m, "%s",g_i2c_event_writeBuff[4]);
+	seq_printf(m, "%s",g_i2c_recovery_writeBuff[4]);
 	return 0;
 }
 
 static int i2c_recovery_proc_show5(struct seq_file *m, void *v) {
-	seq_printf(m, "%s",g_i2c_event_writeBuff[5]);
+	seq_printf(m, "%s",g_i2c_recovery_writeBuff[5]);
 	return 0;
 }
 
 static int i2c_recovery_proc_show6(struct seq_file *m, void *v) {
-	seq_printf(m, "%s",g_i2c_event_writeBuff[6]);
+	seq_printf(m, "%s",g_i2c_recovery_writeBuff[6]);
 	return 0;
 }
 
 static int i2c_recovery_proc_show7(struct seq_file *m, void *v) {
-	seq_printf(m, "%s",g_i2c_event_writeBuff[7]);
+	seq_printf(m, "%s",g_i2c_recovery_writeBuff[7]);
 	return 0;
 }
 
@@ -419,8 +419,8 @@ static int __init i2c_recovery_proc_init(void) {
     int i;
     for (i=0;i<8;i++)
     {
-        strcpy(g_i2c_event_writeBuff[i], "0\n0\n0\n0\n");
-        g_event_count[i] = 0;
+        strcpy(g_i2c_recovery_writeBuff[i], "0\n0\n0\n");
+        g_recovery_count[i] = 0;
     }
 
     proc_create("i2c_recovery_bus0", 0644, NULL, &i2c_recovery_proc_fops0);
@@ -599,6 +599,12 @@ static u8 ast_i2c_bus_error_recover(struct ast_i2c_bus *bus)
 		return -1;
 	}
 	dev_dbg(bus->dev, "Recovery successfully\n");
+    if (bus->adap.nr<8 && bus->adap.nr>=0){
+        g_recovery_count[bus->adap.nr]++;
+        sprintf(g_i2c_recovery_writeBuff[bus->adap.nr], "%d\n0x%2X\n%d",bus->adap.nr,sts,g_recovery_count[bus->adap.nr]);
+    }
+	else
+        dev_dbg(bus->dev, "Not support bus ID\n");
 	return 0;
 }
 
@@ -606,15 +612,6 @@ static int ast_i2c_wait_bus_not_busy(struct ast_i2c_bus *bus)
 {
 	int timeout = 2; //TODO number
 
-    //I2C hang
-	if (ast_i2c_read(bus, I2C_CMD_REG) & AST_I2CD_BUS_BUSY_STS) {
-		if (bus->adap.nr<8 && bus->adap.nr>=0){
-			g_event_count[bus->adap.nr]++;
-			sprintf(g_i2c_event_writeBuff[bus->adap.nr], "%d\n0x%2X\n%d\n%d",bus->adap.nr,sts,g_event_count[bus->adap.nr],1);
-		}
-        else
-            dev_dbg(bus->dev, "Not support bus ID\n");
-	}
 	while (ast_i2c_read(bus, I2C_CMD_REG) & AST_I2CD_BUS_BUSY_STS) {
 		ast_i2c_bus_error_recover(bus);
 		if(timeout <= 0)
@@ -622,15 +619,7 @@ static int ast_i2c_wait_bus_not_busy(struct ast_i2c_bus *bus)
 		timeout--;
 		msleep(2);
 	}
-    //I2C recovery
-    if (!(ast_i2c_read(bus, I2C_CMD_REG) & AST_I2CD_BUS_BUSY_STS)) {
-		if (bus->adap.nr<8 && bus->adap.nr>=0){
-			g_event_count[bus->adap.nr]++;
-			sprintf(g_i2c_event_writeBuff[bus->adap.nr], "%d\n0x%2X\n%d\n%d",bus->adap.nr,sts,g_event_count[bus->adap.nr],0);
-		}
-        else
-            dev_dbg(bus->dev, "Not support bus ID\n");
-	}
+
 	return timeout <= 0 ? EAGAIN : 0;
 }
 
@@ -865,8 +854,8 @@ static bool ast_i2c_master_irq(struct ast_i2c_bus *bus)
 
     if (sts & AST_I2CD_INTR_BUS_RECOVER_DONE){
         if (bus->adap.nr<8 && bus->adap.nr>=0){
-            g_event_count[bus->adap.nr]++;
-            sprintf(g_i2c_event_writeBuff[bus->adap.nr], "%d\n0x%2X\n%d\n",bus->adap.nr,sts,g_event_count[bus->adap.nr]);
+            g_recovery_count[bus->adap.nr]++;
+            sprintf(g_i2c_recovery_writeBuff[bus->adap.nr], "%d\n0x%2X\n%d\n",bus->adap.nr,sts,g_recovery_count[bus->adap.nr]);
         }
         else
             dev_dbg(bus->dev, "Not support bus ID\n");
