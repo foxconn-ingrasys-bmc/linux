@@ -3,3 +3,4 @@
 obj-$(CONFIG_ARCH_ASPEED)	+= aspeed.o
 obj-$(CONFIG_DEBUG_FS)	+= debugfs.o
 obj-y                   += dev-pwm-fan.o
+obj-y                   += dev-spi.o
