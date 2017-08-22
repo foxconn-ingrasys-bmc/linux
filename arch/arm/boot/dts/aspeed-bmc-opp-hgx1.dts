@@ -1,0 +1,203 @@
+/dts-v1/;
+
+#include "aspeed-g4.dtsi"
+#include <dt-bindings/gpio/aspeed-gpio.h>
+
+/ {
+	model = "Hgx1 BMC";
+	compatible = "ms,sthelens-bmc", "aspeed,ast2400";
+
+	aliases {
+		serial4 = &uart5;
+	};
+
+	chosen {
+		stdout-path = &uart5;
+		bootargs = "console=ttyS4,38400 earlyprintk";
+	};
+
+	memory {
+		reg = <0x40000000 0x20000000>;
+	};
+
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		vga_memory: framebuffer@5f000000 {
+			no-map;
+			reg = <0x5f000000 0x01000000>; /* 16MB */
+		};
+	};
+
+	ahb {
+		bmc_pnor: fmc@1e620000 {
+			reg = < 0x1e620000 0x94
+				0x20000000 0x02000000 >;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "aspeed,ast2400-fmc";
+			flash@0 {
+				reg = < 0 >;
+				compatible = "jedec,spi-nor" ;
+#include "aspeed-bmc-opp-flash-layout.dtsi"
+			};
+
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		heartbeat {
+			gpios = <&gpio ASPEED_GPIO(R, 4) GPIO_ACTIVE_HIGH>;
+		};
+		identify {
+			gpios = <&gpio ASPEED_GPIO(F, 4) GPIO_ACTIVE_LOW>;
+		};
+		beep {
+			gpios = <&gpio ASPEED_GPIO(N, 7) GPIO_ACTIVE_HIGH>;
+		};
+	};
+};
+
+&mac0 {
+	status = "okay";
+};
+
+&uart5 {
+	status = "okay";
+};
+
+&i2c0{
+	status = "okay";
+};
+&i2c1{
+	status = "okay";
+	GPIO-MUX5@70 {
+			compatible = "nxp,pca9548";
+			reg = <0x70>;
+	};
+
+};
+&i2c2{
+	status = "okay";
+	i2c-switch@76 {
+			compatible = "nxp,pca9548";
+			reg = <0x76>;
+			i2c@0 {
+        			reg = <0x00>;
+			};
+			i2c@1 {
+        			reg = <0x01>;
+        	};
+			i2c@2 {
+        			reg = <0x02>;
+			};
+			i2c@3 {
+        			reg = <0x03>;
+        	};
+			i2c@4 {
+        			reg = <0x04>;
+			};
+			i2c@5 {
+        			reg = <0x05>;
+        			lm75@48 {
+	              		compatible = "national,lm75";
+	               		reg = <0x48>;
+        			};
+					lm75@49 {
+						compatible = "national,lm75";
+						reg = <0x49>;
+					};
+					lm75@4a {
+						compatible = "national,lm75";
+						reg = <0x4a>;
+					};
+					lm75@4b {
+						compatible = "national,lm75";
+						reg = <0x4b>;
+					};
+					lm75@4c {
+						compatible = "national,lm75";
+						reg = <0x4c>;
+					};
+					lm75@4d {
+						compatible = "national,lm75";
+						reg = <0x4d>;
+					};
+					lm75@4e {
+						compatible = "national,lm75";
+						reg = <0x4e>;
+					};
+					lm75@4f {
+						compatible = "national,lm75";
+						reg = <0x4f>;
+					};
+			};
+			i2c@6 {
+        			reg = <0x06>;
+			};
+			i2c@7 {
+        			reg = <0x07>;
+			};
+	};
+	i2c-switch@77 {
+			compatible = "nxp,pca9548";
+			reg = <0x77>;
+			i2c@1 {
+        			#address-cells = <1>;
+        			#size-cells = <0>;
+        			reg = <0x01>;
+
+			/* PCAL9538 */
+			};
+			i2c@3 {
+        			#address-cells = <1>;
+        			#size-cells = <0>;
+        			reg = <0x3>;
+
+			/* PCAL9538 x 3 */
+			};
+	};	
+};
+&i2c3{
+	status = "okay";
+	GPIO-MUX1@74 {
+		compatible = "nxp,pca9539";
+		reg = <0x74>;
+	};
+	GPIO-MUX2@75 {
+		compatible = "nxp,pca9539";
+		reg = <0x75>;
+	};
+	GPIO-MUX3@76 {
+		compatible = "nxp,pca9539";
+		reg = <0x76>;
+	};
+	GPIO-MUX4@77 {
+		compatible = "nxp,pca9539";
+		reg = <0x77>;
+	};
+};
+&i2c4{
+	status = "okay";
+    eeprom@50 {
+        compatible = "atmel,24c256";
+        reg = <0x50>;
+        pagesize = <64>;
+    };
+};
+&i2c5{
+	status = "okay";
+};
+&i2c6{
+	status = "okay";
+};
+&i2c7{
+	status = "okay";
+};
+&vuart {
+	status = "okay";
+};
