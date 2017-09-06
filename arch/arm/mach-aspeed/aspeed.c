@@ -205,6 +205,111 @@ static void __init do_sthelens_setup(void)
         reg = readl(AST_IO(AST_BASE_GPIO | 0x78));
         reg |= (1<<4);
         writel(reg, AST_IO(AST_BASE_GPIO | 0x78));
+         writel(reg, AST_IO(AST_BASE_GPIO | 0x78));
+        /* Config GPIO Reset Tolerant Register */
+        writel(0x00008000, AST_IO(AST_BASE_GPIO | 0x3C));
+        writel(0x000000FF, AST_IO(AST_BASE_GPIO | 0xAC));
+        writel(0x00000018, AST_IO(AST_BASE_GPIO | 0xFC));
+
+        /* fix low time and frequency issues of I2C signals */
+        writel(0x77777305, AST_IO(AST_BASE_I2C | 0x44));
+        writel(0x77777305, AST_IO(AST_BASE_I2C | 0x84));
+        writel(0x77777305, AST_IO(AST_BASE_I2C | 0xc4));
+        writel(0x77777305, AST_IO(0x1E78A100 | 0x04));
+}
+static void __init do_hgx1_setup(void)
+{
+        u32 reg;
+        do_common_setup();
+
+        /* Flash controller */
+        writel(0x00000003, AST_IO(AST_BASE_SPI | 0x00));
+        writel(0x00002404, AST_IO(AST_BASE_SPI | 0x04));
+
+        // XXX UART stuff to fix to pinmux & co
+        writel(0x02010023, AST_IO(AST_BASE_LPC | 0x9c));
+        /* Setup PNOR address mapping for 64M flash */
+        writel(0x30000C00, AST_IO(AST_BASE_LPC | 0x88));
+        writel(0xFC0003FF, AST_IO(AST_BASE_LPC | 0x8C));
+
+
+        /* SCU config */
+        writel(0x10CC5E80, AST_IO(AST_BASE_SCU | 0x0c));
+        /* We enable the UART clock divisor in the SCU's misc control
+         * register, as the baud rates in aspeed.dtb all assume that the
+         * divisor is active
+         */
+        reg = readl(AST_IO(AST_BASE_SCU | 0x2c));
+        writel(reg | 0x00001000, AST_IO(AST_BASE_SCU | 0x2c));
+
+        //Disable host SPI mode  bit 12:13 = 00
+        writel(0xFA1C84D6, AST_IO(AST_BASE_SCU | 0x70));
+        /*config GPIOF0, GPIOF1, GPIOF3, GPIOF7 to gpio pin */
+        writel(0x20000000, AST_IO(AST_BASE_SCU | 0x80));
+        writel(0x00fff0c0, AST_IO(AST_BASE_SCU | 0x84));
+        /* SCU setup */
+        writel(0x01C000FF, AST_IO(AST_BASE_SCU | 0x88));
+        writel(0xC1C000FF, AST_IO(AST_BASE_SCU | 0x8c));
+        writel(0x003FA008, AST_IO(AST_BASE_SCU | 0x90));
+
+        /* GPIO setup */
+        writel(0x9E82FCE7, AST_IO(AST_BASE_GPIO | 0x00));
+        writel(0x0370E077, AST_IO(AST_BASE_GPIO | 0x04));
+
+        /* SCU setup */
+        writel(0xC1C0007E, AST_IO(AST_BASE_SCU | 0x88));
+        //writel(0x01C00000, AST_IO(AST_BASE_SCU | 0x88));//GPION1 - GPION6 should config to GPIO pin
+        /* To enable GPIOE0 pass through function debounce mode */
+        writel(0x010FFFFF, AST_IO(AST_BASE_SCU | 0xA8));
+
+        /*
+         * Do read/modify/write on power gpio to prevent resetting power on
+         * reboot
+         */
+        reg = readl(AST_IO(AST_BASE_GPIO | 0x20));
+        reg |= 0xCFC8F7FD;
+        writel(reg, AST_IO(AST_BASE_GPIO | 0x20));
+        writel(0xC738F50A, AST_IO(AST_BASE_GPIO | 0x24)); //GPIOF0=>output, GPIOF1=>input, GPIOF2=>output
+        writel(0x0031FFAF, AST_IO(AST_BASE_GPIO | 0x80));
+
+        /* Select TIMER3 as debounce timer */
+        writel(0x00000001, AST_IO(AST_BASE_GPIO | 0x48));
+        writel(0x00000001, AST_IO(AST_BASE_GPIO | 0x4C));
+
+        /* Set debounce timer to 480000 cycles, with a pclk of 48MHz,
+         * corresponds to 20 ms. This time was found by experimentation */
+        writel(0x000EA600, AST_IO(AST_BASE_GPIO | 0x58));
+        /* Config GPIOC6 & C7 & Q7 as output high to provent board reset*/
+        reg = readl(AST_IO(AST_BASE_GPIO | 0x0));
+        reg |= (1<<23)| (1<<22);
+        writel(reg, AST_IO(AST_BASE_GPIO | 0x0));
+
+        reg = readl(AST_IO(AST_BASE_GPIO | 0x4));
+        reg |= (1<<23)| (1<<22);
+        writel(reg, AST_IO(AST_BASE_GPIO | 0x4));
+
+        reg = readl(AST_IO(AST_BASE_GPIO | 0x84));
+        reg |= (1<<7);
+        writel(reg, AST_IO(AST_BASE_GPIO | 0x84));
+        /* Config GPIOM3 as output, GPIOM4 as output high */
+        reg = readl(AST_IO(AST_BASE_GPIO | 0x7C));
+        reg |= (1<<3)| (1<<4);
+        writel(reg, AST_IO(AST_BASE_GPIO | 0x7C));
+
+        reg = readl(AST_IO(AST_BASE_GPIO | 0x78));
+        reg |= (1<<4);
+        writel(reg, AST_IO(AST_BASE_GPIO | 0x78));
+         writel(reg, AST_IO(AST_BASE_GPIO | 0x78));
+        /* Config GPIO Reset Tolerant Register */
+        writel(0x00008000, AST_IO(AST_BASE_GPIO | 0x3C));
+        writel(0x000000FF, AST_IO(AST_BASE_GPIO | 0xAC));
+        writel(0x00000018, AST_IO(AST_BASE_GPIO | 0xFC));
+
+        /* fix low time and frequency issues of I2C signals */
+        writel(0x77777305, AST_IO(AST_BASE_I2C | 0x44));
+        writel(0x77777305, AST_IO(AST_BASE_I2C | 0x84));
+        writel(0x77777305, AST_IO(AST_BASE_I2C | 0xc4));
+        writel(0x77777305, AST_IO(AST_BASE_I2C | 0x104));
 }
 static void __init do_palmetto_setup(void)
 {
@@ -371,7 +476,9 @@ static void __init aspeed_init_early(void)
 	if (of_machine_is_compatible("ibm,romulus-bmc"))
 		do_romulus_setup();
 	if (of_machine_is_compatible("ms,sthelens-bmc"))
-        do_sthelens_setup();
+        	do_sthelens_setup();
+	if (of_machine_is_compatible("ingrasys,hgx1-bmc"))
+		do_hgx1_setup();
 }
 
 static void __init aspeed_map_io(void)
