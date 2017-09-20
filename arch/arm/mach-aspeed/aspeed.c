@@ -145,8 +145,8 @@ static void __init do_sthelens_setup(void)
          * register, as the baud rates in aspeed.dtb all assume that the
          * divisor is active
          */
-        reg = readl(AST_IO(AST_BASE_SCU | 0x2c));
-        writel(reg | 0x00001000, AST_IO(AST_BASE_SCU | 0x2c));
+        //reg = readl(AST_IO(AST_BASE_SCU | 0x2c));
+        //writel(reg | 0x00001000, AST_IO(AST_BASE_SCU | 0x2c));
 
         //Disable host SPI mode  bit 12:13 = 00
         writel(0xFA1C84D6, AST_IO(AST_BASE_SCU | 0x70));
