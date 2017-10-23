@@ -242,8 +242,14 @@ static void __init do_hgx1_setup(void)
         reg = readl(AST_IO(AST_BASE_SCU | 0x2c));
         writel(reg | 0x00001000, AST_IO(AST_BASE_SCU | 0x2c));
 
-        //Disable host SPI mode  bit 12:13 = 00
-        writel(0xFA1C84D6, AST_IO(AST_BASE_SCU | 0x70));
+        /* Disable host SPI mode. bit 13:12 = 00 */
+        reg = readl(AST_IO(AST_BASE_SCU | 0x70));
+        writel(reg & 0xFFFFCFFF, AST_IO(AST_BASE_SCU | 0x70));
+        /* VGA memory size selection 8MB. bit 3:2 = 00 */
+        //writel(0xFA1C84D2, AST_IO(AST_BASE_SCU | 0x70));
+        reg = readl(AST_IO(AST_BASE_SCU | 0x70));
+        writel(reg & 0xFFFFFFF3, AST_IO(AST_BASE_SCU | 0x70));
+
         /*config GPIOF0, GPIOF1, GPIOF3, GPIOF7 to gpio pin */
         writel(0x20000000, AST_IO(AST_BASE_SCU | 0x80));
         writel(0x00fff0c0, AST_IO(AST_BASE_SCU | 0x84));
