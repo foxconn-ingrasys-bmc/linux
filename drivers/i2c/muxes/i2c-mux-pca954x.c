@@ -235,7 +235,7 @@ static int pca954x_probe(struct i2c_client *client,
 	 * initializes the mux to disconnected state.
 	 */
 	if (i2c_smbus_write_byte(client, 0) < 0) {
-		dev_warn(&client->dev, "probe failed\n");
+		//dev_warn(&client->dev, "probe failed\n");
 		return -ENODEV;
 	}
 
