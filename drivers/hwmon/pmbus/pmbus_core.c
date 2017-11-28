@@ -1746,7 +1746,7 @@ static int pmbus_init_common(struct i2c_client *client, struct pmbus_data *data,
 		data->status_register = PMBUS_STATUS_WORD;
 		ret = i2c_smbus_read_word_data(client, PMBUS_STATUS_WORD);
 		if (ret < 0 || ret == 0xffff) {
-			dev_err(dev, "PMBus status register not found\n");
+			//dev_err(dev, "PMBus status register not found\n");
 			return -ENODEV;
 		}
 	}

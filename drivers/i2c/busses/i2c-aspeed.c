@@ -803,7 +803,7 @@ static int ast_i2c_xfer(struct i2c_adapter *adap,
 
 	ret = ast_i2c_wait_bus_not_busy(bus);
 	if (ret) {
-		dev_err(&adap->dev, "i2c_ast: timeout waiting for bus free\n");
+		//dev_err(&adap->dev, "i2c_ast: timeout waiting for bus free\n");
 		goto out;
 	}
 
