@@ -1234,7 +1234,7 @@ i2c_sysfs_new_device(struct device *dev, struct device_attribute *attr,
 	list_add_tail(&client->detected, &adap->userspace_clients);
 	mutex_unlock(&adap->userspace_clients_lock);
 	//dev_info(dev, "%s: Instantiated device %s at 0x%02hx\n", "new_device",
-		 info.type, info.addr);
+	//	 info.type, info.addr);
 
 	return count;
 }
