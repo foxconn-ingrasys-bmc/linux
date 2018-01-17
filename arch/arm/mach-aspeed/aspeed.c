@@ -316,6 +316,12 @@ static void __init do_hgx1_setup(void)
         writel(0x77777305, AST_IO(AST_BASE_I2C | 0x84));
         writel(0x77777305, AST_IO(AST_BASE_I2C | 0xc4));
         writel(0x77777305, AST_IO(AST_BASE_I2C | 0x104));
+
+	/*Disable wdt2*/
+	//reg = readl(AST_IO(AST_BASE_WDT | 0x2C));
+	//reg &= 0xFFFFFFFE;
+	//writel(reg, AST_IO(AST_BASE_WDT | 0x2C));
+	//printk("WDT2 Disable : %08x\n", readl(AST_IO(AST_BASE_WDT | 0x2C)));
 }
 static void __init do_palmetto_setup(void)
 {
