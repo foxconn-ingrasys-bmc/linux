@@ -5,7 +5,9 @@
 #endif
 
 #CFLAGS += -Wall
-obj-y	+= main.o lattice.o ast-jtag.o
+obj-y	+= main.o 
+obj-y	+= lattice.o
+obj-y	+= ast-jtag.o
 #OBJS	= main.o lattice.o ast-jtag.o
 #EXE	= cpld
 

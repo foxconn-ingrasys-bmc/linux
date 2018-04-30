@@ -1,9 +1,9 @@
 /*
 Please get the JEDEC file format before you read the code
 */
-//#include <linux/module.h> /* Needed by all modules */
-//#include <linux/kernel.h>
-#include <stdio>
+#include <linux/module.h> /* Needed by all modules */
+#include <linux/kernel.h>
+//#include <stdio.h>
 //#include <sys/ioctl.h>
 #include <linux/ioctl.h>
 //#include <sys/types.h>
