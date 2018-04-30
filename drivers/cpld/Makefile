@@ -1,24 +1,25 @@
-ifdef INST
-ifeq ("$(origin INST)", "command line")
-INSTALL_DIR := $(INST)
-endif
-endif
+#ifdef INST
+#ifeq ("$(origin INST)", "command line")
+#INSTALL_DIR := $(INST)
+#endif
+#endif
 
-CFLAGS += -Wall
-OBJS	= main.o lattice.o ast-jtag.o
-EXE	= cpld
+#CFLAGS += -Wall
+obj-y	+= main.o lattice.o ast-jtag.o
+#OBJS	= main.o lattice.o ast-jtag.o
+#EXE	= cpld
 
-CC      = $(CROSS_COMPILE)gcc
+#CC      = $(CROSS_COMPILE)gcc
 
-.c.o:
-	$(CC) $(CFLAGS) -c $<
+#.c.o:
+#	$(CC) $(CFLAGS) -c $<
 
-$(EXE): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $@
+#$(EXE): $(OBJS)
+#	$(CC) $(CFLAGS) $(OBJS) -o $@
 
-clean:
-	rm -f $(EXE) $(OBJS)
+#clean:
+#	rm -f $(EXE) $(OBJS)
 
-install:
-	cp $(EXE) $(INSTALL_DIR)
+#install:
+#	cp $(EXE) $(INSTALL_DIR)
 
