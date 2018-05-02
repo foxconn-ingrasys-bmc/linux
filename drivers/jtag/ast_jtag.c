@@ -786,17 +786,15 @@ static ssize_t show_sts(struct device *dev,
 
 static DEVICE_ATTR(sts, S_IRUGO, show_sts, NULL);
 
-static ssize_t show_frequency(struct device *dev,
-							  struct device_attribute *attr, char *buf)
+static ssize_t show_frequency(struct device *dev,struct device_attribute *attr, char *buf)
 {
 	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
-	printk("PCLK = %d \n", ast_get_pclk());
-	printk("DIV  = %d \n", JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1);
+	//printk("PCLK = %d \n", ast_get_pclk());
+	//printk("DIV  = %d \n", JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1);
 	return sprintf(buf, "Frequency : %d\n", ast_jtag->apb_clk / (JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1));
 }
 
-static ssize_t store_frequency(struct device *dev,
-							   struct device_attribute *attr, const char *buf, size_t count)
+static ssize_t store_frequency(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
 {
 	u32 val;
 	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
@@ -909,6 +907,7 @@ static int __init ast_jtag_probe(struct platform_device *pdev)
 	ret = misc_register(&ast_jtag_misc);
 	if (ret) {
 		printk(KERN_ERR "JTAG : failed to request interrupt\n");
+		printk("JTAG : failed to request interrupt\n");
 		goto out_irq;
 	}
 
@@ -918,6 +917,7 @@ static int __init ast_jtag_probe(struct platform_device *pdev)
 	ret = sysfs_create_group(&pdev->dev.kobj, &jtag_attribute_group);
 	if (ret) {
 		printk(KERN_ERR "ast_jtag: failed to create sysfs device attributes.\n");
+		printk("ast_jtag: failed to create sysfs device attributes.\n");
 		return -1;
 	}
 
@@ -931,6 +931,7 @@ out_region:
 	release_mem_region(res->start, res->end - res->start + 1);
 out:
 	printk(KERN_WARNING "ast_jtag: driver init failed (ret=%d)!\n", ret);
+	printk("ast_jtag: driver init failed (ret=%d)!\n", ret);
 	return ret;
 }
 
