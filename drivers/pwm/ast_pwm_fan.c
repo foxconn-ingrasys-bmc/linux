@@ -2023,8 +2023,9 @@ ast_pwm_tacho_probe(struct platform_device *pdev)
 	int err;
 	int ret=0;
 	int i;
-
+	
 	dev_dbg(&pdev->dev, "ast_pwm_fan_probe \n");
+	printk("ast_pwm_fan_probe \n");
 
 	//SCU Pin-MUX 	//PWM & TACHO
 	//ast_scu_multi_func_pwm_tacho();
@@ -2112,7 +2113,7 @@ ast_pwm_tacho_probe(struct platform_device *pdev)
 			goto out_sysfs4;
 	}
 
-	ast_pwm_tacho_init();
+	ast_pwm_taco_init();
 	
 	printk(KERN_INFO "ast_pwm_tacho: driver successfully loaded.\n");
 
@@ -2193,7 +2194,7 @@ ast_pwm_tacho_suspend(struct platform_device *pdev, pm_message_t state)
 static int 
 ast_pwm_tacho_resume(struct platform_device *pdev)
 {
-	ast_pwm_tacho_init();
+	ast_pwm_taco_init();
 	return 0;
 }
 
