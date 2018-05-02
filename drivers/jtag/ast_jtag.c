@@ -790,8 +790,8 @@ static ssize_t show_frequency(struct device *dev,
 							  struct device_attribute *attr, char *buf)
 {
 	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
-//	printk("PCLK = %d \n", ast_get_pclk());
-//	printk("DIV  = %d \n", JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1);
+	printk("PCLK = %d \n", ast_get_pclk());
+	printk("DIV  = %d \n", JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1);
 	return sprintf(buf, "Frequency : %d\n", ast_jtag->apb_clk / (JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1));
 }
 
@@ -842,6 +842,7 @@ static int ast_jtag_probe(struct platform_device *pdev)
 	int ret = 0;
 
 	JTAG_DBUG("ast_jtag_probe\n");
+	printk("ast_jtag_probe\n");
 
 	if (!(ast_jtag = devm_kzalloc(&pdev->dev, sizeof(struct ast_jtag_info), GFP_KERNEL))) {
 		return -ENOMEM;
@@ -938,6 +939,7 @@ static int ast_jtag_remove(struct platform_device *pdev)
 	struct ast_jtag_info *ast_jtag = platform_get_drvdata(pdev);
 
 	JTAG_DBUG("ast_jtag_remove\n");
+	printk("ast_jtag_remove\n");
 
 	sysfs_remove_group(&pdev->dev.kobj, &jtag_attribute_group);
 
