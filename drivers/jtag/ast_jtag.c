@@ -836,7 +836,8 @@ struct miscdevice ast_jtag_misc = {
 	.fops 	= &ast_jtag_fops,
 };
 
-static int ast_jtag_probe(struct platform_device *pdev)
+//static int ast_jtag_probe(struct platform_device *pdev)
+static int __init ast_jtag_probe(struct platform_device *pdev)
 {
 	struct resource *res;
 	int ret = 0;
@@ -933,7 +934,7 @@ out:
 	return ret;
 }
 
-static int ast_jtag_remove(struct platform_device *pdev)
+static int __exit ast_jtag_remove(struct platform_device *pdev)
 {
 	struct resource *res;
 	struct ast_jtag_info *ast_jtag = platform_get_drvdata(pdev);
@@ -980,7 +981,7 @@ MODULE_DEVICE_TABLE(of, ast_jtag_of_matches);
 
 static struct platform_driver ast_jtag_driver = {
 	.probe 		= ast_jtag_probe,
-	.remove 		= ast_jtag_remove,
+	.remove 	= ast_jtag_remove,
 #ifdef CONFIG_PM
 	.suspend        = ast_jtag_suspend,
 	.resume         = ast_jtag_resume,

@@ -1,0 +1,8 @@
+#
+#
+
+config JTAG
+	bool "jtag driver for aspeed soc"
+	default y
+	help
+	  This selects the jtag driver for aspeed soc.
