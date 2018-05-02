@@ -20,7 +20,6 @@ obj-$(CONFIG_RAPIDIO)		+= rapidio/
 obj-y				+= video/
 obj-y				+= idle/
 obj-y				+= jtag/
-obj-y				+= cpld/
 # IPMI must come before ACPI in order to provide IPMI opregion support
 obj-y				+= char/ipmi/
 
