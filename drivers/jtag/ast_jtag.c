@@ -834,8 +834,8 @@ struct miscdevice ast_jtag_misc = {
 	.fops 	= &ast_jtag_fops,
 };
 
-//static int ast_jtag_probe(struct platform_device *pdev)
-static int __init ast_jtag_probe(struct platform_device *pdev)
+static int ast_jtag_probe(struct platform_device *pdev)
+//static int __init ast_jtag_probe(struct platform_device *pdev)
 {
 	struct resource *res;
 	int ret = 0;
@@ -921,7 +921,9 @@ static int __init ast_jtag_probe(struct platform_device *pdev)
 		return -1;
 	}
 
+
 	printk(KERN_INFO "ast_jtag: driver successfully loaded.\n");
+	printk("ast_jtag: driver successfully loaded.\n");
 
 	return 0;
 
@@ -935,7 +937,8 @@ out:
 	return ret;
 }
 
-static int __exit ast_jtag_remove(struct platform_device *pdev)
+//static int __exit ast_jtag_remove(struct platform_device *pdev)
+static int ast_jtag_remove(struct platform_device *pdev)
 {
 	struct resource *res;
 	struct ast_jtag_info *ast_jtag = platform_get_drvdata(pdev);
@@ -988,12 +991,31 @@ static struct platform_driver ast_jtag_driver = {
 	.resume         = ast_jtag_resume,
 #endif
 	.driver         = {
-		.name   = KBUILD_MODNAME,
-		.of_match_table = ast_jtag_of_matches,
+		//.name   = KBUILD_MODNAME,
+		//.of_match_table = ast_jtag_of_matches,
+		.name	= "ast_jtag",
+		.owner = THIS_MODULE,
 	},
 };
 
 module_platform_driver(ast_jtag_driver);
+
+static int __init
+ast_jtag_init(void)
+{
+        return platform_driver_register(&ast_jtag_driver);
+}
+
+static void __exit
+ast_jtag_exit(void)
+{
+        platform_driver_unregister(&ast_jtag_driver);
+}
+
+module_init(ast_jtag_init);
+module_exit(ast_jtag_exit);
+
+
 
 MODULE_AUTHOR("Ryan Chen <ryan_chen@aspeedtech.com>");
 MODULE_DESCRIPTION("AST JTAG LIB Driver");

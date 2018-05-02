@@ -3,4 +3,5 @@
 #
 
 #obj-m			+= ast_jtag.o
-obj-$(CONFIG_JTAG)	+= ast_jtag.o
+#obj-$(CONFIG_JTAG)	+= ast_jtag.o
+obj-y			+= ast_jtag.o
