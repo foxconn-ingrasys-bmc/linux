@@ -2,4 +2,4 @@
 # Makefile for the jtag core.
 #
 
-obj-y			+= ast_jtag.o
+obj-m			+= ast_jtag.o
