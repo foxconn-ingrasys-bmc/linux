@@ -1003,12 +1003,14 @@ module_platform_driver(ast_jtag_driver);
 static int __init
 ast_jtag_init(void)
 {
+	printk("ast_jtag_init\n");0
         return platform_driver_register(&ast_jtag_driver);
 }
 
 static void __exit
 ast_jtag_exit(void)
 {
+	printk("ast_jtag_exit\n");
         platform_driver_unregister(&ast_jtag_driver);
 }
 
