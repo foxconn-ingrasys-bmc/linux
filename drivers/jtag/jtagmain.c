@@ -17,10 +17,11 @@
   #endif
 #endif
 
-#define JTAG_MAJOR           175
-#define JTAG_MINOR	    	   0
-#define JTAG_MAX_DEVICES     255
-#define JTAG_DEV_NAME        "jtag"
+#define JTAG_MAJOR          175
+#define JTAG_MINOR	    0
+#define JTAG_MAX_DEVICES    255
+#define JTAG_DEV_NAME       "jtag"
+//#define JTAG_DEV_NAME       "ast-jtag"
 
 #define AST_JTAG_BUFFER_SIZE 0x10000
 #define AST_FW_BUFFER_SIZE  0x80000  //512KB
@@ -313,6 +314,7 @@ static core_hal_t jtag_core_hal = {
  */
 int __init jtag_init(void)
 {
+	printk("willen jtag_init\n");
 	int ret =0 ;
   
   /* jtag device initialization */ 
