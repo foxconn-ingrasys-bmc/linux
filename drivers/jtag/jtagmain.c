@@ -1,3 +1,20 @@
+/****************************************************************
+ **                                                            **
+ **    (C)Copyright 2006-2009, American Megatrends Inc.        **
+ **                                                            **
+ **            All Rights Reserved.                            **
+ **                                                            **
+ **        5555 Oakbrook Pkwy Suite 200, Norcross              **
+ **                                                            **
+ **        Georgia - 30093, USA. Phone-(770)-246-8600.         **
+ **                                                            **
+****************************************************************/
+
+ /*
+ * File name: jtagmain.c
+ * This driver provides common layer, independent of the hardware, for the JTAG driver.
+ */
+
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/poll.h>
@@ -5,11 +22,11 @@
 #include <linux/delay.h>
 #include <linux/cdev.h>
 #include <asm/io.h>
-//#include "../helper/helper.h"
-//#include "../helper/driver_hal.h"
-//#include "../helper/dbgout.h"
-//#include "jtag.h"
-//#include "jtag_ioctl.h"
+//#include "helper.h"
+//#include "driver_hal.h"
+//#include "dbgout.h"
+#include "jtag.h"
+#include "jtag_ioctl.h"
 
 #ifdef HAVE_UNLOCKED_IOCTL
   #if HAVE_UNLOCKED_IOCTL
@@ -17,26 +34,25 @@
   #endif
 #endif
 
-#define JTAG_MAJOR          175
-#define JTAG_MINOR	    0
-#define JTAG_MAX_DEVICES    255
-#define JTAG_DEV_NAME       "jtag"
-//#define JTAG_DEV_NAME       "ast-jtag"
+#define JTAG_MAJOR           175
+#define JTAG_MINOR	    	   0
+#define JTAG_MAX_DEVICES     255
+#define JTAG_DEV_NAME        "jtag"
 
 #define AST_JTAG_BUFFER_SIZE 0x10000
 #define AST_FW_BUFFER_SIZE  0x80000  //512KB
 
 static struct cdev *jtag_cdev;
 static dev_t jtag_devno = MKDEV(JTAG_MAJOR, JTAG_MINOR);
-//static jtag_hw_device_operations_t *pjhwd_ops = NULL;
+static jtag_hw_device_operations_t *pjhwd_ops = NULL;
 
 unsigned int *JTAG_read_buffer = NULL;
 unsigned int *JTAG_write_buffer= NULL;
 unsigned long *JTAG_other_buffer= NULL;
 
-//JTAG_DEVICE_INFO	JTAG_device_information;
+JTAG_DEVICE_INFO	JTAG_device_information;
 
-#if 0
+
 int register_jtag_hw_device_ops (jtag_hw_device_operations_t *pjhwd)
 {
 	pjhwd_ops = pjhwd;
@@ -152,8 +168,35 @@ static int jtag_ioctl(struct inode *inode, struct file *file,unsigned int cmd, u
 {
 	struct jtag_dev *pdev = (struct jtag_dev*) file->private_data;
 	unsigned long	idcode;
+	unsigned long	usercode; //wn023
 	IO_ACCESS_DATA Kernal_IO_Data;
 	int ret = 0;
+
+#ifdef INTEL_JTAG_ADDITIONS
+	/* Handle the following IOCTLs first because of the straight user data passed in */
+	switch (cmd)
+	{
+        case AST_JTAG_SIOCFREQ:
+        case AST_JTAG_GIOCFREQ:
+            printk("JTAG frequency changes not supported.\n");
+            return -ENOTTY;
+            break;
+        case AST_JTAG_SLAVECONTLR:
+            printk("JTAG slave/master control not supported.\n");
+            return 0;
+            break;
+        case AST_JTAG_BITBANG:
+        case AST_JTAG_SET_TAPSTATE:
+        case AST_JTAG_READWRITESCAN:
+        case AST_JTAG_ASD_INIT:
+        case AST_JTAG_ASD_DEINIT:
+            ret = pdev->pjtag_hal->pjtag_hal_ops->intel_jtag_ioctl(cmd, arg);
+			return ret;
+			break;
+	}
+
+	/* the rest of IOCTLs handle the pointer of the user data */
+#endif
 
 	memset (&Kernal_IO_Data, 0x00, sizeof(IO_ACCESS_DATA));
 	Kernal_IO_Data = *(IO_ACCESS_DATA *)arg;	
@@ -176,9 +219,7 @@ static int jtag_ioctl(struct inode *inode, struct file *file,unsigned int cmd, u
 			break;
 			
 		case IOCTL_JTAG_IDCODE_READ:
-			ret=pjhwd_ops->get_hw_device_idcode(&idcode);
-			if(ret!=0) ret=-1;
-			
+			pjhwd_ops->get_hw_device_idcode(&idcode);
 			Kernal_IO_Data.Data = idcode;
 			*(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
 			break;
@@ -194,88 +235,63 @@ static int jtag_ioctl(struct inode *inode, struct file *file,unsigned int cmd, u
 				printk("%s: Oops~ program bits should be %d!\n", JTAG_DEV_NAME, (int)JTAG_device_information.Device_All_Bits_Length);
 			}
 			else{
-				ret = copy_from_user ((u32 *)JTAG_write_buffer, (u8 *)Kernal_IO_Data.Input_Buffer_Base, Kernal_IO_Data.Data);
-				Kernal_IO_Data.Data  = pjhwd_ops->set_hw_device_ctl(IOCTL_JTAG_PROGRAM_DEVICE,(void*)JTAG_write_buffer, Kernal_IO_Data.Data * 8);
-			}
-			*(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
+    		ret = copy_from_user ((u32 *)JTAG_write_buffer, (u8 *)Kernal_IO_Data.Input_Buffer_Base, Kernal_IO_Data.Data);
+    		Kernal_IO_Data.Data  = pjhwd_ops->set_hw_device_ctl(IOCTL_JTAG_PROGRAM_DEVICE,(void*)JTAG_write_buffer, Kernal_IO_Data.Data * 8);
+      }
+      *(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
 			break;
 			
 		case IOCTL_JTAG_VERIFY_DEVICE:
-			if(Kernal_IO_Data.Data * 8 != JTAG_device_information.Device_All_Bits_Length){
-				printk("%s: Oops~ verify bits should be %d!,\nYou send %d bits.\n", JTAG_DEV_NAME, (int)JTAG_device_information.Device_All_Bits_Length,(int)Kernal_IO_Data.Data * 8);
-				Kernal_IO_Data.Data= 1;
+    	if(Kernal_IO_Data.Data * 8 != JTAG_device_information.Device_All_Bits_Length){
+    		printk("%s: Oops~ verify bits should be %d!,\nYou send %d bits.\n", JTAG_DEV_NAME, (int)JTAG_device_information.Device_All_Bits_Length,(int)Kernal_IO_Data.Data * 8);
+    		Kernal_IO_Data.Data= 1;
 			}
 			else{
 				ret = copy_from_user ((u32 *)JTAG_write_buffer, (u8 *)Kernal_IO_Data.Input_Buffer_Base, Kernal_IO_Data.Data);
-				Kernal_IO_Data.Data = pjhwd_ops->set_hw_device_ctl(IOCTL_JTAG_VERIFY_DEVICE,(void*)JTAG_write_buffer, Kernal_IO_Data.Data * 8);
+        Kernal_IO_Data.Data = pjhwd_ops->set_hw_device_ctl(IOCTL_JTAG_VERIFY_DEVICE,(void*)JTAG_write_buffer, Kernal_IO_Data.Data * 8);
 			}
-			*(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
+      *(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
 			break;
 				
 		case IOCTL_JTAG_DEVICE_TFR:
-			Kernal_IO_Data.Data = pjhwd_ops->set_hw_device_ctl(IOCTL_JTAG_DEVICE_TFR, 0, 0);
-			*(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
+      Kernal_IO_Data.Data = pjhwd_ops->set_hw_device_ctl(IOCTL_JTAG_DEVICE_TFR, 0, 0);
+      *(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
 			break;
 			
 		case IOCTL_JTAG_DEVICE_CHECKSUM:
 			pjhwd_ops->get_hw_device_idcode(&idcode);
 			ret = pjhwd_ops->set_hw_device_ctl(IOCTL_JTAG_DEVICE_CHECKSUM,(void*)&Kernal_IO_Data.Data, 0); 
-			*(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
+      *(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
 			break;
 			
-		case IOCTL_JTAG_READ_USERCODE:
-			pjhwd_ops->get_hw_device_idcode(&idcode);
-			ret = pjhwd_ops->set_hw_device_ctl(IOCTL_JTAG_READ_USERCODE,(void*)&Kernal_IO_Data.Value, 0);
-			Kernal_IO_Data.Data = ret;
-			*(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
-			break;
-			
-		case IOCTL_JTAG_SET_IO:
-			ret = pjhwd_ops->set_hw_device_io_ctl(Kernal_IO_Data.Data, Kernal_IO_Data.Value);
+    case IOCTL_JTAG_UPDATE_DEVICE:
+      printk("Enter Jtag kernel driver limit %d ,real %d\n",(unsigned int)AST_FW_BUFFER_SIZE,(unsigned int)Kernal_IO_Data.Data);
+    	pjhwd_ops->get_hw_device_idcode(&idcode);
+      if(Kernal_IO_Data.Data < AST_FW_BUFFER_SIZE){
+        printk("JED Size OK\n");
+        ret = copy_from_user ((u32 *)JTAG_other_buffer, (u8 *)Kernal_IO_Data.Input_Buffer_Base, Kernal_IO_Data.Data);
+        Kernal_IO_Data.Data = pjhwd_ops->set_hw_device_ctl(IOCTL_JTAG_UPDATE_DEVICE,(void*)JTAG_other_buffer,Kernal_IO_Data.Data);
+        *(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
+      }
+      else {
+        printk("JED Size NG\n");
+        ret = -1;
+      }
+      break;
 
-			Kernal_IO_Data.Value = ret;
+		//wn023
+		case IOCTL_JTAG_DEVICE_USERCODE:
+			pjhwd_ops->get_hw_device_usercode(&usercode);
+			Kernal_IO_Data.Data = usercode;
 			*(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
 			break;
-			
-		case IOCTL_JTAG_UPDATE_DEVICE:
-			ret=pjhwd_ops->get_hw_device_idcode(&idcode);
-			if(ret != 0){
-				ret=-1;
-			}
-			else if(Kernal_IO_Data.Data < AST_FW_BUFFER_SIZE){
-				ret = copy_from_user ((u32 *)JTAG_other_buffer, (u8 *)Kernal_IO_Data.Input_Buffer_Base, Kernal_IO_Data.Data);
-				Kernal_IO_Data.Data = pjhwd_ops->set_hw_device_ctl(IOCTL_JTAG_UPDATE_DEVICE,(void*)JTAG_other_buffer,Kernal_IO_Data.Data);
-				*(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
-			}
-			else {
-				ret = -1;
-			}
-			break;
-
-		case IOCTL_JTAG_UPDATE_JBC:
-			if(Kernal_IO_Data.Data < AST_FW_BUFFER_SIZE){
-				ret = copy_from_user ((u32 *)JTAG_write_buffer, (u8 *)Kernal_IO_Data.Input_Buffer_Base, Kernal_IO_Data.Data);
-				if(pjhwd_ops->set_hw_device_ctl != NULL){
-					ret = pjhwd_ops->set_hw_device_ctl(IOCTL_JTAG_UPDATE_DEVICE,(void*)JTAG_write_buffer,Kernal_IO_Data.Data);
-				}
-				else{
-					ret = 1;
-				}
-				Kernal_IO_Data.Data =ret ;
-			}
-			else{
-				printk("%s: Oops~ size of jbc file is too big(%d).\n", JTAG_DEV_NAME, (int)Kernal_IO_Data.Data);
-				Kernal_IO_Data.Data= 1;
-			}
-			 
-			*(IO_ACCESS_DATA *)arg = Kernal_IO_Data;
-			break;
-			
+   		
 		default:
 			printk ( "Invalid JTAG Function\n");
 			return -EINVAL;
 	}
-	return ret;
+
+  return ret;
 }
 
 
@@ -306,7 +322,6 @@ static core_hal_t jtag_core_hal = {
 	.unregister_hal_module = unregister_jtag_hal_module,
 	.pcore_funcs           = (void *)&jtag_core_funcs
 };
-#endif
 
 
 /*
@@ -314,7 +329,6 @@ static core_hal_t jtag_core_hal = {
  */
 int __init jtag_init(void)
 {
-	printk("willen jtag_init\n");
 	int ret =0 ;
   
   /* jtag device initialization */ 
@@ -323,7 +337,7 @@ int __init jtag_init(void)
 	   printk (KERN_ERR "failed to register jtag device <%s> (err: %d)\n", JTAG_DEV_NAME, ret);
 	   return ret;
 	}
-#if 0   
+   
 	jtag_cdev = cdev_alloc ();
 	if (!jtag_cdev)
 	{
@@ -332,11 +346,11 @@ int __init jtag_init(void)
 	   return -1;
 	}
    
-	//cdev_init (jtag_cdev, &jtag_ops);
+	cdev_init (jtag_cdev, &jtag_ops);
 	
 	jtag_cdev->owner = THIS_MODULE;
 	
-/*	if ((ret = cdev_add (jtag_cdev, jtag_devno, JTAG_MAX_DEVICES)) < 0)
+	if ((ret = cdev_add (jtag_cdev, jtag_devno, JTAG_MAX_DEVICES)) < 0)
 	{
 		cdev_del (jtag_cdev);
 		unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
@@ -353,7 +367,7 @@ int __init jtag_init(void)
 		ret = -EINVAL;
 		return ret;
 	}
-*/
+
   // alloc write/read/other buffer
   memset (&JTAG_device_information, 0, sizeof(JTAG_DEVICE_INFO));
   
@@ -391,8 +405,7 @@ out_no_mem:
   if (JTAG_write_buffer != NULL)
   	kfree(JTAG_write_buffer);
 	if (JTAG_other_buffer != NULL)
-		kfree(JTAG_other_buffer);
-#endif
+		kfree(JTAG_other_buffer);  
   return ret;
 }
 
@@ -401,18 +414,18 @@ out_no_mem:
  */
 void __exit jtag_exit(void)
 {
-//	unregister_core_hal_module (EDEV_TYPE_JTAG);
+	unregister_core_hal_module (EDEV_TYPE_JTAG);
 	unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
 
 	if (NULL != jtag_cdev)
 	{
 		cdev_del (jtag_cdev);
 	}
-#if 0	
+	
 	kfree(JTAG_read_buffer);
 	kfree(JTAG_write_buffer);
 	kfree(JTAG_other_buffer);
-#endif
+
   printk ( "Unregistered the JTAG Driver Sucessfully\n");
 
   return;	
@@ -427,7 +440,7 @@ EXPORT_SYMBOL(get_jtag_read_buffer);
 module_init(jtag_init);
 module_exit(jtag_exit);
 
-MODULE_AUTHOR("BMC-KS");
+MODULE_AUTHOR("American Megatrends Inc.");
 MODULE_DESCRIPTION("JTAG Common Driver");
 MODULE_LICENSE ("GPL");
 
