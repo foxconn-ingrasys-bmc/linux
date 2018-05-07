@@ -27,13 +27,13 @@
 
 static struct cdev *jtag_cdev;
 static dev_t jtag_devno = MKDEV(JTAG_MAJOR, JTAG_MINOR);
-static jtag_hw_device_operations_t *pjhwd_ops = NULL;
+//static jtag_hw_device_operations_t *pjhwd_ops = NULL;
 
 unsigned int *JTAG_read_buffer = NULL;
 unsigned int *JTAG_write_buffer= NULL;
 unsigned long *JTAG_other_buffer= NULL;
 
-JTAG_DEVICE_INFO	JTAG_device_information;
+//JTAG_DEVICE_INFO	JTAG_device_information;
 
 #if 0
 int register_jtag_hw_device_ops (jtag_hw_device_operations_t *pjhwd)
@@ -321,7 +321,7 @@ int __init jtag_init(void)
 	   printk (KERN_ERR "failed to register jtag device <%s> (err: %d)\n", JTAG_DEV_NAME, ret);
 	   return ret;
 	}
-   
+#if 0   
 	jtag_cdev = cdev_alloc ();
 	if (!jtag_cdev)
 	{
@@ -330,11 +330,11 @@ int __init jtag_init(void)
 	   return -1;
 	}
    
-	cdev_init (jtag_cdev, &jtag_ops);
+	//cdev_init (jtag_cdev, &jtag_ops);
 	
 	jtag_cdev->owner = THIS_MODULE;
 	
-	if ((ret = cdev_add (jtag_cdev, jtag_devno, JTAG_MAX_DEVICES)) < 0)
+/*	if ((ret = cdev_add (jtag_cdev, jtag_devno, JTAG_MAX_DEVICES)) < 0)
 	{
 		cdev_del (jtag_cdev);
 		unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
@@ -351,7 +351,7 @@ int __init jtag_init(void)
 		ret = -EINVAL;
 		return ret;
 	}
-
+*/
   // alloc write/read/other buffer
   memset (&JTAG_device_information, 0, sizeof(JTAG_DEVICE_INFO));
   
@@ -389,7 +389,8 @@ out_no_mem:
   if (JTAG_write_buffer != NULL)
   	kfree(JTAG_write_buffer);
 	if (JTAG_other_buffer != NULL)
-		kfree(JTAG_other_buffer);  
+		kfree(JTAG_other_buffer);
+#endif
   return ret;
 }
 
@@ -398,18 +399,18 @@ out_no_mem:
  */
 void __exit jtag_exit(void)
 {
-	unregister_core_hal_module (EDEV_TYPE_JTAG);
+//	unregister_core_hal_module (EDEV_TYPE_JTAG);
 	unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
 
 	if (NULL != jtag_cdev)
 	{
 		cdev_del (jtag_cdev);
 	}
-	
+#if 0	
 	kfree(JTAG_read_buffer);
 	kfree(JTAG_write_buffer);
 	kfree(JTAG_other_buffer);
-
+#endif
   printk ( "Unregistered the JTAG Driver Sucessfully\n");
 
   return;	
