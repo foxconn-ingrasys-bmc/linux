@@ -1012,14 +1012,6 @@ static int __init
 ast_jtag_init(void)
 {
 	printk("ast_jtag_init\n");
-	int ret;
-
-	if ((ret = register_chrdev_region (jtag_devno, JTAG_MAX_DEVICES, JTAG_DEV_NAME)) < 0)
-	{
-	   printk("failed to register jtag device <%s> (err: %d)\n", JTAG_DEV_NAME, ret);
-	   return ret;
-	}
-
         return platform_driver_register(&ast_jtag_driver);
 }
 

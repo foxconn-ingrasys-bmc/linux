@@ -5,11 +5,11 @@
 #include <linux/delay.h>
 #include <linux/cdev.h>
 #include <asm/io.h>
-#include "../helper/helper.h"
-#include "../helper/driver_hal.h"
-#include "../helper/dbgout.h"
-#include "jtag.h"
-#include "jtag_ioctl.h"
+//#include "../helper/helper.h"
+//#include "../helper/driver_hal.h"
+//#include "../helper/dbgout.h"
+//#include "jtag.h"
+//#include "jtag_ioctl.h"
 
 #ifdef HAVE_UNLOCKED_IOCTL
   #if HAVE_UNLOCKED_IOCTL
@@ -35,7 +35,7 @@ unsigned long *JTAG_other_buffer= NULL;
 
 JTAG_DEVICE_INFO	JTAG_device_information;
 
-
+#if 0
 int register_jtag_hw_device_ops (jtag_hw_device_operations_t *pjhwd)
 {
 	pjhwd_ops = pjhwd;
@@ -305,6 +305,7 @@ static core_hal_t jtag_core_hal = {
 	.unregister_hal_module = unregister_jtag_hal_module,
 	.pcore_funcs           = (void *)&jtag_core_funcs
 };
+#endif
 
 
 /*
