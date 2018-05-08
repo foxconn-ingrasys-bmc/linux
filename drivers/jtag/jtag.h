@@ -34,6 +34,8 @@ struct scan_xfer {
 };
 #endif
 
+#define EDEV_TYPE_JTAG 15
+
 typedef struct
 {
 	uint32_t (*get_hw_device_idcode) (unsigned long *id_code);	
