@@ -38,6 +38,12 @@ struct scan_xfer {
 
 typedef struct
 {
+	int inst_num;
+	void *pdrv_data;
+} hw_info_t;
+
+typedef struct
+{
 	uint32_t (*get_hw_device_idcode) (unsigned long *id_code);	
 	uint32_t (*set_hw_device_ctl) ( unsigned int cmd, unsigned long *buf, unsigned long data_size ) ;
 	uint32_t (*get_hw_device_usercode) (unsigned long *id_code); //wn023
