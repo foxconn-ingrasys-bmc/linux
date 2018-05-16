@@ -29,7 +29,9 @@
 #include <linux/slab.h>
 #include <linux/list.h>
 #include "driver_hal.h"
- 
+
+#define DEBUG 1
+
 #ifdef DEBUG
 #define dbgprint(fmt, args...)       printk (KERN_INFO fmt, ##args) 
 #else
