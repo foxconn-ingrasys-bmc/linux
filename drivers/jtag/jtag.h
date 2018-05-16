@@ -34,7 +34,7 @@ struct scan_xfer {
 };
 #endif
 
-#define IO_ADDRESS(x)            (((x) & 0x0fffffff) + (((x) >> 4) & 0x0f000000) + 0xf0000000) )
+#define IO_ADDRESS(x)            (((x) & 0x0fffffff) + (((x) >> 4) & 0x0f000000) + 0xf0000000)
 
 typedef struct
 {
