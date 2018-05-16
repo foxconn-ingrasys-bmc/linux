@@ -37,13 +37,13 @@
 #define AST_JTAG_DATA			0x00
 #define AST_JTAG_INST			0x04
 #define AST_JTAG_CTRL			0x08
-#define AST_JTAG_ISR			0x0C
-#define AST_JTAG_SW			0x10
-#define AST_JTAG_TCK			0x14
+#define AST_JTAG_ISR				0x0C
+#define AST_JTAG_SW				0x10
+#define AST_JTAG_TCK				0x14
 #define AST_JTAG_IDLE			0x18
 
 /* AST_JTAG_CTRL - 0x08 : Engine Control */
-#define JTAG_ENG_EN			(0x1 << 31)
+#define JTAG_ENG_EN				(0x1 << 31)
 #define JTAG_ENG_OUT_EN			(0x1 << 30)
 #define JTAG_FORCE_TMS			(0x1 << 29)
 
@@ -53,15 +53,15 @@
 #define JTAG_SET_INST_MSB		(0x1 << 19)
 #define JTAG_TERMINATE_INST		(0x1 << 18)
 #define JTAG_LAST_INST			(0x1 << 17)
-#define JTAG_INST_EN			(0x1 << 16)
+#define JTAG_INST_EN				(0x1 << 16)
 #define JTAG_DATA_LEN_MASK		(0x3f << 4)
 
 #define JTAG_DR_UPDATE			(0x1 << 10)	//AST2500 only
-#define JTAG_DATA_LEN(x)		(x << 4)
+#define JTAG_DATA_LEN(x)			(x << 4)
 #define JTAG_SET_DATA_MSB		(0x1 << 3)
 #define JTAG_TERMINATE_DATA		(0x1 << 2)
 #define JTAG_LAST_DATA			(0x1 << 1)
-#define JTAG_DATA_EN			(0x1)
+#define JTAG_DATA_EN				(0x1)
 
 /* AST_JTAG_ISR	- 0x0C : INterrupt status and enable */
 #define JTAG_INST_PAUSE			(0x1 << 19)
@@ -70,9 +70,9 @@
 #define JTAG_DATA_COMPLETE		(0x1 << 16)
 
 #define JTAG_INST_PAUSE_EN		(0x1 << 3)
-#define JTAG_INST_COMPLETE_EN		(0x1 << 2)
+#define JTAG_INST_COMPLETE_EN	(0x1 << 2)
 #define JTAG_DATA_PAUSE_EN		(0x1 << 1)
-#define JTAG_DATA_COMPLETE_EN		(0x1)
+#define JTAG_DATA_COMPLETE_EN	(0x1)
 
 
 /* AST_JTAG_SW	- 0x10 : Software Mode and Status */
@@ -86,20 +86,12 @@
 #define JTAG_STS_ENG_IDLE		(0x1)
 
 /* AST_JTAG_TCK	- 0x14 : TCK Control */
-#define JTAG_TCK_INVERSE		(0x1 << 31)
-#define JTAG_TCK_DIVISOR_MASK		(0x7ff)
-#define JTAG_GET_TCK_DIVISOR(x)		(x & 0x7ff)
+#define JTAG_TCK_INVERSE			(0x1 << 31)
+#define JTAG_TCK_DIVISOR_MASK	(0x7ff)
+#define JTAG_GET_TCK_DIVISOR(x)	(x & 0x7ff)
 
 /*  AST_JTAG_IDLE - 0x18 : Ctroller set for go to IDLE */
-#define JTAG_GO_IDLE			(0x1)
-
-
-#define JTAG_MAJOR          	175
-#define JTAG_MINOR	   	0
-#define JTAG_MAX_DEVICES     	255
-#define JTAG_DEV_NAME        	"ast-jtag"
-static dev_t jtag_devno = MKDEV(JTAG_MAJOR, JTAG_MINOR);
-
+#define JTAG_GO_IDLE				(0x1)
 /*************************************************************************************/
 typedef enum jtag_xfer_mode {
 	HW_MODE = 0,
@@ -109,24 +101,24 @@ typedef enum jtag_xfer_mode {
 struct runtest_idle {
 	xfer_mode 	mode;		//0 :HW mode, 1: SW mode
 	unsigned char 	reset;		//Test Logic Reset
-	unsigned char 	end;		//o: idle, 1: ir pause, 2: drpause
-	unsigned char 	tck;		//keep tck
+	unsigned char 	end;			//o: idle, 1: ir pause, 2: drpause
+	unsigned char 	tck;			//keep tck
 };
 
 struct sir_xfer {
 	xfer_mode 	mode;		//0 :HW mode, 1: SW mode
-	unsigned short length;		//bits
+	unsigned short length;	//bits
 	unsigned int tdi;
 	unsigned int tdo;
-	unsigned char endir;		//0: idle, 1:pause
+	unsigned char endir;	//0: idle, 1:pause
 };
 
 struct sdr_xfer {
 	xfer_mode 	mode;		//0 :HW mode, 1: SW mode
-	unsigned char 	direct; 	// 0 ; read , 1 : write
-	unsigned short length;		//bits
+	unsigned char 	direct; // 0 ; read , 1 : write
+	unsigned short length;	//bits
 	unsigned int *tdio;
-	unsigned char enddr;		//0: idle, 1:pause
+	unsigned char enddr;	//0: idle, 1:pause
 };
 
 #define JTAGIOC_BASE       'T'
@@ -150,10 +142,10 @@ struct sdr_xfer {
 struct ast_jtag_info {
 	void __iomem	*reg_base;
 	u8 			sts;			//0: idle, 1:irpause 2:drpause
-	int 			irq;			//JTAG IRQ number
+	int 			irq;				//JTAG IRQ number
 	struct reset_control *reset;
-	struct clk 		*clk;
-	u32			apb_clk;
+	struct clk 			*clk;
+	u32					apb_clk;
 	u32 			flag;
 	wait_queue_head_t jtag_wq;
 	bool 			is_open;
@@ -794,15 +786,17 @@ static ssize_t show_sts(struct device *dev,
 
 static DEVICE_ATTR(sts, S_IRUGO, show_sts, NULL);
 
-static ssize_t show_frequency(struct device *dev,struct device_attribute *attr, char *buf)
+static ssize_t show_frequency(struct device *dev,
+							  struct device_attribute *attr, char *buf)
 {
 	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
-	//printk("PCLK = %d \n", ast_get_pclk());
-	//printk("DIV  = %d \n", JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1);
+//	printk("PCLK = %d \n", ast_get_pclk());
+//	printk("DIV  = %d \n", JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1);
 	return sprintf(buf, "Frequency : %d\n", ast_jtag->apb_clk / (JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1));
 }
 
-static ssize_t store_frequency(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+static ssize_t store_frequency(struct device *dev,
+							   struct device_attribute *attr, const char *buf, size_t count)
 {
 	u32 val;
 	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
@@ -843,13 +837,11 @@ struct miscdevice ast_jtag_misc = {
 };
 
 static int ast_jtag_probe(struct platform_device *pdev)
-//static int __init ast_jtag_probe(struct platform_device *pdev)
 {
 	struct resource *res;
 	int ret = 0;
 
 	JTAG_DBUG("ast_jtag_probe\n");
-	printk("ast_jtag_probe\n");
 
 	if (!(ast_jtag = devm_kzalloc(&pdev->dev, sizeof(struct ast_jtag_info), GFP_KERNEL))) {
 		return -ENOMEM;
@@ -915,7 +907,6 @@ static int ast_jtag_probe(struct platform_device *pdev)
 	ret = misc_register(&ast_jtag_misc);
 	if (ret) {
 		printk(KERN_ERR "JTAG : failed to request interrupt\n");
-		printk("JTAG : failed to request interrupt\n");
 		goto out_irq;
 	}
 
@@ -925,13 +916,10 @@ static int ast_jtag_probe(struct platform_device *pdev)
 	ret = sysfs_create_group(&pdev->dev.kobj, &jtag_attribute_group);
 	if (ret) {
 		printk(KERN_ERR "ast_jtag: failed to create sysfs device attributes.\n");
-		printk("ast_jtag: failed to create sysfs device attributes.\n");
 		return -1;
 	}
 
-
 	printk(KERN_INFO "ast_jtag: driver successfully loaded.\n");
-	printk("ast_jtag: driver successfully loaded.\n");
 
 	return 0;
 
@@ -941,18 +929,15 @@ out_region:
 	release_mem_region(res->start, res->end - res->start + 1);
 out:
 	printk(KERN_WARNING "ast_jtag: driver init failed (ret=%d)!\n", ret);
-	printk("ast_jtag: driver init failed (ret=%d)!\n", ret);
 	return ret;
 }
 
-//static int __exit ast_jtag_remove(struct platform_device *pdev)
 static int ast_jtag_remove(struct platform_device *pdev)
 {
 	struct resource *res;
 	struct ast_jtag_info *ast_jtag = platform_get_drvdata(pdev);
 
 	JTAG_DBUG("ast_jtag_remove\n");
-	printk("ast_jtag_remove\n");
 
 	sysfs_remove_group(&pdev->dev.kobj, &jtag_attribute_group);
 
@@ -993,47 +978,18 @@ MODULE_DEVICE_TABLE(of, ast_jtag_of_matches);
 
 static struct platform_driver ast_jtag_driver = {
 	.probe 		= ast_jtag_probe,
-	.remove 	= ast_jtag_remove,
+	.remove 		= ast_jtag_remove,
 #ifdef CONFIG_PM
 	.suspend        = ast_jtag_suspend,
 	.resume         = ast_jtag_resume,
 #endif
 	.driver         = {
-		//.name   = KBUILD_MODNAME,
-		//.of_match_table = ast_jtag_of_matches,
-		.name	= "ast_jtag",
-		.owner = THIS_MODULE,
+		.name   = KBUILD_MODNAME,
+		.of_match_table = ast_jtag_of_matches,
 	},
 };
 
 module_platform_driver(ast_jtag_driver);
-
-static int __init
-ast_jtag_init(void)
-{
-	int ret = 0;
-	printk("willen ast_jtag_init\n");
-
-	if ((ret = register_chrdev_region (jtag_devno, JTAG_MAX_DEVICES, JTAG_DEV_NAME)) < 0)
-	{
-	   printk("failed to register jtag device <%s> (err: %d)\n", JTAG_DEV_NAME, ret);
-	   return ret;
-	}
-
-        return platform_driver_register(&ast_jtag_driver);
-}
-
-static void __exit
-ast_jtag_exit(void)
-{
-	printk("willen ast_jtag_exit\n");
-        platform_driver_unregister(&ast_jtag_driver);
-}
-
-module_init(ast_jtag_init);
-module_exit(ast_jtag_exit);
-
-
 
 MODULE_AUTHOR("Ryan Chen <ryan_chen@aspeedtech.com>");
 MODULE_DESCRIPTION("AST JTAG LIB Driver");
