@@ -5,4 +5,4 @@
 #obj-m			+= ast_jtag.o
 #obj-$(CONFIG_JTAG)	+= ast_jtag.o
 TARGET    := jtag
-OBJS      := jtagmain.o
+obj-y			+= jtagmain.o
