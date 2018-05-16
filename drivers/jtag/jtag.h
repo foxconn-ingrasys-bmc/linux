@@ -34,13 +34,7 @@ struct scan_xfer {
 };
 #endif
 
-#define EDEV_TYPE_JTAG 15
-
-typedef struct
-{
-	int inst_num;
-	void *pdrv_data;
-} hw_info_t;
+#define IO_ADDRESS(x)            (((x) & 0x0fffffff) + (((x) >> 4) & 0x0f000000) + 0xf0000000) )
 
 typedef struct
 {
