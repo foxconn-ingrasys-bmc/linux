@@ -23,7 +23,7 @@
 #include <linux/cdev.h>
 #include <asm/io.h>
 //#include "helper.h"
-//#include "driver_hal.h"
+#include "driver_hal.h"
 //#include "dbgout.h"
 #include "jtag.h"
 #include "jtag_ioctl.h"
