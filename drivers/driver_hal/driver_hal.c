@@ -121,13 +121,15 @@ int register_hw_hal_module (hw_hal_t *phw_hal, void **pcore_funcs)
 	nh = (hw_hal_list_t*) kmalloc (sizeof(hw_hal_list_t), GFP_KERNEL);
 	if (!nh)
 		return -ENOMEM;
-	dbgprint ("allcoated hw hal\n");			
+	dbgprint ("allcoated hw hal start\n");			
 	mutex_lock (&core_hal_list_mlock);       
 
 	list_for_each_entry (c, &core_hal_list, list)
 	{
+		dbgprint ("111 allcoated hw hal\n");
 		if (c->core_hal->dev_type == phw_hal->dev_type)
 		{
+			dbgprint ("222 allcoated hw hal\n");
 			int i;
 			hw_hal_list_t *h;
 			unsigned char last_mnum = 0;
