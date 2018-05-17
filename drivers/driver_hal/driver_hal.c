@@ -123,7 +123,7 @@ int register_hw_hal_module (hw_hal_t *phw_hal, void **pcore_funcs)
 		return -ENOMEM;
 	dbgprint ("allcoated hw hal start\n");			
 	mutex_lock (&core_hal_list_mlock);       
-
+	dbgprint ("phw_hal->dev_type %d\n", phw_hal->dev_type);
 	list_for_each_entry (c, &core_hal_list, list)
 	{
 		dbgprint ("111 allcoated hw hal\n");
