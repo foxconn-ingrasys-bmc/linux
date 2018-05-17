@@ -169,6 +169,7 @@ int register_hw_hal_module (hw_hal_t *phw_hal, void **pcore_funcs)
 				if ((last_mnum + phw_hal->num_instances) > MAX_DEV_INSTANCES)
 				{
 					ret = -ENOBUFS;
+					dbgprint ("11111 MAX_DEV_INSTANCES\n");
 					goto failed;
 				}			
 				//			}
@@ -179,7 +180,10 @@ int register_hw_hal_module (hw_hal_t *phw_hal, void **pcore_funcs)
 				
 				ret = c->core_hal->register_hal_module (nh->hw_hal->num_instances, nh->hw_hal->phal_ops, &nh->pdrv_data);
 				if (ret < 0)
+				{
+					dbgprint ("22222 register_hal_module\n");
 					goto failed;
+				}
 
 				dbgprint ("core priv data: %p\n", nh->pdrv_data);	
 
