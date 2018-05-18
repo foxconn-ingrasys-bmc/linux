@@ -366,7 +366,7 @@ int ast_jtag_init(void)
   
   //memset (&JTAG_device_information, 0, sizeof(JTAG_DEVICE_INFO));
   *(volatile u32 *)(IO_ADDRESS(0x1E6E2000)) = (0x1688A8A8); //Unlock SCU register
-
+  printk(KERN_WARNING "33333333333333333333333333333333333333\n");
   #ifdef SOC_AST2300
    status = *(volatile u32 *)(IO_ADDRESS(0x1E6E2084));
    if(status & (0x1 << 5))
@@ -379,21 +379,22 @@ int ast_jtag_init(void)
    	barrier();
    }
   #endif
+   printk(KERN_WARNING "4444444444444444444444444444444444444\n");
   status = *(volatile u32 *)(IO_ADDRESS(0x1E6E2004));
   *(volatile u32 *)(IO_ADDRESS(0x1E6E2004)) = status &= ~(0x00400000); //Set JTAG Master Enable in SCU Reset Register
   *(volatile u32 *)(IO_ADDRESS(0x1E6E2000)) = 0; //Lock SCU register
-
+  printk(KERN_WARNING "5555555555555555555555555555555\n");
   iowrite32(AST_JTAG_CTRL_ENABLE, (void * __iomem)ast_jtag_v_add + JTAG_CONTROL); // Enable Engine
   barrier();
   iowrite32(SOFTWARE_MODE_ENABLE | SOFTWARE_TDIO_BIT, (void * __iomem)ast_jtag_v_add + JTAG_STATUS);
   barrier();
-  
+  printk(KERN_WARNING "666666666666666666666666666666666\n");
   reg = ioread32((void * __iomem)ast_jtag_v_add + JTAG_INTERRUPT);
   reg = reg & ~(AST_JTAG_INTR_STATUS_MASK | AST_JTAG_INTR_ENABLE_MASK);
   iowrite32( reg, (void * __iomem)ast_jtag_v_add + JTAG_INTERRUPT); //Disable Interrupt
   barrier();
   mdelay(1); //let last data output.
-  
+  printk(KERN_WARNING "77777777777777777777777777777777777777\n");
   ast_jtag_reset();
 
   return 0;
