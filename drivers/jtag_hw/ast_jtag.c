@@ -347,14 +347,14 @@ int ast_jtag_init(void)
 		printk(KERN_WARNING "%s: register HAL HW module failed\n", AST_JTAG_DRIVER_NAME);
 		return ast_jtag_hal_id;
 	}
-   
+	printk(KERN_WARNING "1111111111111111111111\n");
 	ast_jtag_v_add = ioremap_nocache(AST_JTAG_REG_BASE, 0x40);
 	if (!ast_jtag_v_add) {
 		printk(KERN_WARNING "%s: ioremap failed\n", AST_JTAG_DRIVER_NAME);
     unregister_hw_hal_module(EDEV_TYPE_JTAG, ast_jtag_hal_id);
 		return -ENOMEM;
 	}
-
+	printk(KERN_WARNING "2222222222222222222222222222\n");
   #ifdef SOC_AST2300
 	 ast_gpio_v_add = ioremap_nocache(AST_GPIO_REG_BASE, 0x40);
 	 if (!ast_gpio_v_add) {
