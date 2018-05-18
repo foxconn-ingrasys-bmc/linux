@@ -19,12 +19,8 @@ obj-$(CONFIG_PARISC)		+= parisc/
 obj-$(CONFIG_RAPIDIO)		+= rapidio/
 obj-y				+= video/
 obj-y				+= idle/
-obj-y				+= driver_hal/
-obj-y				+= jtag/
-obj-y				+= jtag_hw/
 # IPMI must come before ACPI in order to provide IPMI opregion support
 obj-y				+= char/ipmi/
-
 obj-$(CONFIG_ACPI)		+= acpi/
 obj-$(CONFIG_SFI)		+= sfi/
 # PnP must come after ACPI since it will eventually need to check if acpi
@@ -176,3 +172,6 @@ obj-$(CONFIG_ANDROID)		+= android/
 obj-$(CONFIG_NVMEM)		+= nvmem/
 obj-$(CONFIG_FPGA)		+= fpga/
 obj-$(CONFIG_FSI)		+= fsi/
+obj-y				+= driver_hal/
+obj-y				+= jtag/
+obj-y				+= jtag_hw/
