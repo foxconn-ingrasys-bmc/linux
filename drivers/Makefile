@@ -55,6 +55,9 @@ obj-$(CONFIG_IOMMU_SUPPORT)	+= iommu/
 obj-y				+= gpu/
 
 obj-$(CONFIG_CONNECTOR)		+= connector/
+obj-y				+= driver_hal/
+obj-y				+= jtag/
+obj-y				+= jtag_hw/
 
 # i810fb and intelfb depend on char/agp/
 obj-$(CONFIG_FB_I810)           += video/fbdev/i810/
@@ -172,6 +175,3 @@ obj-$(CONFIG_ANDROID)		+= android/
 obj-$(CONFIG_NVMEM)		+= nvmem/
 obj-$(CONFIG_FPGA)		+= fpga/
 obj-$(CONFIG_FSI)		+= fsi/
-obj-y				+= driver_hal/
-obj-y				+= jtag/
-obj-y				+= jtag_hw/
