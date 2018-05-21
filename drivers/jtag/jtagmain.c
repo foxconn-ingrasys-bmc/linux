@@ -361,11 +361,11 @@ int __init jtag_init(void)
 		return ret;
 	}
 	
-	jtag_class = class_create(THIS_MODULE, "jtag");
+	jtag_class = class_create(THIS_MODULE, JTAG_DEV_NAME);
 	if (IS_ERR(jtag_class))
 		return PTR_ERR(jtag_class);
 	jtag_class->devnode = jtag_devno;
-	device_create(jtag_class, NULL, jtag_devno, NULL, "jtag0");
+	device_create(jtag_class, NULL, MKDEV(JTAG_MAJOR, JTAG_MINOR), NULL, "jtag0");
 
 	if ((ret = register_core_hal_module (&jtag_core_hal)) < 0)
 	{
