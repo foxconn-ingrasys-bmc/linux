@@ -334,7 +334,7 @@ static int __init jtag_class_init(void)
 	return 0;
 }
 
-postcore_initcall(tty_class_init);
+postcore_initcall(jtag_class_init);
 
 /*
  * JTGA driver init function
