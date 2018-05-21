@@ -371,6 +371,8 @@ int __init jtag_init(void)
 		ret = -ENODEV;
 		return ret;
 	}
+	
+	device_create(jtag_class, NULL, jtag_devno, NULL, "jtag0");
 
 	if ((ret = register_core_hal_module (&jtag_core_hal)) < 0)
 	{
@@ -380,7 +382,6 @@ int __init jtag_init(void)
 		ret = -EINVAL;
 		return ret;
 	}
-	device_create(jtag_class, NULL, jtag_devno, NULL, "jtag");
 
   // alloc write/read/other buffer
   memset (&JTAG_device_information, 0, sizeof(JTAG_DEVICE_INFO));
