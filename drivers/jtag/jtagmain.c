@@ -365,7 +365,7 @@ int __init jtag_init(void)
 	if (IS_ERR(jtag_class))
 		return PTR_ERR(jtag_class);
 	jtag_class->devnode = jtag_devno;
-	device_create(jtag_class, NULL, jtag_devno, jtag_cdev, "jtag0");
+//	device_create(jtag_class, NULL, jtag_devno, jtag_cdev, "jtag0");
 
 	if ((ret = register_core_hal_module (&jtag_core_hal)) < 0)
 	{
