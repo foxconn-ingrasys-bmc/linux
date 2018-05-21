@@ -347,14 +347,13 @@ int ast_jtag_init(void)
 		printk(KERN_WARNING "%s: register HAL HW module failed\n", AST_JTAG_DRIVER_NAME);
 		return ast_jtag_hal_id;
 	}
-	printk(KERN_WARNING "1111111111111111111111\n");
+
 	ast_jtag_v_add = ioremap_nocache(AST_JTAG_REG_BASE, 0x40);
 	if (!ast_jtag_v_add) {
 		printk(KERN_WARNING "%s: ioremap failed\n", AST_JTAG_DRIVER_NAME);
     unregister_hw_hal_module(EDEV_TYPE_JTAG, ast_jtag_hal_id);
 		return -ENOMEM;
 	}
-	printk(KERN_WARNING "2222222222222222222222222222\n");
   
   //memset (&JTAG_device_information, 0, sizeof(JTAG_DEVICE_INFO));
 //  *(volatile u32 *)(IO_ADDRESS(0x1E6E2000)) = (0x1688A8A8); //Unlock SCU register
@@ -368,13 +367,13 @@ int ast_jtag_init(void)
   barrier();
   iowrite32(SOFTWARE_MODE_ENABLE | SOFTWARE_TDIO_BIT, (void * __iomem)ast_jtag_v_add + JTAG_STATUS);
   barrier();
-  printk(KERN_WARNING "333333333333333333333333333333\n");
+
   reg = ioread32((void * __iomem)ast_jtag_v_add + JTAG_INTERRUPT);
   reg = reg & ~(AST_JTAG_INTR_STATUS_MASK | AST_JTAG_INTR_ENABLE_MASK);
   iowrite32( reg, (void * __iomem)ast_jtag_v_add + JTAG_INTERRUPT); //Disable Interrupt
   barrier();
   mdelay(1); //let last data output.
-  printk(KERN_WARNING "44444444444444444444444444444444\n");
+
   ast_jtag_reset();
 
   return 0;

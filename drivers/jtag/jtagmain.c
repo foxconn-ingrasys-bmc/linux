@@ -21,6 +21,7 @@
 #include <linux/pci.h>
 #include <linux/delay.h>
 #include <linux/cdev.h>
+#include <linux/device.h>
 #include <asm/io.h>
 //#include "helper.h"
 #include "../driver_hal/driver_hal.h"
@@ -52,6 +53,7 @@ unsigned long *JTAG_other_buffer= NULL;
 
 JTAG_DEVICE_INFO	JTAG_device_information;
 
+struct class *jtag_class;
 
 int register_jtag_hw_device_ops (jtag_hw_device_operations_t *pjhwd)
 {
@@ -323,6 +325,16 @@ static core_hal_t jtag_core_hal = {
 	.pcore_funcs           = (void *)&jtag_core_funcs
 };
 
+static int __init jtag_class_init(void)
+{
+	jtag_class = class_create(THIS_MODULE, "jtag");
+	if (IS_ERR(jtag_class))
+		return PTR_ERR(jtag_class);
+	jtag_class->devnode = jtag_devno;
+	return 0;
+}
+
+postcore_initcall(tty_class_init);
 
 /*
  * JTGA driver init function
@@ -354,6 +366,7 @@ int __init jtag_init(void)
 	{
 		cdev_del (jtag_cdev);
 		unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
+		device_destroy(jtag_class, jtag_devno);
 		printk	(KERN_ERR "failed to add <%s> char device\n", JTAG_DEV_NAME);
 		ret = -ENODEV;
 		return ret;
@@ -367,6 +380,7 @@ int __init jtag_init(void)
 		ret = -EINVAL;
 		return ret;
 	}
+	device_create(jtag_class, NULL, jtag_devno, NULL, "jtag");
 
   // alloc write/read/other buffer
   memset (&JTAG_device_information, 0, sizeof(JTAG_DEVICE_INFO));
@@ -416,6 +430,7 @@ void __exit jtag_exit(void)
 {
 	unregister_core_hal_module (EDEV_TYPE_JTAG);
 	unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
+	device_destroy(jtag_class, jtag_devno);
 
 	if (NULL != jtag_cdev)
 	{
