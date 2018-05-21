@@ -372,7 +372,7 @@ int __init jtag_init(void)
 		return ret;
 	}
 	
-	device_create(jtag_class, NULL, jtag_devno, NULL, "jtag0");
+//	device_create(jtag_class, NULL, jtag_devno, NULL, "jtag0");
 
 	if ((ret = register_core_hal_module (&jtag_core_hal)) < 0)
 	{
