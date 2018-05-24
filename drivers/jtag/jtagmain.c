@@ -338,13 +338,13 @@ int __init jtag_init(void)
 	   return ret;
 	}
    
-	jtag_cdev = cdev_alloc ();
-	if (!jtag_cdev)
-	{
-	   unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
-	   printk (KERN_ERR "%s: failed to allocate jtag cdev structure\n", JTAG_DEV_NAME);
-	   return -1;
-	}
+//	jtag_cdev = cdev_alloc ();
+//	if (!jtag_cdev)
+//	{
+//	   unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
+//	   printk (KERN_ERR "%s: failed to allocate jtag cdev structure\n", JTAG_DEV_NAME);
+//	   return -1;
+//	}
    
 	cdev_init (jtag_cdev, &jtag_ops);
 	
