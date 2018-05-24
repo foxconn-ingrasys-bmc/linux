@@ -14,7 +14,6 @@
  * File name: jtagmain.c
  * This driver provides common layer, independent of the hardware, for the JTAG driver.
  */
-
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/poll.h>
@@ -351,7 +350,7 @@ int __init jtag_init(void)
 	
 	jtag_cdev->owner = THIS_MODULE;
 	
-	if ((ret = cdev_add (jtag_cdev, jtag_devno, JTAG_MAX_DEVICES)) < 0)
+	if ((ret = cdev_add (jtag_cdev, jtag_devno, JTAG_MAX_DEVICES, "/dev/jtag")) < 0)
 	{
 		cdev_del (jtag_cdev);
 		unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
@@ -360,12 +359,12 @@ int __init jtag_init(void)
 		ret = -ENODEV;
 		return ret;
 	}
-	
+
 	jtag_class = class_create(THIS_MODULE, JTAG_DEV_NAME);
 	if (IS_ERR(jtag_class))
 		return PTR_ERR(jtag_class);
 	jtag_class->devnode = jtag_devno;
-//	device_create(jtag_class, NULL, jtag_devno, jtag_cdev, "jtag0");
+	device_create(jtag_class, NULL, jtag_devno, NULL, "jtag");
 
 	if ((ret = register_core_hal_module (&jtag_core_hal)) < 0)
 	{
