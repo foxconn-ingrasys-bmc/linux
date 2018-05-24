@@ -37,7 +37,7 @@
 #define JTAG_MAJOR           175
 #define JTAG_MINOR	    	   0
 #define JTAG_MAX_DEVICES     255
-#define JTAG_DEV_NAME        "jtag"
+#define JTAG_DEV_NAME        "/dev/jtag"
 
 #define AST_JTAG_BUFFER_SIZE 0x10000
 #define AST_FW_BUFFER_SIZE  0x80000  //512KB
@@ -350,7 +350,7 @@ int __init jtag_init(void)
 	
 	jtag_cdev->owner = THIS_MODULE;
 	
-	if ((ret = cdev_add (jtag_cdev, jtag_devno, JTAG_MAX_DEVICES, "/dev/jtag")) < 0)
+	if ((ret = cdev_add (jtag_cdev, jtag_devno, JTAG_MAX_DEVICES)) < 0)
 	{
 		cdev_del (jtag_cdev);
 		unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
@@ -360,11 +360,11 @@ int __init jtag_init(void)
 		return ret;
 	}
 
-	jtag_class = class_create(THIS_MODULE, JTAG_DEV_NAME);
+	jtag_class = class_create(THIS_MODULE, "jtag");
 	if (IS_ERR(jtag_class))
 		return PTR_ERR(jtag_class);
 	jtag_class->devnode = jtag_devno;
-	device_create(jtag_class, NULL, jtag_devno, NULL, "jtag");
+	device_create(jtag_class, NULL, jtag_devno, NULL, "jtag0");
 
 	if ((ret = register_core_hal_module (&jtag_core_hal)) < 0)
 	{
