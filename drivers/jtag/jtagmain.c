@@ -332,7 +332,8 @@ static core_hal_t jtag_core_hal = {
 int __init jtag_init(void)
 {
 	int ret =0 ;
-  
+  	
+	printk("willen itag_init\n");
   /* jtag device initialization */ 
 	if ((ret = register_chrdev_region (jtag_devno, JTAG_MAX_DEVICES, JTAG_DEV_NAME)) < 0)
 	{
@@ -366,7 +367,7 @@ int __init jtag_init(void)
 	if (IS_ERR(jtag_class))
 		return PTR_ERR(jtag_class);
 	jtag_class->devnode = jtag_devno;
-	device_create(jtag_class, NULL, jtag_devno, NULL, "jtag");
+	//device_create(jtag_class, NULL, jtag_devno, NULL, "jtag");
 
 	if ((ret = register_core_hal_module (&jtag_core_hal)) < 0)
 	{
