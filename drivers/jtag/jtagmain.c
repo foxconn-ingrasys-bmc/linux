@@ -350,7 +350,7 @@ int __init jtag_init(void)
 	
 	jtag_cdev->owner = THIS_MODULE;
 	
-	if ((ret = cdev_add (jtag_cdev, jtag_devno, JTAG_MAX_DEVICES, "/dev/jtag")) < 0)
+	if ((ret = cdev_add (jtag_cdev, jtag_devno, JTAG_MAX_DEVICES)) < 0)
 	{
 		cdev_del (jtag_cdev);
 		unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
