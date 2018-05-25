@@ -42,7 +42,7 @@
 #define AST_JTAG_BUFFER_SIZE 0x10000
 #define AST_FW_BUFFER_SIZE  0x80000  //512KB
 
-static struct cdev *jtag_cdev;
+static struct cdev jtag_cdev;
 static dev_t jtag_devno = MKDEV(JTAG_MAJOR, JTAG_MINOR);
 static jtag_hw_device_operations_t *pjhwd_ops = NULL;
 
@@ -346,13 +346,13 @@ int __init jtag_init(void)
 //	   return -1;
 //	}
    
-	cdev_init (jtag_cdev, &jtag_ops);
+	cdev_init (&jtag_cdev, &jtag_ops);
 	
 	jtag_cdev->owner = THIS_MODULE;
 	
-	if ((ret = cdev_add (jtag_cdev, jtag_devno, JTAG_MAX_DEVICES)) < 0)
+	if ((ret = cdev_add (&jtag_cdev, jtag_devno, JTAG_MAX_DEVICES)) < 0)
 	{
-		cdev_del (jtag_cdev);
+		cdev_del (&jtag_cdev);
 		unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
 		device_destroy(jtag_class, jtag_devno);
 		printk	(KERN_ERR "failed to add <%s> char device\n", JTAG_DEV_NAME);
@@ -364,7 +364,7 @@ int __init jtag_init(void)
 	if (IS_ERR(jtag_class))
 		return PTR_ERR(jtag_class);
 	jtag_class->devnode = jtag_devno;
-	device_create(jtag_class, NULL, jtag_devno, NULL, "jtag0");
+	device_create(jtag_class, NULL, jtag_devno, NULL, "jtag");
 
 	if ((ret = register_core_hal_module (&jtag_core_hal)) < 0)
 	{
@@ -425,9 +425,9 @@ void __exit jtag_exit(void)
 	unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
 	device_destroy(jtag_class, jtag_devno);
 
-	if (NULL != jtag_cdev)
+	if (jtag_cdev)
 	{
-		cdev_del (jtag_cdev);
+		cdev_del (&jtag_cdev);
 	}
 	
 	kfree(JTAG_read_buffer);
