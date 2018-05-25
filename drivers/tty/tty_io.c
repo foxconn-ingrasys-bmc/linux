@@ -3572,7 +3572,7 @@ void tty_default_fops(struct file_operations *fops)
 void __init console_init(void)
 {
 	initcall_t *call;
-
+	printk("willen console_init\n");
 	/* Setup the default TTY line discipline. */
 	n_tty_init();
 
@@ -3599,6 +3599,7 @@ static char *tty_devnode(struct device *dev, umode_t *mode)
 
 static int __init tty_class_init(void)
 {
+	printk("willen tty_class_init\n");
 	tty_class = class_create(THIS_MODULE, "tty");
 	if (IS_ERR(tty_class))
 		return PTR_ERR(tty_class);
