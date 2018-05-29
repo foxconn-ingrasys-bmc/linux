@@ -352,7 +352,7 @@ int __init jtag_init(void)
 		printk("willen alloc_chrdev_region failed\n");
 		goto error;
 	}
-
+	chrdev_jtag_major = MAJOR(jtag_dev);
 	cdev_init(&chrdev_jtag_cdev, &jtag_ops);
  	cdev_ret = cdev_add(&chrdev_jtag_cdev, jtag_dev, num_of_dev);
 	if (cdev_ret)
