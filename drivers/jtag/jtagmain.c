@@ -47,10 +47,9 @@
 
 //static struct cdev *jtag_cdev;
 //static dev_t jtag_devno = MKDEV(JTAG_MAJOR, JTAG_MINOR);
-static jtag_hw_device_operations_t *pjhwd_ops = NULL;
+//static jtag_hw_device_operations_t *pjhwd_ops = NULL;
+
 static unsigned int chrdev_jtag_major = 0;
-
-
 static struct cdev chrdev_jtag_cdev;
 static struct class *chrdev_jtag_class = NULL;
 static unsigned int num_of_dev = 1;
@@ -180,12 +179,12 @@ static long jtag_ioctl(struct file *file,unsigned int cmd, unsigned long arg)
 static int jtag_ioctl(struct inode *inode, struct file *file,unsigned int cmd, unsigned long arg)
 #endif
 {
+	int ret = 0;
 #if 0
 	struct jtag_dev *pdev = (struct jtag_dev*) file->private_data;
 	unsigned long	idcode;
 	unsigned long	usercode; //wn023
 	IO_ACCESS_DATA Kernal_IO_Data;
-	int ret = 0;
 
 #ifdef INTEL_JTAG_ADDITIONS
 	/* Handle the following IOCTLs first because of the straight user data passed in */
@@ -431,7 +430,7 @@ out_no_mem:
 void __exit jtag_exit(void)
 {
 	printk("willen jtag_exit\n");
-	dev_t jtag_dev = MKDEV(chrdev_jtag_major, 0);
+	//dev_t jtag_dev = MKDEV(chrdev_jtag_major, 0);
  
  	device_destroy(chrdev_jtag_class, jtag_dev);
         class_destroy(chrdev_jtag_class);
