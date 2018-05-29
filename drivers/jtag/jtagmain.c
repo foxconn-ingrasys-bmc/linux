@@ -342,13 +342,14 @@ static jtag_core_funcs_t jtag_core_funcs = {
  */
 int __init jtag_init(void)
 {
+	dev_t jtag_dev = MKDEV(chrdev_jtag_major, 0);
+
 	int alloc_ret = 0;
 	int cdev_ret = 0;
 	int ret = -1;
 
 	printk("willen jtag_init\n");
 
-	dev_t jtag_dev = MKDEV(chrdev_jtag_major, 0);
 	alloc_ret = alloc_chrdev_region(&jtag_dev, 0, num_of_dev, JTAG_DRIVER_NAME);
 	if (alloc_ret)
 	{
@@ -429,8 +430,9 @@ out_no_mem:
  */
 void __exit jtag_exit(void)
 {
+	dev_t jtag_dev = MKDEV(chrdev_jtag_major, 0);
+	
 	printk("willen jtag_exit\n");
-	//dev_t jtag_dev = MKDEV(chrdev_jtag_major, 0);
  
  	device_destroy(chrdev_jtag_class, jtag_dev);
         class_destroy(chrdev_jtag_class);
