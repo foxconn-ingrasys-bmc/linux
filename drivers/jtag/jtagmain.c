@@ -45,8 +45,8 @@
 #define AST_JTAG_BUFFER_SIZE 0x10000
 #define AST_FW_BUFFER_SIZE  0x80000  //512KB
 
-static struct cdev *jtag_cdev;
-static dev_t jtag_devno = MKDEV(JTAG_MAJOR, JTAG_MINOR);
+//static struct cdev *jtag_cdev;
+//static dev_t jtag_devno = MKDEV(JTAG_MAJOR, JTAG_MINOR);
 static jtag_hw_device_operations_t *pjhwd_ops = NULL;
 static unsigned int chrdev_jtag_major = 0;
 
@@ -312,7 +312,7 @@ static struct file_operations jtag_ops = {
  	.read = NULL,
 	.write = NULL,
 #ifdef USE_UNLOCKED_IOCTL
-	.unlocked_ioctl: jtag_ioctl,
+	.unlocked_ioctl = jtag_ioctl,
 #else
 	.ioctl = jtag_ioctl,
 #endif
@@ -325,14 +325,14 @@ static jtag_core_funcs_t jtag_core_funcs = {
 	.get_jtag_core_data = NULL,
 };
 
-static core_hal_t jtag_core_hal = {
-	.owner		             = THIS_MODULE,
-	.name		               = "JTAG CORE",
-	.dev_type              = EDEV_TYPE_JTAG,
-	.register_hal_module   = register_jtag_hal_module,
-	.unregister_hal_module = unregister_jtag_hal_module,
-	.pcore_funcs           = (void *)&jtag_core_funcs
-};
+//static core_hal_t jtag_core_hal = {
+//	.owner		             = THIS_MODULE,
+//	.name		               = "JTAG CORE",
+//	.dev_type              = EDEV_TYPE_JTAG,
+//	.register_hal_module   = register_jtag_hal_module,
+//	.unregister_hal_module = unregister_jtag_hal_module,
+//	.pcore_funcs           = (void *)&jtag_core_funcs
+//};
 
 /*
  * JTGA driver init function
@@ -353,7 +353,7 @@ int __init jtag_init(void)
 		goto error;
 	}
 
-	cdev_init(&chrdev_jtag_cdev, &jtag_fops);
+	cdev_init(&chrdev_jtag_cdev, &jtag_ops);
  	cdev_ret = cdev_add(&chrdev_jtag_cdev, jtag_dev, num_of_dev);
 	if (cdev_ret)
 	{
@@ -427,7 +427,7 @@ out_no_mem:
 void __exit jtag_exit(void)
 {
 	printk("willen jtag_exit\n");
-	dev_t jtag_dev = MKDEV(chrdev_sys_major, 0);
+	dev_t jtag_dev = MKDEV(chrdev_jtag_major, 0);
  
  	device_destroy(chrdev_jtag_class, jtag_dev);
         class_destroy(chrdev_jtag_class);
