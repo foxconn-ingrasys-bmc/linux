@@ -174,4 +174,4 @@ obj-$(CONFIG_FPGA)		+= fpga/
 obj-$(CONFIG_FSI)		+= fsi/
 obj-y				+= driver_hal/
 obj-y				+= jtag/
-#obj-y				+= jtag_hw/
+obj-y				+= jtag_hw/

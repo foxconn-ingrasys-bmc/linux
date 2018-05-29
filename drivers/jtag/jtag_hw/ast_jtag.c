@@ -24,9 +24,9 @@
 #include <asm/uaccess.h>
 #include <linux/delay.h>
 
-//#include "driver_hal.h"
-#include "jtag.h"
-#include "jtag_ioctl.h"
+#include "../driver_hal/driver_hal.h"
+#include "../jtag/jtag.h"
+#include "../jtag/jtag_ioctl.h"
 #include "ast_jtag.h"
 
 
@@ -124,8 +124,8 @@ void jtag_sir(unsigned short bits, unsigned int tdi){
  * Read data back and send instruction
  * Note: Connect a GPIO(G5) to replace TDO, and read it to get data back from device. A workaround for AST2300/AST1050.
  */
-void jtag_sdr(unsigned short bits, unsigned int *TDI,unsigned int *TDO){
-	
+void jtag_sdr(unsigned short bits, unsigned int *TDI,unsigned int *TDO)
+{	
 	unsigned int index = 0;
 	u32 shift_bits =0;
 	u32 dr_data;
@@ -337,84 +337,94 @@ int ast_jtag_init(void)
 {
 	int status;
 	uint32_t reg;
-
 	extern int jtag_core_loaded;
 	if (!jtag_core_loaded)
 			return -1;
 
-	//ast_jtag_hal_id = register_hw_hal_module(&ast_jtag_hw_hal, (void **) &jtag_core_ops);
-	//if (ast_jtag_hal_id < 0) {
-	//	printk(KERN_WARNING "%s: register HAL HW module failed\n", AST_JTAG_DRIVER_NAME);
-	//	return ast_jtag_hal_id;
-	//}
+	printk("willen ast_jtag_init\n");
+
+	ast_jtag_hal_id = register_hw_hal_module(&ast_jtag_hw_hal, (void **) &jtag_core_ops);
+	if (ast_jtag_hal_id < 0) 
+	{
+		printk("willen %s: register HAL HW module failed\n", AST_JTAG_DRIVER_NAME);
+		return ast_jtag_hal_id;
+	}
    
 	ast_jtag_v_add = ioremap_nocache(AST_JTAG_REG_BASE, 0x40);
-	if (!ast_jtag_v_add) {
-		printk(KERN_WARNING "%s: ioremap failed\n", AST_JTAG_DRIVER_NAME);
-    	//	unregister_hw_hal_module(EDEV_TYPE_JTAG, ast_jtag_hal_id);
+	if (!ast_jtag_v_add)
+	{
+		printk("willen %s: ioremap failed\n", AST_JTAG_DRIVER_NAME);
+    		unregister_hw_hal_module(EDEV_TYPE_JTAG, ast_jtag_hal_id);
 		return -ENOMEM;
 	}
 
-  #ifdef SOC_AST2300
-	 ast_gpio_v_add = ioremap_nocache(AST_GPIO_REG_BASE, 0x40);
-	 if (!ast_gpio_v_add) {
-	 	printk(KERN_WARNING "%s: AST_GPIO_REG_BASE ioremap failed\n", AST_JTAG_DRIVER_NAME);
-	 	//unregister_hw_hal_module(EDEV_TYPE_JTAG, ast_jtag_hal_id);
-	 	return -ENOMEM;
-	 }
-	#endif
+//#ifdef SOC_AST2300
+//	 ast_gpio_v_add = ioremap_nocache(AST_GPIO_REG_BASE, 0x40);
+//	 if (!ast_gpio_v_add) {
+//	 	printk(KERN_WARNING "%s: AST_GPIO_REG_BASE ioremap failed\n", AST_JTAG_DRIVER_NAME);
+//	 	unregister_hw_hal_module(EDEV_TYPE_JTAG, ast_jtag_hal_id);
+//	 	return -ENOMEM;
+//	 }
+//#endif
   
-  //memset (&JTAG_device_information, 0, sizeof(JTAG_DEVICE_INFO));
-  *(volatile u32 *)(IO_ADDRESS(0x1E6E2000)) = (0x1688A8A8); //Unlock SCU register
+	memset (&JTAG_device_information, 0, sizeof(JTAG_DEVICE_INFO));
+//  	*(volatile u32 *)(IO_ADDRESS(0x1E6E2000)) = (0x1688A8A8); //Unlock SCU register
 
-  #ifdef SOC_AST2300
-   status = *(volatile u32 *)(IO_ADDRESS(0x1E6E2084));
-   if(status & (0x1 << 5))
-   	printk(KERN_WARNING "%s: Watchdog WDTRST2 output function\n", AST_JTAG_DRIVER_NAME);
-   else
-   {
-   	reg = ioread32((void * __iomem)ast_gpio_v_add + GPIO_DIRECTION);
-   	reg = reg & ~(GPIO_G5_BIT);
-   	iowrite32(reg, (void * __iomem)ast_gpio_v_add + GPIO_DIRECTION);
-   	barrier();
-   }
-  #endif
-  status = *(volatile u32 *)(IO_ADDRESS(0x1E6E2004));
-  *(volatile u32 *)(IO_ADDRESS(0x1E6E2004)) = status &= ~(0x00400000); //Set JTAG Master Enable in SCU Reset Register
-  *(volatile u32 *)(IO_ADDRESS(0x1E6E2000)) = 0; //Lock SCU register
+//#ifdef SOC_AST2300
+//   	status = *(volatile u32 *)(IO_ADDRESS(0x1E6E2084));
+//   	if(status & (0x1 << 5))
+//   		printk(KERN_WARNING "%s: Watchdog WDTRST2 output function\n", AST_JTAG_DRIVER_NAME);
+//   	else
+//   	{
+//   		reg = ioread32((void * __iomem)ast_gpio_v_add + GPIO_DIRECTION);
+//   		reg = reg & ~(GPIO_G5_BIT);
+//   		iowrite32(reg, (void * __iomem)ast_gpio_v_add + GPIO_DIRECTION);
+//   		barrier();
+//	}
+//#endif
 
-  iowrite32(AST_JTAG_CTRL_ENABLE, (void * __iomem)ast_jtag_v_add + JTAG_CONTROL); // Enable Engine
-  barrier();
-  iowrite32(SOFTWARE_MODE_ENABLE | SOFTWARE_TDIO_BIT, (void * __iomem)ast_jtag_v_add + JTAG_STATUS);
-  barrier();
+  	iowrite32(SCU_KEY, (void * __iomem)AST_SCU_REG_BASE);
+	reg = ioread32((void * __iomem)AST_SCU_REG_BASE + SCU_RESET_CTRL);
+  	reg = reg & ~(SCU_RESET_MCTP);
+	iowrite32( reg, (void * __iomem)AST_SCU_REG_BASE + SCU_RESET_CTRL);
+  	iowrite32( reg, (void * __iomem)AST_SCU_REG_BASE);
+//  	status = *(volatile u32 *)(IO_ADDRESS(0x1E6E2004));
+//  	*(volatile u32 *)(IO_ADDRESS(0x1E6E2004)) = status &= ~(0x00400000); //Set JTAG Master Enable in SCU Reset Register
+//  	*(volatile u32 *)(IO_ADDRESS(0x1E6E2000)) = 0; //Lock SCU register
+
+  	iowrite32(AST_JTAG_CTRL_ENABLE, (void * __iomem)ast_jtag_v_add + JTAG_CONTROL); // Enable Engine
+  	barrier();
+  	iowrite32(SOFTWARE_MODE_ENABLE | SOFTWARE_TDIO_BIT, (void * __iomem)ast_jtag_v_add + JTAG_STATUS);
+  	barrier();
+
+  	reg = ioread32((void * __iomem)ast_jtag_v_add + JTAG_INTERRUPT);
+  	reg = reg & ~(AST_JTAG_INTR_STATUS_MASK | AST_JTAG_INTR_ENABLE_MASK);
+  	iowrite32( reg, (void * __iomem)ast_jtag_v_add + JTAG_INTERRUPT); //Disable Interrupt
+  	barrier();
+  	mdelay(1); //let last data output.
   
-  reg = ioread32((void * __iomem)ast_jtag_v_add + JTAG_INTERRUPT);
-  reg = reg & ~(AST_JTAG_INTR_STATUS_MASK | AST_JTAG_INTR_ENABLE_MASK);
-  iowrite32( reg, (void * __iomem)ast_jtag_v_add + JTAG_INTERRUPT); //Disable Interrupt
-  barrier();
-  mdelay(1); //let last data output.
-  
-  ast_jtag_reset();
+  	ast_jtag_reset();
 
-  return 0;
+  	return 0;
 }
 
 void ast_jtag_exit(void)
 {
-  iowrite32(AST_JTAG_CTRL_ENG_OUT_DIS, (void * __iomem)ast_jtag_v_add + JTAG_CONTROL); // Disable Engine
-  barrier();
-  
-  #ifdef SOC_AST2300
-   iounmap (ast_gpio_v_add);
-  #endif
-  iounmap (ast_jtag_v_add);
-//  unregister_hw_hal_module(EDEV_TYPE_JTAG, ast_jtag_hal_id);
+	printk("willen ast_jtag_exit\n");
+  	iowrite32(AST_JTAG_CTRL_ENG_OUT_DIS, (void * __iomem)ast_jtag_v_add + JTAG_CONTROL); // Disable Engine
+  	barrier();
+  	
+//#ifdef SOC_AST2300
+//   	iounmap (ast_gpio_v_add);
+//#endif
+ 	iounmap (ast_jtag_v_add);
+  	unregister_hw_hal_module(EDEV_TYPE_JTAG, ast_jtag_hal_id);
 
-#ifdef INTEL_JTAG_ADDITIONS
-  intel_jtag_exit();
-#endif
+//#ifdef INTEL_JTAG_ADDITIONS
+//  	intel_jtag_exit();
+//#endif
 
-  return;
+	return;
 }
 
 EXPORT_SYMBOL(g_is_Support_LoopFunc);
