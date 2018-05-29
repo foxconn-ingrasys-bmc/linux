@@ -463,7 +463,7 @@ module_exit(jtag_exit);
 MODULE_AUTHOR("American Megatrends Inc.");
 MODULE_DESCRIPTION("JTAG Common Driver");
 MODULE_LICENSE ("GPL");
-#if 0
+
 int jtag_core_loaded =1;
 EXPORT_SYMBOL(jtag_core_loaded);
-#endif
+
