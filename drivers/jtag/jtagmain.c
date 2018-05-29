@@ -61,7 +61,7 @@ unsigned int *JTAG_write_buffer= NULL;
 unsigned long *JTAG_other_buffer= NULL;
 
 JTAG_DEVICE_INFO	JTAG_device_information;
-
+#if 0
 struct class *jtag_class;
 
 int register_jtag_hw_device_ops (jtag_hw_device_operations_t *pjhwd)
@@ -125,10 +125,11 @@ unsigned int* get_jtag_read_buffer(void)
 {
 	return JTAG_read_buffer;
 }
-
+#endif
 
 static int jtag_open(struct inode *inode, struct file *file)
 {
+#if 0
 	unsigned int minor = iminor(inode);
 	struct jtag_hal *pjtag_hal;
 	struct jtag_dev *pdev;
@@ -153,13 +154,14 @@ static int jtag_open(struct inode *inode, struct file *file)
 
 	pdev->pjtag_hal = pjtag_hal;
 	file->private_data = pdev;
-
+#endif
 	return 0;
 }
 
 
 static int jtag_release(struct inode *inode, struct file *file)
 {
+#if 0
 	int ret;
 	unsigned char open_count;
   struct jtag_dev *pdev = (struct jtag_dev*)file->private_data;
@@ -168,6 +170,7 @@ static int jtag_release(struct inode *inode, struct file *file)
   ret = hw_close (EDEV_TYPE_JTAG, iminor(inode), &open_count);
   if(ret) { return -1; }
 	kfree (pdev);
+#endif
 	return 0;
 }
 
@@ -177,6 +180,7 @@ static long jtag_ioctl(struct file *file,unsigned int cmd, unsigned long arg)
 static int jtag_ioctl(struct inode *inode, struct file *file,unsigned int cmd, unsigned long arg)
 #endif
 {
+#if 0
 	struct jtag_dev *pdev = (struct jtag_dev*) file->private_data;
 	unsigned long	idcode;
 	unsigned long	usercode; //wn023
@@ -301,7 +305,7 @@ static int jtag_ioctl(struct inode *inode, struct file *file,unsigned int cmd, u
 			printk ( "Invalid JTAG Function\n");
 			return -EINVAL;
 	}
-
+#endif
   return ret;
 }
 
@@ -320,11 +324,11 @@ static struct file_operations jtag_ops = {
 	.release = jtag_release,
 };
 
-
+#if 0
 static jtag_core_funcs_t jtag_core_funcs = {
 	.get_jtag_core_data = NULL,
 };
-
+#endif
 //static core_hal_t jtag_core_hal = {
 //	.owner		             = THIS_MODULE,
 //	.name		               = "JTAG CORE",
@@ -368,7 +372,7 @@ int __init jtag_init(void)
 		goto error;
 	}
 
-	device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,"chrdev_jtag");
+	device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,"ast-jtag");
 
 	printk("willen %s driver(major number %d) installed.\n", JTAG_DRIVER_NAME, chrdev_jtag_major);
  	return 0;
@@ -445,19 +449,20 @@ void __exit jtag_exit(void)
 //	printk("willen Unregistered the JTAG Driver Sucessfully\n");
 	return;	
 }
-
+#if 0
 EXPORT_SYMBOL(JTAG_device_information);
 EXPORT_SYMBOL(register_jtag_hw_device_ops);
 EXPORT_SYMBOL(unregister_jtag_hw_device_ops);
 EXPORT_SYMBOL(get_jtag_write_buffer);
 EXPORT_SYMBOL(get_jtag_read_buffer);
-
+#endif
 module_init(jtag_init);
 module_exit(jtag_exit);
 
 MODULE_AUTHOR("American Megatrends Inc.");
 MODULE_DESCRIPTION("JTAG Common Driver");
 MODULE_LICENSE ("GPL");
-
+#if 0
 int jtag_core_loaded =1;
 EXPORT_SYMBOL(jtag_core_loaded);
+#endif
