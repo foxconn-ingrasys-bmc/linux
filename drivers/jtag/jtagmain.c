@@ -128,19 +128,20 @@ unsigned int* get_jtag_read_buffer(void)
 
 static int jtag_open(struct inode *inode, struct file *file)
 {
-#if 0
 	unsigned int minor = iminor(inode);
-	struct jtag_hal *pjtag_hal;
+	//struct jtag_hal *pjtag_hal;
 	struct jtag_dev *pdev;
 	hw_info_t jtag_hw_info;
 	unsigned char open_count;
 	int ret;
 
+	printk("willen jtag_open\n");
+
 	ret = hw_open (EDEV_TYPE_JTAG, minor,&open_count, &jtag_hw_info);
 	if (ret)
 		return -ENXIO;
 
-	pjtag_hal = jtag_hw_info.pdrv_data;
+	//pjtag_hal = jtag_hw_info.pdrv_data;
 
 	pdev = (struct jtag_dev*)kmalloc(sizeof(struct jtag_dev), GFP_KERNEL);
 	
@@ -151,25 +152,25 @@ static int jtag_open(struct inode *inode, struct file *file)
 		return -ENOMEM;
 	}
 
-	pdev->pjtag_hal = pjtag_hal;
+	//pdev->pjtag_hal = pjtag_hal;
 	file->private_data = pdev;
-#endif
+
 	return 0;
 }
 
 
 static int jtag_release(struct inode *inode, struct file *file)
 {
-#if 0
 	int ret;
 	unsigned char open_count;
-  struct jtag_dev *pdev = (struct jtag_dev*)file->private_data;
-	pdev->pjtag_hal = NULL;
-  file->private_data = NULL;
-  ret = hw_close (EDEV_TYPE_JTAG, iminor(inode), &open_count);
-  if(ret) { return -1; }
-	kfree (pdev);
-#endif
+  	struct jtag_dev *pdev = (struct jtag_dev*)file->private_data;
+	printk("willen jtag_release\n");
+	//pdev->pjtag_hal = NULL;
+  	file->private_data = NULL;
+  	ret = hw_close (EDEV_TYPE_JTAG, iminor(inode), &open_count);
+  	if(ret) { return -1; }
+		kfree (pdev);
+
 	return 0;
 }
 
@@ -342,7 +343,7 @@ static jtag_core_funcs_t jtag_core_funcs = {
  */
 int __init jtag_init(void)
 {
-	dev_t jtag_dev = MKDEV(chrdev_jtag_major, 0);
+	dev_t dev = MKDEV(chrdev_jtag_major, 0);
 
 	int alloc_ret = 0;
 	int cdev_ret = 0;
@@ -350,15 +351,15 @@ int __init jtag_init(void)
 
 	printk("willen jtag_init\n");
 
-	alloc_ret = alloc_chrdev_region(&jtag_dev, 0, num_of_dev, JTAG_DRIVER_NAME);
+	alloc_ret = alloc_chrdev_region(&dev, 0, num_of_dev, JTAG_DRIVER_NAME);
 	if (alloc_ret)
 	{
 		printk("willen alloc_chrdev_region failed\n");
 		goto error;
 	}
-	chrdev_jtag_major = MAJOR(jtag_dev);
+	chrdev_jtag_major = MAJOR(dev);
 	cdev_init(&chrdev_jtag_cdev, &jtag_ops);
- 	cdev_ret = cdev_add(&chrdev_jtag_cdev, jtag_dev, num_of_dev);
+ 	cdev_ret = cdev_add(&chrdev_jtag_cdev, dev, num_of_dev);
 	if (cdev_ret)
 	{
 		printk("willen cdev_add failed\n");
@@ -380,7 +381,7 @@ error:
 	if (cdev_ret == 0)
   		cdev_del(&chrdev_jtag_cdev);
  	if (alloc_ret == 0)
-  		unregister_chrdev_region(jtag_dev, num_of_dev);
+  		unregister_chrdev_region(dev, num_of_dev);
 
 	return ret;
 #if 0
@@ -430,14 +431,14 @@ out_no_mem:
  */
 void __exit jtag_exit(void)
 {
-	dev_t jtag_dev = MKDEV(chrdev_jtag_major, 0);
+	dev_t dev = MKDEV(chrdev_jtag_major, 0);
 	
 	printk("willen jtag_exit\n");
  
- 	device_destroy(chrdev_jtag_class, jtag_dev);
+ 	device_destroy(chrdev_jtag_class, dev);
         class_destroy(chrdev_jtag_class);
 	cdev_del(&chrdev_jtag_cdev);
-	unregister_chrdev_region(jtag_dev, num_of_dev);
+	unregister_chrdev_region(dev, num_of_dev);
 	
 //	unregister_core_hal_module (EDEV_TYPE_JTAG);
 

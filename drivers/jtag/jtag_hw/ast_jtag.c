@@ -46,8 +46,10 @@ int g_is_Support_LoopFunc=0;
  * jtag_sir
  * Send Jtag instruction
  */
-void jtag_sir(unsigned short bits, unsigned int tdi){
-	
+void jtag_sir(unsigned short bits, unsigned int tdi)
+{
+	printk("willen jtag_sir\n");
+#if 0	
 	int i = 0;
 	//uint32_t tdo;
 	// go to DRSCAN
@@ -116,6 +118,7 @@ void jtag_sir(unsigned short bits, unsigned int tdi){
 	udelay(42);
 	iowrite32(SOFTWARE_MODE_ENABLE | SOFTWARE_TDIO_BIT, (void * __iomem)ast_jtag_v_add + JTAG_STATUS);
 	udelay(42);
+#endif
 }
 
 
@@ -125,7 +128,9 @@ void jtag_sir(unsigned short bits, unsigned int tdi){
  * Note: Connect a GPIO(G5) to replace TDO, and read it to get data back from device. A workaround for AST2300/AST1050.
  */
 void jtag_sdr(unsigned short bits, unsigned int *TDI,unsigned int *TDO)
-{	
+{
+	printk("willen jtag_sdr\n");
+#if 0	
 	unsigned int index = 0;
 	u32 shift_bits =0;
 	u32 dr_data;
@@ -211,6 +216,7 @@ void jtag_sdr(unsigned short bits, unsigned int *TDI,unsigned int *TDO)
 	udelay(42);
 	iowrite32(SOFTWARE_MODE_ENABLE | SOFTWARE_TDIO_BIT, (void * __iomem)ast_jtag_v_add + JTAG_STATUS);
 	udelay(42);
+#endif
 }
 
 
@@ -220,6 +226,8 @@ void jtag_sdr(unsigned short bits, unsigned int *TDI,unsigned int *TDO)
  */
 void ast_jtag_reset (void)
 {
+	printk("willen ast_jtag_reset\n");
+#if 0
 	int i = 0;
 	//State from test logic reset to Run-Test/Idle State 
 	iowrite32(SOFTWARE_MODE_ENABLE | SOFTWARE_TMS_BIT | SOFTWARE_TDIO_BIT, (void * __iomem)ast_jtag_v_add + JTAG_STATUS);
@@ -238,6 +246,7 @@ void ast_jtag_reset (void)
 	udelay(42);
 	iowrite32(SOFTWARE_MODE_ENABLE | SOFTWARE_TDIO_BIT, (void * __iomem)ast_jtag_v_add + JTAG_STATUS);
 	udelay(42);
+#endif
 }
 
 
@@ -246,7 +255,8 @@ void ast_jtag_reset (void)
  * Switch JTAG status from IDLE to DRPAUSE and DRUPDATE to IDLE without going through ShiftDR status.
  * When call this function, the jtag status should be idle status.
  */
-void jtag_dr_pause(unsigned int min_mSec){
+void jtag_dr_pause(unsigned int min_mSec)
+{
 	
 	// start state is run test idle
 	// go to DRSCAN
