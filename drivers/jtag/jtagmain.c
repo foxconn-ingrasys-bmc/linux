@@ -41,12 +41,20 @@
 #define JTAG_DEV_NAME        "jtag"
 //#define JTAG_DEV_NAME		"/dev/ast-jtag"
 
+#define JTAG_DRIVER_NAME        "jtag"
 #define AST_JTAG_BUFFER_SIZE 0x10000
 #define AST_FW_BUFFER_SIZE  0x80000  //512KB
 
 static struct cdev *jtag_cdev;
 static dev_t jtag_devno = MKDEV(JTAG_MAJOR, JTAG_MINOR);
 static jtag_hw_device_operations_t *pjhwd_ops = NULL;
+static unsigned int chrdev_jtag_major = 0;
+
+
+static struct cdev chrdev_jtag_cdev;
+static struct class *chrdev_jtag_class = NULL;
+static unsigned int num_of_dev = 1;
+
 
 unsigned int *JTAG_read_buffer = NULL;
 unsigned int *JTAG_write_buffer= NULL;
@@ -300,16 +308,16 @@ static int jtag_ioctl(struct inode *inode, struct file *file,unsigned int cmd, u
 
 /* ----- Driver registration ---------------------------------------------- */
 static struct file_operations jtag_ops = {
-  owner:      THIS_MODULE,
-  read:       NULL,
-  write:      NULL,
+	.owner = THIS_MODULE,
+ 	.read = NULL,
+	.write = NULL,
 #ifdef USE_UNLOCKED_IOCTL
-  unlocked_ioctl: jtag_ioctl,
+	.unlocked_ioctl: jtag_ioctl,
 #else
-	ioctl:      jtag_ioctl,
+	.ioctl = jtag_ioctl,
 #endif
-  open:       jtag_open,
-  release:    jtag_release,
+	.open = jtag_open,
+	.release = jtag_release,
 };
 
 
@@ -331,54 +339,47 @@ static core_hal_t jtag_core_hal = {
  */
 int __init jtag_init(void)
 {
-	int ret =0 ;
-  	
-	printk("willen itag_init\n");
-  /* jtag device initialization */ 
-	if ((ret = register_chrdev_region (jtag_devno, JTAG_MAX_DEVICES, JTAG_DEV_NAME)) < 0)
+	int alloc_ret = 0;
+	int cdev_ret = 0;
+	int ret = -1;
+
+	printk("willen jtag_init\n");
+
+	dev_t jtag_dev = MKDEV(chrdev_jtag_major, 0);
+	alloc_ret = alloc_chrdev_region(&jtag_dev, 0, num_of_dev, JTAG_DRIVER_NAME);
+	if (alloc_ret)
 	{
-	   printk (KERN_ERR "failed to register jtag device <%s> (err: %d)\n", JTAG_DEV_NAME, ret);
-	   return ret;
-	}
-   
-	jtag_cdev = cdev_alloc ();
-	if (!jtag_cdev)
-	{
-	   unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
-	   printk (KERN_ERR "%s: failed to allocate jtag cdev structure\n", JTAG_DEV_NAME);
-	   return -1;
-	}
-   
-	cdev_init (jtag_cdev, &jtag_ops);
-	
-	jtag_cdev->owner = THIS_MODULE;
-	
-	if ((ret = cdev_add (jtag_cdev, jtag_devno, JTAG_MAX_DEVICES)) < 0)
-	{
-		cdev_del (jtag_cdev);
-		unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
-		device_destroy(jtag_class, jtag_devno);
-		printk	(KERN_ERR "failed to add <%s> char device\n", JTAG_DEV_NAME);
-		ret = -ENODEV;
-		return ret;
+		printk("willen alloc_chrdev_region failed\n");
+		goto error;
 	}
 
-	jtag_class = class_create(THIS_MODULE, JTAG_DEV_NAME);
-	if (IS_ERR(jtag_class))
-		return PTR_ERR(jtag_class);
-	jtag_class->devnode = jtag_devno;
-	//device_create(jtag_class, NULL, jtag_devno, NULL, "jtag");
-
-	if ((ret = register_core_hal_module (&jtag_core_hal)) < 0)
+	cdev_init(&chrdev_jtag_cdev, &jtag_fops);
+ 	cdev_ret = cdev_add(&chrdev_jtag_cdev, jtag_dev, num_of_dev);
+	if (cdev_ret)
 	{
-		printk(KERN_ERR "failed to register the Core JTAG module\n");
-		cdev_del (jtag_cdev);
-		unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
-		ret = -EINVAL;
-		return ret;
+		printk("willen cdev_add failed\n");
+		goto error;
 	}
 
-  // alloc write/read/other buffer
+	chrdev_jtag_class = class_create(THIS_MODULE, JTAG_DRIVER_NAME);
+ 	if (IS_ERR(chrdev_jtag_class))
+	{
+  		printk("willen chrdev_jtag_class create failed\n");
+		goto error;
+	}
+
+	device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,"jtag");
+
+	printk("willen %s driver(major number %d) installed.\n", JTAG_DRIVER_NAME, chrdev_jtag_major);
+ 	return 0;
+error:
+	if (cdev_ret == 0)
+  		cdev_del(&chrdev_jtag_cdev);
+ 	if (alloc_ret == 0)
+  		unregister_chrdev_region(jtag_dev, num_of_dev);
+
+	return ret;
+#if 0
   memset (&JTAG_device_information, 0, sizeof(JTAG_DEVICE_INFO));
   
   JTAG_read_buffer = kmalloc (AST_JTAG_BUFFER_SIZE, GFP_DMA|GFP_KERNEL);
@@ -417,6 +418,7 @@ out_no_mem:
 	if (JTAG_other_buffer != NULL)
 		kfree(JTAG_other_buffer);  
   return ret;
+#endif
 }
 
 /*!
@@ -424,22 +426,24 @@ out_no_mem:
  */
 void __exit jtag_exit(void)
 {
-	unregister_core_hal_module (EDEV_TYPE_JTAG);
-	unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);
-	device_destroy(jtag_class, jtag_devno);
-
-	if (NULL != jtag_cdev)
-	{
-		cdev_del (jtag_cdev);
-	}
+	printk("willen jtag_exit\n");
+	dev_t jtag_dev = MKDEV(chrdev_sys_major, 0);
+ 
+ 	device_destroy(chrdev_jtag_class, jtag_dev);
+        class_destroy(chrdev_jtag_class);
+	cdev_del(&chrdev_jtag_cdev);
+	unregister_chrdev_region(jtag_dev, num_of_dev);
 	
-	kfree(JTAG_read_buffer);
-	kfree(JTAG_write_buffer);
-	kfree(JTAG_other_buffer);
+//	unregister_core_hal_module (EDEV_TYPE_JTAG);
 
-  printk ( "Unregistered the JTAG Driver Sucessfully\n");
+ 	printk("willen %s driver removed.\n", JTAG_DRIVER_NAME);
+	
+//	kfree(JTAG_read_buffer);
+//	kfree(JTAG_write_buffer);
+//	kfree(JTAG_other_buffer);
 
-  return;	
+//	printk("willen Unregistered the JTAG Driver Sucessfully\n");
+	return;	
 }
 
 EXPORT_SYMBOL(JTAG_device_information);
