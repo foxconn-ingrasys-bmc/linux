@@ -368,7 +368,7 @@ int __init jtag_init(void)
 		goto error;
 	}
 
-	device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,"jtag");
+	device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,"chrdev_jtag");
 
 	printk("willen %s driver(major number %d) installed.\n", JTAG_DRIVER_NAME, chrdev_jtag_major);
  	return 0;
