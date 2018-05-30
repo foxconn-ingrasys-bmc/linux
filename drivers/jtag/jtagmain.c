@@ -45,8 +45,8 @@
 #define AST_JTAG_BUFFER_SIZE 0x10000
 #define AST_FW_BUFFER_SIZE  0x80000  //512KB
 
-static struct cdev *jtag_cdev;
-static dev_t jtag_devno = MKDEV(JTAG_MAJOR, JTAG_MINOR);
+//static struct cdev *jtag_cdev;
+//static dev_t jtag_devno = MKDEV(JTAG_MAJOR, JTAG_MINOR);
 static jtag_hw_device_operations_t *pjhwd_ops = NULL;
 
 static unsigned int chrdev_jtag_major = 0;
@@ -129,7 +129,7 @@ unsigned int* get_jtag_read_buffer(void)
 static int jtag_open(struct inode *inode, struct file *file)
 {
 	unsigned int minor = iminor(inode);
-	//struct jtag_hal *pjtag_hal;
+	struct jtag_hal *pjtag_hal;
 	struct jtag_dev *pdev;
 	hw_info_t jtag_hw_info;
 	unsigned char open_count;
