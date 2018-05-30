@@ -45,9 +45,9 @@
 #define AST_JTAG_BUFFER_SIZE 0x10000
 #define AST_FW_BUFFER_SIZE  0x80000  //512KB
 
-//static struct cdev *jtag_cdev;
-//static dev_t jtag_devno = MKDEV(JTAG_MAJOR, JTAG_MINOR);
-//static jtag_hw_device_operations_t *pjhwd_ops = NULL;
+static struct cdev *jtag_cdev;
+static dev_t jtag_devno = MKDEV(JTAG_MAJOR, JTAG_MINOR);
+static jtag_hw_device_operations_t *pjhwd_ops = NULL;
 
 static unsigned int chrdev_jtag_major = 0;
 static struct cdev chrdev_jtag_cdev;
@@ -60,7 +60,7 @@ unsigned int *JTAG_write_buffer= NULL;
 unsigned long *JTAG_other_buffer= NULL;
 
 JTAG_DEVICE_INFO	JTAG_device_information;
-#if 0
+
 struct class *jtag_class;
 
 int register_jtag_hw_device_ops (jtag_hw_device_operations_t *pjhwd)
@@ -107,7 +107,7 @@ int unregister_jtag_hal_module (void *phw_data)
 	return 0;
 }
 
-
+#if 0
 /*
  * get_write_buffer
  */
