@@ -30,7 +30,8 @@
 #include "ast_jtag.h"
 
 
-#define AST_JTAG_DRIVER_NAME	"ast_jtag"
+//#define AST_JTAG_DRIVER_NAME	"ast_jtag"
+#define AST_JTAG_DRIVER_NAME	"ast-jtag"
 
 volatile u8		*ast_jtag_v_add=0;
 #ifdef SOC_AST2300

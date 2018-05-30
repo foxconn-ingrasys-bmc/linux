@@ -30,7 +30,8 @@
 #include "ast_jtag.h"
 
 
-#define AST_JTAG_DRIVER_NAME	"ast_jtag"
+//#define AST_JTAG_DRIVER_NAME	"ast_jtag"
+#define AST_JTAG_DRIVER_NAME	"ast-jtag"
 
 volatile u8		*ast_jtag_v_add=0;
 #ifdef SOC_AST2300
@@ -342,16 +343,19 @@ int ast_jtag_init(void)
 	if (!jtag_core_loaded)
 			return -1;
 
+	printk("willen ast_jtag_init\n");
 	ast_jtag_hal_id = register_hw_hal_module(&ast_jtag_hw_hal, (void **) &jtag_core_ops);
-	if (ast_jtag_hal_id < 0) {
-		printk(KERN_WARNING "%s: register HAL HW module failed\n", AST_JTAG_DRIVER_NAME);
+	if (ast_jtag_hal_id < 0)
+	{
+		printk("willen %s: register HAL HW module failed\n", AST_JTAG_DRIVER_NAME);
 		return ast_jtag_hal_id;
 	}
 
 	ast_jtag_v_add = ioremap_nocache(AST_JTAG_REG_BASE, 0x40);
-	if (!ast_jtag_v_add) {
-		printk(KERN_WARNING "%s: ioremap failed\n", AST_JTAG_DRIVER_NAME);
-    unregister_hw_hal_module(EDEV_TYPE_JTAG, ast_jtag_hal_id);
+	if (!ast_jtag_v_add) 
+	{
+		printk("willen %s: ioremap failed\n", AST_JTAG_DRIVER_NAME);
+		unregister_hw_hal_module(EDEV_TYPE_JTAG, ast_jtag_hal_id);
 		return -ENOMEM;
 	}
   
@@ -381,20 +385,20 @@ int ast_jtag_init(void)
 
 void ast_jtag_exit(void)
 {
-  iowrite32(AST_JTAG_CTRL_ENG_OUT_DIS, (void * __iomem)ast_jtag_v_add + JTAG_CONTROL); // Disable Engine
-  barrier();
+	printk("willen ast_jtag_exit\n");
+	iowrite32(AST_JTAG_CTRL_ENG_OUT_DIS, (void * __iomem)ast_jtag_v_add + JTAG_CONTROL); // Disable Engine
+  	barrier();
   
-  #ifdef SOC_AST2300
-   iounmap (ast_gpio_v_add);
-  #endif
-  iounmap (ast_jtag_v_add);
-  unregister_hw_hal_module(EDEV_TYPE_JTAG, ast_jtag_hal_id);
+#ifdef SOC_AST2300
+   	iounmap (ast_gpio_v_add);
+#endif
+	iounmap (ast_jtag_v_add);
+	unregister_hw_hal_module(EDEV_TYPE_JTAG, ast_jtag_hal_id);
 
 #ifdef INTEL_JTAG_ADDITIONS
-  intel_jtag_exit();
+	intel_jtag_exit();
 #endif
-
-  return;
+	return;
 }
 
 EXPORT_SYMBOL(g_is_Support_LoopFunc);

@@ -139,20 +139,22 @@ static int jtag_open(struct inode *inode, struct file *file)
 
 	ret = hw_open (EDEV_TYPE_JTAG, minor,&open_count, &jtag_hw_info);
 	if (ret)
+	{
+		printk("willen hw_open failed\n");
 		return -ENXIO;
-
-	//pjtag_hal = jtag_hw_info.pdrv_data;
+	}
+	pjtag_hal = jtag_hw_info.pdrv_data;
 
 	pdev = (struct jtag_dev*)kmalloc(sizeof(struct jtag_dev), GFP_KERNEL);
 	
 	if (!pdev)
 	{
 		hw_close (EDEV_TYPE_JTAG, minor, &open_count);
-		printk (KERN_ERR "%s: failed to allocate jtag private dev structure for jtag iminor: %d\n", JTAG_DEV_NAME, minor);
+		printk ("willen %s: failed to allocate jtag private dev structure for jtag iminor: %d\n", JTAG_DEV_NAME, minor);
 		return -ENOMEM;
 	}
 
-	//pdev->pjtag_hal = pjtag_hal;
+	pdev->pjtag_hal = pjtag_hal;
 	file->private_data = pdev;
 
 	return 0;
