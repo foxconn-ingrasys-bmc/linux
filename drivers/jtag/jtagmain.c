@@ -330,7 +330,7 @@ static struct file_operations jtag_ops = {
 static jtag_core_funcs_t jtag_core_funcs = {
 	.get_jtag_core_data = NULL,
 };
-
+#if 0
 static core_hal_t jtag_core_hal = {
 	.owner			= THIS_MODULE,
 	.name		        = "JTAG CORE",
@@ -339,7 +339,7 @@ static core_hal_t jtag_core_hal = {
 	.unregister_hal_module 	= unregister_jtag_hal_module,
 	.pcore_funcs           	= (void *)&jtag_core_funcs
 };
-
+#endif
 /*
  * JTGA driver init function
  */
@@ -415,7 +415,8 @@ error:
   return 0;
   
 out_no_mem:
-	cdev_del (jtag_cdev);
+//	cdev_del (jtag_cdev);
+	cdev_del (chrdev_jtag_cdev);
 	unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);	
 	
   if (JTAG_read_buffer != NULL)
