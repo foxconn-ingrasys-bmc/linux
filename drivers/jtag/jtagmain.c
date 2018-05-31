@@ -107,7 +107,7 @@ int unregister_jtag_hal_module (void *phw_data)
 	return 0;
 }
 
-#if 0
+
 /*
  * get_write_buffer
  */
@@ -124,7 +124,7 @@ unsigned int* get_jtag_read_buffer(void)
 {
 	return JTAG_read_buffer;
 }
-#endif
+
 
 static int jtag_open(struct inode *inode, struct file *file)
 {
@@ -167,7 +167,7 @@ static int jtag_release(struct inode *inode, struct file *file)
 	unsigned char open_count;
   	struct jtag_dev *pdev = (struct jtag_dev*)file->private_data;
 	printk("willen jtag_release\n");
-	//pdev->pjtag_hal = NULL;
+	pdev->pjtag_hal = NULL;
   	file->private_data = NULL;
   	ret = hw_close (EDEV_TYPE_JTAG, iminor(inode), &open_count);
   	if(ret) { return -1; }
@@ -326,19 +326,19 @@ static struct file_operations jtag_ops = {
 	.release = jtag_release,
 };
 
-#if 0
+
 static jtag_core_funcs_t jtag_core_funcs = {
 	.get_jtag_core_data = NULL,
 };
-#endif
-//static core_hal_t jtag_core_hal = {
-//	.owner		             = THIS_MODULE,
-//	.name		               = "JTAG CORE",
-//	.dev_type              = EDEV_TYPE_JTAG,
-//	.register_hal_module   = register_jtag_hal_module,
-//	.unregister_hal_module = unregister_jtag_hal_module,
-//	.pcore_funcs           = (void *)&jtag_core_funcs
-//};
+
+static core_hal_t jtag_core_hal = {
+	.owner			= THIS_MODULE,
+	.name		        = "JTAG CORE",
+	.dev_type              	= EDEV_TYPE_JTAG,
+	.register_hal_module   	= register_jtag_hal_module,
+	.unregister_hal_module 	= unregister_jtag_hal_module,
+	.pcore_funcs           	= (void *)&jtag_core_funcs
+};
 
 /*
  * JTGA driver init function
@@ -386,7 +386,7 @@ error:
   		unregister_chrdev_region(dev, num_of_dev);
 
 	return ret;
-#if 0
+
   memset (&JTAG_device_information, 0, sizeof(JTAG_DEVICE_INFO));
   
   JTAG_read_buffer = kmalloc (AST_JTAG_BUFFER_SIZE, GFP_DMA|GFP_KERNEL);
@@ -425,7 +425,7 @@ out_no_mem:
 	if (JTAG_other_buffer != NULL)
 		kfree(JTAG_other_buffer);  
   return ret;
-#endif
+
 }
 
 /*!
@@ -442,24 +442,24 @@ void __exit jtag_exit(void)
 	cdev_del(&chrdev_jtag_cdev);
 	unregister_chrdev_region(dev, num_of_dev);
 	
-//	unregister_core_hal_module (EDEV_TYPE_JTAG);
+	unregister_core_hal_module (EDEV_TYPE_JTAG);
 
  	printk("willen %s driver removed.\n", JTAG_DRIVER_NAME);
 	
-//	kfree(JTAG_read_buffer);
-//	kfree(JTAG_write_buffer);
-//	kfree(JTAG_other_buffer);
+	kfree(JTAG_read_buffer);
+	kfree(JTAG_write_buffer);
+	kfree(JTAG_other_buffer);
 
-//	printk("willen Unregistered the JTAG Driver Sucessfully\n");
+	printk("willen Unregistered the JTAG Driver Sucessfully\n");
 	return;	
 }
-#if 0
+
 EXPORT_SYMBOL(JTAG_device_information);
 EXPORT_SYMBOL(register_jtag_hw_device_ops);
 EXPORT_SYMBOL(unregister_jtag_hw_device_ops);
 EXPORT_SYMBOL(get_jtag_write_buffer);
 EXPORT_SYMBOL(get_jtag_read_buffer);
-#endif
+
 module_init(jtag_init);
 module_exit(jtag_exit);
 
