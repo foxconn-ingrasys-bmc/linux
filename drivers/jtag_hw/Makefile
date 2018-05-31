@@ -3,4 +3,4 @@
 #
 TARGET := jtag_hw
 #obj-y			+= ast_jtag.o
-obj-y			+= ast_jtag_aspeed.o
+obj-y			+= ast-jtag.o
