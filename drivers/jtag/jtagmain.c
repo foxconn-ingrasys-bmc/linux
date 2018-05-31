@@ -357,7 +357,7 @@ int __init jtag_init(void)
 	if (alloc_ret)
 	{
 		printk("willen alloc_chrdev_region failed\n");
-		goto error;
+//		goto error;
 	}
 	chrdev_jtag_major = MAJOR(dev);
 	cdev_init(&chrdev_jtag_cdev, &jtag_ops);
@@ -365,67 +365,71 @@ int __init jtag_init(void)
 	if (cdev_ret)
 	{
 		printk("willen cdev_add failed\n");
-		goto error;
+//		goto error;
 	}
 
 	chrdev_jtag_class = class_create(THIS_MODULE, JTAG_DRIVER_NAME);
  	if (IS_ERR(chrdev_jtag_class))
 	{
   		printk("willen chrdev_jtag_class create failed\n");
-		goto error;
+//		goto error;
 	}
 
 	device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,"ast-jtag");
 
 	printk("willen %s driver(major number %d) installed.\n", JTAG_DRIVER_NAME, chrdev_jtag_major);
- 	return 0;
+// 	return 0;
 error:
-	if (cdev_ret == 0)
-  		cdev_del(&chrdev_jtag_cdev);
- 	if (alloc_ret == 0)
-  		unregister_chrdev_region(dev, num_of_dev);
+//	if (cdev_ret == 0)
+//  		cdev_del(&chrdev_jtag_cdev);
+// 	if (alloc_ret == 0)
+//  		unregister_chrdev_region(dev, num_of_dev);
 
-	return ret;
+//	return ret;
 
-  memset (&JTAG_device_information, 0, sizeof(JTAG_DEVICE_INFO));
+	memset (&JTAG_device_information, 0, sizeof(JTAG_DEVICE_INFO));
   
-  JTAG_read_buffer = kmalloc (AST_JTAG_BUFFER_SIZE, GFP_DMA|GFP_KERNEL);
-  if (JTAG_read_buffer == NULL) {
-  	printk (KERN_WARNING "%s: Can't allocate read_buffer\n", JTAG_DEV_NAME);
-    ret = -ENOMEM;
-    goto out_no_mem;
-  }
+  	JTAG_read_buffer = kmalloc (AST_JTAG_BUFFER_SIZE, GFP_DMA|GFP_KERNEL);
+  	if (JTAG_read_buffer == NULL) 
+	{
+  		printk ("willen %s: Can't allocate read_buffer\n", JTAG_DRIVER_NAME);
+    		ret = -ENOMEM;
+    		goto out_no_mem;
+  	}
 
-  JTAG_write_buffer = kmalloc (AST_JTAG_BUFFER_SIZE, GFP_DMA|GFP_KERNEL);
-  if (JTAG_write_buffer == NULL) {
-    printk (KERN_WARNING "%s: Can't allocate write_buffer\n", JTAG_DEV_NAME);
-    ret = -ENOMEM;
-    goto out_no_mem;
-  }
+  	JTAG_write_buffer = kmalloc (AST_JTAG_BUFFER_SIZE, GFP_DMA|GFP_KERNEL);
+  	if (JTAG_write_buffer == NULL)
+	{
+    		printk ("willen %s: Can't allocate write_buffer\n", JTAG_DEV_NAME);
+    		ret = -ENOMEM;
+    		goto out_no_mem;
+  	}
 
-  JTAG_other_buffer = kmalloc (AST_FW_BUFFER_SIZE, GFP_DMA|GFP_KERNEL);
-  if (JTAG_other_buffer == NULL) {
-    printk (KERN_WARNING "%s: Can't allocate other_buffer\n", JTAG_DEV_NAME);
-    ret = -ENOMEM;
-    goto out_no_mem;
-  }
-  memset(JTAG_other_buffer, 0xff, AST_FW_BUFFER_SIZE);
+	JTAG_other_buffer = kmalloc (AST_FW_BUFFER_SIZE, GFP_DMA|GFP_KERNEL);
+	if (JTAG_other_buffer == NULL)
+	{
+    		printk ("willen %s: Can't allocate other_buffer\n", JTAG_DEV_NAME);
+    		ret = -ENOMEM;
+    		goto out_no_mem;
+  	}
+  	memset(JTAG_other_buffer, 0xff, AST_FW_BUFFER_SIZE);
 
 	printk("The JTAG Driver is loaded successfully.\n" );
-  return 0;
+  	return 0;
   
 out_no_mem:
-//	cdev_del (jtag_cdev);
-	cdev_del (chrdev_jtag_cdev);
-	unregister_chrdev_region (jtag_devno, JTAG_MAX_DEVICES);	
+  	cdev_del(&chrdev_jtag_cdev);
+	unregister_chrdev_region(dev, num_of_dev);
 	
-  if (JTAG_read_buffer != NULL)
-  	kfree(JTAG_read_buffer);
-  if (JTAG_write_buffer != NULL)
-  	kfree(JTAG_write_buffer);
+  	if (JTAG_read_buffer != NULL)
+  		kfree(JTAG_read_buffer);
+ 	if (JTAG_write_buffer != NULL)
+  		kfree(JTAG_write_buffer);
 	if (JTAG_other_buffer != NULL)
 		kfree(JTAG_other_buffer);  
-  return ret;
+  	
+	printk("The JTAG Driver is loaded failed.\n" );
+	return ret;
 
 }
 
