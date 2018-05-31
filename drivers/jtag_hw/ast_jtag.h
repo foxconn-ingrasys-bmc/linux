@@ -13,22 +13,28 @@
 #ifndef _AST_JTAG_MASTER_H_
 #define _AST_JTAG_MASTER_H_
 
-#define AST_JTAG_REG_BASE 0x1E6E4000
-#define AST_JTAG_PORT_NUM 1
+#define AST_SCU_REG_BASE	0x1E6E2000
+#define SCU_RESET_CTRL		0x04
+#define SCU_KEY			0x1688A8A8
+#define SCU_RESET_MCTP		0x00400000
+
+
+#define AST_JTAG_REG_BASE	0x1E6E4000
+#define AST_JTAG_PORT_NUM	1
 
 #ifdef SOC_AST2300
- #define AST_GPIO_REG_BASE 0x1E780000
- #define GPIO_DATA_VALUE   0x20
- #define GPIO_DIRECTION		 0x24
- #define GPIO_G5_BIT       0x00200000
+#define AST_GPIO_REG_BASE	0x1E780000
+#define GPIO_DATA_VALUE		0x20
+#define GPIO_DIRECTION		0x24
+#define GPIO_G5_BIT       	0x00200000
 #endif
 
 // register
-#define	JTAG_DATA		    0x00
+#define	JTAG_DATA		0x00
 #define	JTAG_INSTRUCTION	0x04
 #define	JTAG_CONTROL		0x08
 #define	JTAG_INTERRUPT		0x0c
-#define	JTAG_STATUS		    0x10
+#define	JTAG_STATUS		0x10
 #define	JTAG_TCK_CONTROL	0x14
 
 // engine control
@@ -78,17 +84,17 @@
 /* regs used in jtag_drv_mod2 module */
 #define AST_JTAG_CTRL			JTAG_CONTROL
 #define AST_JTAG_ISR			JTAG_INTERRUPT
-#define AST_JTAG_SW				JTAG_STATUS
+#define AST_JTAG_SW			JTAG_STATUS
 
 /* AST_JTAG_CTRL - 0x08 : Engine Control */
-#define JTAG_ENG_EN				AST_JTAG_CTRL_ENGINE_ENABLE
+#define JTAG_ENG_EN			AST_JTAG_CTRL_ENGINE_ENABLE
 #define JTAG_ENG_OUT_EN			AST_JTAG_CTRL_OUTPUT_ENABLE
 #define JTAG_FORCE_TMS			AST_JTAG_CTRL_FORCE_RESET
 
 #define JTAG_INST_PAUSE_EN		AST_JTAG_INTR_EN_INST_PAUSE
-#define JTAG_INST_COMPLETE_EN	AST_JTAG_INTR_EN_INST_COMP
+#define JTAG_INST_COMPLETE_EN		AST_JTAG_INTR_EN_INST_COMP
 #define JTAG_DATA_PAUSE_EN		AST_JTAG_INTR_EN_DATA_PAUSE
-#define JTAG_DATA_COMPLETE_EN	AST_JTAG_INTR_EN_DATA_COMP
+#define JTAG_DATA_COMPLETE_EN		AST_JTAG_INTR_EN_DATA_COMP
 
 /* AST_JTAG_SW	- 0x10 : Software Mode and Status */
 #define JTAG_SW_MODE_EN			SOFTWARE_MODE_ENABLE
@@ -114,7 +120,7 @@ extern void intel_jtag_exit(void);
 /* -------------------------------------------------- */
 //#define JTAG_PROGRAM_DEBUG_NOT_SVF
 #ifdef JTAG_PROGRAM_DEBUG_NOT_SVF
-  #define JTAG_PROGRAM_DEBUG
+#define JTAG_PROGRAM_DEBUG
 #endif
 /* -------------------------------------------------- */
 #define JTAG_IDLE_OFF_TCK
