@@ -1,7 +1,7 @@
 #include <linux/kernel.h>
 #include <linux/poll.h>
-#include <linux/pci.h>
-#include <linux/cdev.h>
+//#include <linux/pci.h>
+#nclude <linux/cdev.h>
 #include <linux/device.h>
 #include <asm/io.h>
 #include <linux/sysfs.h>
@@ -18,8 +18,8 @@
 #include <linux/reset.h>
 #include <asm/uaccess.h>
 
-#include "jtag.h"
-#include "jtag_ioctl.h"
+//#include "jtag.h"
+//#include "jtag_ioctl.h"
 
 /*************************************************************************************/
 #define JTAG_MAJOR           175
@@ -184,18 +184,14 @@ static DEFINE_SPINLOCK(jtag_state_lock);
 
 struct ast_jtag_info *ast_jtag;
 
-static ssize_t show_tdo(struct device *dev,
-						struct device_attribute *attr, char *buf)
+static ssize_t show_tdo(struct device *dev,struct device_attribute *attr, char *buf)
 {
 	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
 
 	return sprintf(buf, "%s\n", ast_jtag_read(ast_jtag, AST_JTAG_SW) & JTAG_SW_MODE_TDIO ? "1" : "0");
 }
 
-static DEVICE_ATTR(tdo, S_IRUGO, show_tdo, NULL);
-
-static ssize_t store_tdi(struct device *dev,
-						 struct device_attribute *attr, const char *buf, size_t count)
+static ssize_t store_tdi(struct device *dev,struct device_attribute *attr, const char *buf, size_t count)
 {
 	u32 tdi;
 	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
@@ -207,10 +203,7 @@ static ssize_t store_tdi(struct device *dev,
 	return count;
 }
 
-static DEVICE_ATTR(tdi, S_IWUSR, NULL, store_tdi);
-
-static ssize_t store_tms(struct device *dev,
-						 struct device_attribute *attr, const char *buf, size_t count)
+static ssize_t store_tms(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
 {
 	u32 tms;
 	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
@@ -222,10 +215,7 @@ static ssize_t store_tms(struct device *dev,
 	return count;
 }
 
-static DEVICE_ATTR(tms, S_IWUSR, NULL, store_tms);
-
-static ssize_t store_tck(struct device *dev,
-						 struct device_attribute *attr, const char *buf, size_t count)
+static ssize_t store_tck(struct device *dev,struct device_attribute *attr, const char *buf, size_t count)
 {
 	u32 tck;
 	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
@@ -237,17 +227,12 @@ static ssize_t store_tck(struct device *dev,
 	return count;
 }
 
-static DEVICE_ATTR(tck, S_IWUSR, NULL, store_tck);
-
-static ssize_t show_sts(struct device *dev,
-						struct device_attribute *attr, char *buf)
+static ssize_t show_sts(struct device *dev,struct device_attribute *attr, char *buf)
 {
 	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
 
 	return sprintf(buf, "%s\n", ast_jtag->sts ? "Pause" : "Idle");
 }
-
-static DEVICE_ATTR(sts, S_IRUGO, show_sts, NULL);
 
 static ssize_t show_frequency(struct device *dev,struct device_attribute *attr, char *buf)
 {
@@ -258,15 +243,6 @@ static ssize_t show_frequency(struct device *dev,struct device_attribute *attr, 
 }
 
 
-static struct attribute *jtag_sysfs_entries[] = {
-	&dev_attr_freq.attr,
-	&dev_attr_sts.attr,
-	&dev_attr_tck.attr,
-	&dev_attr_tms.attr,
-	&dev_attr_tdi.attr,
-	&dev_attr_tdo.attr,
-	NULL
-};
 
 static struct attribute_group jtag_attribute_group = {
 	.attrs = jtag_sysfs_entries,
@@ -671,10 +647,23 @@ static ssize_t store_frequency(struct device *dev,struct device_attribute *attr,
 	ast_jtag_set_freq(ast_jtag, val);
 	return count;
 }
-
+/*************************************************************************************/
 static DEVICE_ATTR(freq, S_IRUGO | S_IWUSR, show_frequency, store_frequency);
+static DEVICE_ATTR(tdo, S_IRUGO, show_tdo, NULL);
+static DEVICE_ATTR(tdi, S_IWUSR, NULL, store_tdi);
+static DEVICE_ATTR(tms, S_IWUSR, NULL, store_tms);
+static DEVICE_ATTR(tck, S_IWUSR, NULL, store_tck);
+static DEVICE_ATTR(sts, S_IRUGO, show_sts, NULL);
 
-
+static struct attribute *jtag_sysfs_entries[] = {
+	&dev_attr_freq.attr,
+	&dev_attr_sts.attr,
+	&dev_attr_tck.attr,
+	&dev_attr_tms.attr,
+	&dev_attr_tdi.attr,
+	&dev_attr_tdo.attr,
+	NULL
+};
 /*************************************************************************************/
 static long jtag_ioctl(struct file *file, unsigned int cmd,unsigned long arg)
 {
@@ -821,11 +810,6 @@ static irqreturn_t ast_jtag_interrupt(int this_irq, void *dev_id)
 
 }
 
-
-
-
-
-
 /*************************************************************************************/
 static int ast_jtag_probe(struct platform_device *pdev)
 {
@@ -948,14 +932,12 @@ static int ast_jtag_remove(struct platform_device *pdev)
 }
 
 #ifdef CONFIG_PM
-static int
-ast_jtag_suspend(struct platform_device *pdev, pm_message_t state)
+static int ast_jtag_suspend(struct platform_device *pdev, pm_message_t state)
 {
 	return 0;
 }
 
-static int
-ast_jtag_resume(struct platform_device *pdev)
+static int ast_jtag_resume(struct platform_device *pdev)
 {
 	return 0;
 }
