@@ -249,8 +249,7 @@ static ssize_t show_sts(struct device *dev,
 
 static DEVICE_ATTR(sts, S_IRUGO, show_sts, NULL);
 
-static ssize_t show_frequency(struct device *dev,
-							  struct device_attribute *attr, char *buf)
+static ssize_t show_frequency(struct device *dev,struct device_attribute *attr, char *buf)
 {
 	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
 //	printk("PCLK = %d \n", ast_get_pclk());
@@ -258,18 +257,6 @@ static ssize_t show_frequency(struct device *dev,
 	return sprintf(buf, "Frequency : %d\n", ast_jtag->apb_clk / (JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1));
 }
 
-static ssize_t store_frequency(struct device *dev,struct device_attribute *attr, const char *buf, size_t count)
-{
-	u32 val;
-	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
-
-	val = simple_strtoul(buf, NULL, 20);
-	ast_jtag_set_freq(ast_jtag, val);
-
-	return count;
-}
-
-static DEVICE_ATTR(freq, S_IRUGO | S_IWUSR, show_frequency, store_frequency);
 
 static struct attribute *jtag_sysfs_entries[] = {
 	&dev_attr_freq.attr,
@@ -283,12 +270,6 @@ static struct attribute *jtag_sysfs_entries[] = {
 
 static struct attribute_group jtag_attribute_group = {
 	.attrs = jtag_sysfs_entries,
-};
-
-struct miscdevice ast_jtag_misc = {
-	.minor 	= MISC_DYNAMIC_MINOR,
-	.name 	= "ast-jtag",
-	.fops 	= &ast_jtag_fops,
 };
 
 static const struct of_device_id ast_jtag_of_matches[] = {
@@ -678,6 +659,22 @@ void ast_jtag_run_test_idle(struct ast_jtag_info *ast_jtag, struct runtest_idle 
 		ast_jtag->sts = 0;
 	}
 }
+
+
+/*************************************************************************************/
+static ssize_t store_frequency(struct device *dev,struct device_attribute *attr, const char *buf, size_t count)
+{
+	u32 val;
+	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
+
+	val = simple_strtoul(buf, NULL, 20);
+	ast_jtag_set_freq(ast_jtag, val);
+	return count;
+}
+
+static DEVICE_ATTR(freq, S_IRUGO | S_IWUSR, show_frequency, store_frequency);
+
+
 /*************************************************************************************/
 static long jtag_ioctl(struct file *file, unsigned int cmd,unsigned long arg)
 {
