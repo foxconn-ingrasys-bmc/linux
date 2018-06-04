@@ -1,7 +1,7 @@
 #include <linux/kernel.h>
 #include <linux/poll.h>
 //#include <linux/pci.h>
-#nclude <linux/cdev.h>
+#include <linux/cdev.h>
 #include <linux/device.h>
 #include <asm/io.h>
 #include <linux/sysfs.h>
@@ -241,12 +241,6 @@ static ssize_t show_frequency(struct device *dev,struct device_attribute *attr, 
 //	printk("DIV  = %d \n", JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1);
 	return sprintf(buf, "Frequency : %d\n", ast_jtag->apb_clk / (JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1));
 }
-
-
-
-static struct attribute_group jtag_attribute_group = {
-	.attrs = jtag_sysfs_entries,
-};
 
 static const struct of_device_id ast_jtag_of_matches[] = {
 	{ .compatible = "aspeed,ast-jtag", },
@@ -664,6 +658,10 @@ static struct attribute *jtag_sysfs_entries[] = {
 	&dev_attr_tdo.attr,
 	NULL
 };
+
+static struct attribute_group jtag_attribute_group = {
+	.attrs = jtag_sysfs_entries,
+};
 /*************************************************************************************/
 static long jtag_ioctl(struct file *file, unsigned int cmd,unsigned long arg)
 {
@@ -951,8 +949,8 @@ static struct platform_driver ast_jtag_driver = {
 	.resume         = ast_jtag_resume,
 #endif
 	.driver         = {
-		.name   = KBUILD_MODNAME,
-		.of_match_table = ast_jtag_of_matches,
+				.name		= KBUILD_MODNAME,
+				.of_match_table = ast_jtag_of_matches,
 	},
 };
 /*************************************************************************************/
