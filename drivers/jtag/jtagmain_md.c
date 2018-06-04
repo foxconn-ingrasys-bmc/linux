@@ -143,14 +143,14 @@ struct class *jtag_class;
 #define JTAG_MSG(fmt, args...) printk(fmt, ## args)
 
 struct ast_jtag_info {
-	void __iomem	*reg_base;
+	void __iomem		*reg_base;
 	u8 			sts;			//0: idle, 1:irpause 2:drpause
-	int 			irq;				//JTAG IRQ number
-	struct reset_control *reset;
-	struct clk 			*clk;
-	u32					apb_clk;
+	int 			irq;			//JTAG IRQ number
+	struct reset_control 	*reset;
+	struct clk 		*clk;
+	u32			apb_clk;
 	u32 			flag;
-	wait_queue_head_t jtag_wq;
+	wait_queue_head_t 	jtag_wq;
 	bool 			is_open;
 };
 
@@ -166,7 +166,7 @@ ast_jtag_read(struct ast_jtag_info *ast_jtag, u32 reg)
 	JTAG_DBUG("reg = 0x%08x, val = 0x%08x\n", reg, val);
 	return val;
 #else
-	return readl(ast_jtag->reg_base + reg);;
+	return readl(ast_jtag->reg_base + reg);
 #endif
 }
 
@@ -258,8 +258,7 @@ static ssize_t show_frequency(struct device *dev,
 	return sprintf(buf, "Frequency : %d\n", ast_jtag->apb_clk / (JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1));
 }
 
-static ssize_t store_frequency(struct device *dev,
-							   struct device_attribute *attr, const char *buf, size_t count)
+static ssize_t store_frequency(struct device *dev,struct device_attribute *attr, const char *buf, size_t count)
 {
 	u32 val;
 	struct ast_jtag_info *ast_jtag = dev_get_drvdata(dev);
@@ -771,8 +770,21 @@ static const struct file_operations ast_jtag_fops = {
 	.owner		= THIS_MODULE,
 	.unlocked_ioctl	= jtag_ioctl,
 	.open		= jtag_open,
-	.release		= jtag_release,
+	.release	= jtag_release,
 };
+
+struct miscdevice ast_jtag_misc = {
+	.minor  = MISC_DYNAMIC_MINOR,
+	.name   = "ast-jtag",
+	.fops   = &ast_jtag_fops,
+};
+
+
+
+
+
+
+
 /*************************************************************************************/
 static irqreturn_t ast_jtag_interrupt(int this_irq, void *dev_id)
 {
@@ -954,7 +966,7 @@ ast_jtag_resume(struct platform_device *pdev)
 /*************************************************************************************/
 static struct platform_driver ast_jtag_driver = {
 	.probe 		= ast_jtag_probe,
-	.remove 		= ast_jtag_remove,
+	.remove 	= ast_jtag_remove,
 #ifdef CONFIG_PM
 	.suspend        = ast_jtag_suspend,
 	.resume         = ast_jtag_resume,
@@ -972,8 +984,6 @@ int __init jtag_init(void)
 {
 	dev_t dev = MKDEV(chrdev_jtag_major, 0);
 
-	int alloc_ret = 0;
-	int cdev_ret = 0;
 	int ret = -1;
 
 	printk("willen jtag_init\n");
@@ -987,7 +997,7 @@ int __init jtag_init(void)
    	}
    	else
    	{
-		alloc_ret = alloc_chrdev_region(&dev, 0, num_of_dev, JTAG_DRIVER_NAME);
+		ret = alloc_chrdev_region(&dev, 0, num_of_dev, JTAG_DRIVER_NAME);
 		if (ret < 0)
 		{
 			platform_driver_unregister(&ast_jtag_driver);
@@ -1012,7 +1022,7 @@ int __init jtag_init(void)
 			return -1;
 		}
 		
-		cdev_init(&chrdev_jtag_cdev, &jtag_ops);
+		cdev_init(&chrdev_jtag_cdev, &ast_jtag_fops);
  		
  		if (cdev_add(&chrdev_jtag_cdev, dev, num_of_dev) == -1)
     		{
@@ -1038,10 +1048,10 @@ void __exit jtag_exit(void)
 	platform_driver_unregister(&ast_jtag_driver);
 	cdev_del(&chrdev_jtag_cdev);
  	device_destroy(chrdev_jtag_class, dev);
-     class_destroy(chrdev_jtag_class);
+	class_destroy(chrdev_jtag_class);
 	unregister_chrdev_region(dev, num_of_dev);
 
-	return 0;	
+	return;	
 }
 /*************************************************************************************/
 
