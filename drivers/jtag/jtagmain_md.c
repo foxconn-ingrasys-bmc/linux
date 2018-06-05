@@ -1034,7 +1034,7 @@ int __init jtag_init(void)
 			return -1;
 		}
 		
- 		if ( (chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DEVICE_NAME)) == NULL)
+ 		if ( (chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DRIVER_NAME)) == NULL)
 		{
   			platform_driver_unregister(&ast_jtag_driver);
   			unregister_chrdev_region(dev, num_of_dev);
