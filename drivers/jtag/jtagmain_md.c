@@ -133,7 +133,8 @@ static unsigned int num_of_dev = 1;
 #define AST_JTAG_DEBUG
 
 #ifdef AST_JTAG_DEBUG
-#define JTAG_DBUG(fmt, args...) printk(KERN_DEBUG "%s() " fmt,__FUNCTION__, ## args)
+//#define JTAG_DBUG(fmt, args...) printk(KERN_DEBUG "%s() " fmt,__FUNCTION__, ## args)
+#define JTAG_DBUG(fmt, args...) printk(KERN_INFO "%s() " fmt,__FUNCTION__, ## args)
 #else
 #define JTAG_DBUG(fmt, args...)
 #endif
@@ -1014,18 +1015,17 @@ int __init jtag_init(void)
 	dev_t dev = MKDEV(chrdev_jtag_major, 0);
 
 	int ret = -1;
-	printk("willen jtag_init\n");
 	JTAG_DBUG("jtagmain : jtag_init\n");
 	chrdev_jtag_major = MAJOR(dev);
 	
-	ret = platform_driver_probe(&ast_jtag_driver, &ast_jtag_probe);
- 	if (ret < 0)
-   	{
-   		JTAG_DBUG("jtagmain : jtag Platform Driver probe failed with :%d\n", ret);
-		return -1;
-   	}
-   	else
-   	{
+	//ret = platform_driver_probe(&ast_jtag_driver, &ast_jtag_probe);
+ 	//if (ret < 0)
+   	//{
+   	//	JTAG_DBUG("jtagmain : jtag Platform Driver probe failed with :%d\n", ret);
+	//	return -1;
+   	//}
+   	//else
+   	//{
 		ret = alloc_chrdev_region(&dev, 0, num_of_dev, JTAG_DEVICE_NAME);
 		if (ret < 0)
 		{
@@ -1062,7 +1062,7 @@ int __init jtag_init(void)
 			JTAG_DBUG("jtagmain : jtag Device addition failed\n" );
 			return -1;
     		}
-	}
+	//}
 	return 0;
 }
 
