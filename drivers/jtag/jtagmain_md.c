@@ -796,8 +796,8 @@ static const struct file_operations ast_jtag_fops = {
 
 struct miscdevice ast_jtag_misc = {
 	.minor  = MISC_DYNAMIC_MINOR,
-//	.name   = "ast-jtag",
-	.name   = JTAG_DEVICE_NAME,
+	.name   = "ast-jtag",
+//	.name   = JTAG_DEVICE_NAME,
 	.fops   = &ast_jtag_fops,
 };
 
@@ -1029,7 +1029,8 @@ int __init jtag_init(void)
    	}
    	else
    	{
-		ret = alloc_chrdev_region(&dev, 0, num_of_dev, JTAG_DEVICE_NAME);
+		//ret = alloc_chrdev_region(&dev, 0, num_of_dev, JTAG_DEVICE_NAME);
+		ret = alloc_chrdev_region(&dev, 0, num_of_dev, JTAG_DRIVER_NAME);
 		if (ret < 0)
 		{
 			platform_driver_unregister(&ast_jtag_driver);
@@ -1037,7 +1038,8 @@ int __init jtag_init(void)
 			return -1;
 		}
 		
- 		if ( (chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DRIVER_NAME)) == NULL)
+ 		//if ( (chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DEVICE_NAME)) == NULL)
+ 		if ((chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DRIVER_NAME)) == NULL)
 		{
   			platform_driver_unregister(&ast_jtag_driver);
   			unregister_chrdev_region(dev, num_of_dev);
@@ -1045,7 +1047,8 @@ int __init jtag_init(void)
 			return -1;
 		}
 		
-		if (device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,JTAG_DEVICE_NAME) == NULL)
+		//if (device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,JTAG_DEVICE_NAME) == NULL)
+		if ((device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,"ast-jtag")) == NULL)
 		{
 			platform_driver_unregister(&ast_jtag_driver);
 			class_destroy(chrdev_jtag_class);
