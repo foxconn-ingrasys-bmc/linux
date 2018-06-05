@@ -1015,17 +1015,20 @@ int __init jtag_init(void)
 	dev_t dev = MKDEV(chrdev_jtag_major, 0);
 
 	int ret = -1;
-	JTAG_DBUG("jtagmain : jtag_init\n");
+	JTAG_DBUG("jtagmain : jtag_init start\n");
 	chrdev_jtag_major = MAJOR(dev);
 	
 	//ret = platform_driver_probe(&ast_jtag_driver, &ast_jtag_probe);
- 	//if (ret < 0)
-   	//{
-   	//	JTAG_DBUG("jtagmain : jtag Platform Driver probe failed with :%d\n", ret);
-	//	return -1;
-   	//}
-   	//else
-   	//{
+	ret = platform_driver_register(&ast_jtag_driver);
+	
+ 	if (ret < 0)
+   	{
+   		//JTAG_DBUG("jtagmain : jtag Platform Driver probe failed with :%d\n", ret);
+   		JTAG_DBUG("jtagmain : jtag platform_driver_register failed with :%d\n", ret);
+		return -1;
+   	}
+   	else
+   	{
 		ret = alloc_chrdev_region(&dev, 0, num_of_dev, JTAG_DEVICE_NAME);
 		if (ret < 0)
 		{
@@ -1062,7 +1065,8 @@ int __init jtag_init(void)
 			JTAG_DBUG("jtagmain : jtag Device addition failed\n" );
 			return -1;
     		}
-	//}
+	}
+	JTAG_DBUG("jtagmain : jtag_init finished\n" );
 	return 0;
 }
 
