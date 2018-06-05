@@ -796,7 +796,7 @@ static const struct file_operations ast_jtag_fops = {
 struct miscdevice ast_jtag_misc = {
 	.minor  = MISC_DYNAMIC_MINOR,
 //	.name   = "ast-jtag",
-	.name   = JTAG_DEVICE_NAME",
+	.name   = JTAG_DEVICE_NAME,
 	.fops   = &ast_jtag_fops,
 };
 
