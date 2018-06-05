@@ -26,6 +26,7 @@
 #define JTAG_MINOR	   	0
 #define JTAG_MAX_DEVICES    	 255
 #define JTAG_DRIVER_NAME        "jtag"
+#define JTAG_DEVICE_NAME	"ast-jtag"
 
 #define AST_JTAG_DATA		0x00
 #define AST_JTAG_INST		0x04
@@ -100,18 +101,18 @@ struct runtest_idle {
 
 struct sir_xfer {
 	xfer_mode 	mode;		//0 :HW mode, 1: SW mode
-	unsigned short length;		//bits
-	unsigned int tdi;
-	unsigned int tdo;
-	unsigned char endir;		//0: idle, 1:pause
+	unsigned short 	length;		//bits
+	unsigned int 	tdi;
+	unsigned int 	tdo;
+	unsigned char 	endir;		//0: idle, 1:pause
 };
 
 struct sdr_xfer {
 	xfer_mode 	mode;		//0 :HW mode, 1: SW mode
 	unsigned char 	direct; 	// 0 ; read , 1 : write
-	unsigned short length;		//bits
-	unsigned int *tdio;
-	unsigned char enddr;		//0: idle, 1:pause
+	unsigned short 	length;		//bits
+	unsigned int 	*tdio;
+	unsigned char 	enddr;		//0: idle, 1:pause
 };
 
 #define JTAGIOC_BASE       'T'
@@ -127,12 +128,9 @@ static unsigned int chrdev_jtag_major = 0;
 static struct cdev chrdev_jtag_cdev;
 static struct class *chrdev_jtag_class = NULL;
 static unsigned int num_of_dev = 1;
-
-struct class *jtag_class;
-
 /******************************************************************************/
 
-//#define AST_JTAG_DEBUG
+#define AST_JTAG_DEBUG
 
 #ifdef AST_JTAG_DEBUG
 #define JTAG_DBUG(fmt, args...) printk(KERN_DEBUG "%s() " fmt,__FUNCTION__, ## args)
@@ -173,7 +171,7 @@ ast_jtag_read(struct ast_jtag_info *ast_jtag, u32 reg)
 static inline void
 ast_jtag_write(struct ast_jtag_info *ast_jtag, u32 val, u32 reg)
 {
-	JTAG_DBUG("reg = 0x%08x, val = 0x%08x\n", reg, val);
+	JTAG_DBUG("jtagmain : reg = 0x%08x, val = 0x%08x\n", reg, val);
 	writel(val, ast_jtag->reg_base + reg);
 }
 
@@ -346,8 +344,10 @@ int ast_jtag_sir_xfer(struct ast_jtag_info *ast_jtag, struct sir_xfer *sir)
 	int i = 0;
 	JTAG_DBUG("%s mode, ENDIR : %d, len : %d \n", sir->mode ? "SW" : "HW", sir->endir, sir->length);
 
-	if (sir->mode) {
-		if (ast_jtag->sts) {
+	if (sir->mode)
+	{
+		if (ast_jtag->sts)
+		{
 			//from IR/DR Pause
 			TCK_Cycle(ast_jtag, 1, 0);		// go to Exit2 IR / DR
 			TCK_Cycle(ast_jtag, 1, 0);		// go to Update IR /DR
@@ -359,10 +359,14 @@ int ast_jtag_sir_xfer(struct ast_jtag_info *ast_jtag, struct sir_xfer *sir)
 		TCK_Cycle(ast_jtag, 0, 0);		// go to ShiftIR
 
 		sir->tdo = 0;
-		for (i = 0; i < sir->length; i++) {
-			if (i == (sir->length - 1)) {
+		for (i = 0; i < sir->length; i++)
+		{
+			if (i == (sir->length - 1))
+			{
 				sir->tdo |= TCK_Cycle(ast_jtag, 1, sir->tdi & 0x1);	// go to IRExit1
-			} else {
+			}
+			else
+			{
 				sir->tdo |= TCK_Cycle(ast_jtag, 0, sir->tdi & 0x1);	// go to ShiftIR
 				sir->tdi >>= 1;
 				sir->tdo <<= 1;
@@ -372,23 +376,29 @@ int ast_jtag_sir_xfer(struct ast_jtag_info *ast_jtag, struct sir_xfer *sir)
 		TCK_Cycle(ast_jtag, 0, 0);		// go to IRPause
 
 		//stop pause
-		if (sir->endir == 0) {
+		if (sir->endir == 0)
+		{
 			//go to idle
 			TCK_Cycle(ast_jtag, 1, 0);		// go to IRExit2
 			TCK_Cycle(ast_jtag, 1, 0);		// go to IRUpdate
 			TCK_Cycle(ast_jtag, 0, 0);		// go to IDLE
 		}
-	} else {
+	}
+	else
+	{
 		//HW MODE
 
 		ast_jtag_write(ast_jtag, 0 , AST_JTAG_SW); //dis sw mode
 		ast_jtag_write(ast_jtag, sir->tdi, AST_JTAG_INST);
 
-		if (sir->endir) {
+		if (sir->endir)
+		{
 			ast_jtag_write(ast_jtag, JTAG_ENG_EN | JTAG_ENG_OUT_EN | JTAG_SET_INST_LEN(sir->length), AST_JTAG_CTRL);
 			ast_jtag_write(ast_jtag, JTAG_ENG_EN | JTAG_ENG_OUT_EN | JTAG_SET_INST_LEN(sir->length) | JTAG_INST_EN, AST_JTAG_CTRL);
 			ast_jtag_wait_instruction_pause_complete(ast_jtag);
-		} else {
+		}
+		else
+		{
 			ast_jtag_write(ast_jtag, JTAG_ENG_EN | JTAG_ENG_OUT_EN | JTAG_LAST_INST | JTAG_SET_INST_LEN(sir->length), AST_JTAG_CTRL);
 			ast_jtag_write(ast_jtag, JTAG_ENG_EN | JTAG_ENG_OUT_EN | JTAG_LAST_INST | JTAG_SET_INST_LEN(sir->length) | JTAG_INST_EN, AST_JTAG_CTRL);
 			ast_jtag_wait_instruction_complete(ast_jtag);
@@ -399,7 +409,8 @@ int ast_jtag_sir_xfer(struct ast_jtag_info *ast_jtag, struct sir_xfer *sir)
 #if 0
 		ast_jtag_write(ast_jtag, JTAG_SW_MODE_EN | JTAG_SW_MODE_TDIO, AST_JTAG_SW);
 #else
-		if (sir->endir == 0) {
+		if (sir->endir == 0)
+		{
 			ast_jtag_write(ast_jtag, JTAG_SW_MODE_EN | JTAG_SW_MODE_TDIO, AST_JTAG_SW);
 		}
 #endif
@@ -415,11 +426,13 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 	u32 tdo = 0;
 	u32 remain_xfer = sdr->length;
 
-	JTAG_DBUG("%s mode, len : %d \n", sdr->mode ? "SW" : "HW", sdr->length);
+	JTAG_DBUG("jtagmain : %s mode, len : %d \n", sdr->mode ? "SW" : "HW", sdr->length);
 
-	if (sdr->mode) {
+	if (sdr->mode)
+	{
 		//SW mode
-		if (ast_jtag->sts) {
+		if (ast_jtag->sts)
+		{
 			//from IR/DR Pause
 			TCK_Cycle(ast_jtag, 1, 0);		// go to Exit2 IR / DR
 			TCK_Cycle(ast_jtag, 1, 0);		// go to Update IR /DR
@@ -431,24 +444,34 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 
 		if (!sdr->direct)
 			sdr->tdio[index] = 0;
-		while (remain_xfer) {
-			if (sdr->direct) {
+		while (remain_xfer)
+		{
+			if (sdr->direct)
+			{
 				//write
 				if ((shift_bits % 32) == 0)
-					JTAG_DBUG("W dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
+					JTAG_DBUG("jtagmain : W dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
 
 				tdo = (sdr->tdio[index] >> (shift_bits % 32)) & (0x1);
 				JTAG_DBUG("%d ", tdo);
-				if (remain_xfer == 1) {
+				if (remain_xfer == 1)
+				{
 					TCK_Cycle(ast_jtag, 1, tdo);	// go to DRExit1
-				} else {
+				}
+				else
+				{
 					TCK_Cycle(ast_jtag, 0, tdo);	// go to DRShit
 				}
-			} else {
+			}
+			else
+			{
 				//read
-				if (remain_xfer == 1) {
+				if (remain_xfer == 1)
+				{
 					tdo = TCK_Cycle(ast_jtag, 1, tdo);	// go to DRExit1
-				} else {
+				}
+				else
+				{
 					tdo = TCK_Cycle(ast_jtag, 0, tdo);	// go to DRShit
 				}
 				JTAG_DBUG("%d ", tdo);
@@ -468,26 +491,33 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 
 		TCK_Cycle(ast_jtag, 0, 0);		// go to DRPause
 
-		if (sdr->enddr == 0) {
+		if (sdr->enddr == 0)
+		{
 			TCK_Cycle(ast_jtag, 1, 0);		// go to DRExit2
 			TCK_Cycle(ast_jtag, 1, 0);		// go to DRUpdate
 			TCK_Cycle(ast_jtag, 0, 0);		// go to IDLE
 		}
-	} else {
+	}
+	else
+	{
 		//HW MODE
 		ast_jtag_write(ast_jtag, 0, AST_JTAG_SW);
-		while (remain_xfer) {
-			if (sdr->direct) {
-				JTAG_DBUG("W dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
+		while (remain_xfer)
+		{
+			if (sdr->direct)
+			{
+				JTAG_DBUG("jtagmain : W dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
 				ast_jtag_write(ast_jtag, sdr->tdio[index], AST_JTAG_DATA);
-			} else {
+			}
+			else
+			{
 				ast_jtag_write(ast_jtag, 0, AST_JTAG_DATA);
 			}
 
 			if (remain_xfer > 32) {
 				shift_bits = 32;
 				// read bytes were not equals to column length ==> Pause-DR
-				JTAG_DBUG("shit bits %d \n", shift_bits);
+				JTAG_DBUG("jtagmain : shift bits %d \n", shift_bits);
 				ast_jtag_write(ast_jtag,
 							   JTAG_ENG_EN | JTAG_ENG_OUT_EN |
 							   JTAG_DATA_LEN(shift_bits), AST_JTAG_CTRL);
@@ -495,12 +525,15 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 							   JTAG_ENG_EN | JTAG_ENG_OUT_EN |
 							   JTAG_DATA_LEN(shift_bits) | JTAG_DATA_EN, AST_JTAG_CTRL);
 				ast_jtag_wait_data_pause_complete(ast_jtag);
-			} else {
+			}
+			else
+			{
 				// read bytes equals to column length => Update-DR
 				shift_bits = remain_xfer;
-				JTAG_DBUG("shit bits %d with last \n", shift_bits);
-				if (sdr->enddr) {
-					JTAG_DBUG("DR Keep Pause \n");
+				JTAG_DBUG("jtagmain : shift bits %d with last \n", shift_bits);
+				if (sdr->enddr)
+				{
+					JTAG_DBUG("jtagmain : DR Keep Pause \n");
 					ast_jtag_write(ast_jtag,
 								   JTAG_ENG_EN | JTAG_ENG_OUT_EN | JTAG_DR_UPDATE |
 								   JTAG_DATA_LEN(shift_bits), AST_JTAG_CTRL);
@@ -508,8 +541,10 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 								   JTAG_ENG_EN | JTAG_ENG_OUT_EN | JTAG_DR_UPDATE |
 								   JTAG_DATA_LEN(shift_bits) | JTAG_DATA_EN, AST_JTAG_CTRL);
 					ast_jtag_wait_data_pause_complete(ast_jtag);
-				} else {
-					JTAG_DBUG("DR go IDLE \n");
+				}
+				else
+				{
+					JTAG_DBUG("jtagmain : DR go IDLE \n");
 					ast_jtag_write(ast_jtag,
 								   JTAG_ENG_EN | JTAG_ENG_OUT_EN | JTAG_LAST_DATA |
 								   JTAG_DATA_LEN(shift_bits), AST_JTAG_CTRL);
@@ -520,18 +555,19 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 				}
 			}
 
-			if (!sdr->direct) {
+			if (!sdr->direct)
+			{
 				//TODO check ....
 				if (shift_bits < 32)
 					sdr->tdio[index] = ast_jtag_read(ast_jtag, AST_JTAG_DATA) >> (32 - shift_bits);
 				else
 					sdr->tdio[index] = ast_jtag_read(ast_jtag, AST_JTAG_DATA);
-				JTAG_DBUG("R dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
+				JTAG_DBUG("jtagmain : R dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
 			}
 
 			remain_xfer = remain_xfer - shift_bits;
 			index ++;
-			JTAG_DBUG("remain_xfer %d\n", remain_xfer);
+			JTAG_DBUG("jtagmain : remain_xfer %d\n", remain_xfer);
 		}
 		#if 1
 		ast_jtag_write(ast_jtag, JTAG_SW_MODE_EN | JTAG_SW_MODE_TDIO, AST_JTAG_SW);
@@ -551,7 +587,7 @@ void ast_jtag_run_test_idle(struct ast_jtag_info *ast_jtag, struct runtest_idle 
 {
 	int i = 0;
 
-	JTAG_DBUG(":%s mode\n", runtest->mode ? "SW" : "HW");
+	JTAG_DBUG("jtagmian : %s mode\n", runtest->mode ? "SW" : "HW");
 
 	if (runtest->mode) {
 		//SW mode
@@ -759,7 +795,8 @@ static const struct file_operations ast_jtag_fops = {
 
 struct miscdevice ast_jtag_misc = {
 	.minor  = MISC_DYNAMIC_MINOR,
-	.name   = "ast-jtag",
+//	.name   = "ast-jtag",
+	.name   = JTAG_DEVICE_NAME",
 	.fops   = &ast_jtag_fops,
 };
 
@@ -776,7 +813,7 @@ static irqreturn_t ast_jtag_interrupt(int this_irq, void *dev_id)
 	struct ast_jtag_info *ast_jtag = dev_id;
 
 	status = ast_jtag_read(ast_jtag, AST_JTAG_ISR);
-	JTAG_DBUG("sts %x \n", status);
+	JTAG_DBUG("jtagmain : status %x \n", status);
 
 	if (status & JTAG_INST_PAUSE) {
 		ast_jtag_write(ast_jtag, JTAG_INST_PAUSE | (status & 0xf), AST_JTAG_ISR);
@@ -814,40 +851,49 @@ static int ast_jtag_probe(struct platform_device *pdev)
 	struct resource *res;
 	int ret = 0;
 
-	JTAG_DBUG("ast_jtag_probe\n");
+	JTAG_DBUG("jtagmain : ast_jtag_probe\n");
 
-	if (!(ast_jtag = devm_kzalloc(&pdev->dev, sizeof(struct ast_jtag_info), GFP_KERNEL))) {
+	if (!(ast_jtag = devm_kzalloc(&pdev->dev, sizeof(struct ast_jtag_info), GFP_KERNEL)))
+	{
+		JTAG_DBUG("jtgmain : ast_jtag_probe ast_jtag failed\n");
 		return -ENOMEM;
 	}
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-	if (NULL == res) {
+	if (NULL == res)
+	{
 		dev_err(&pdev->dev, "cannot get IORESOURCE_MEM\n");
 		ret = -ENOENT;
 		goto out;
 	}
 
 	ast_jtag->reg_base = devm_ioremap_resource(&pdev->dev, res);
-	if (!ast_jtag->reg_base) {
+	if (!ast_jtag->reg_base) 
+	{
 		ret = -EIO;
 		goto out_region;
 	}
 
 	ast_jtag->irq = platform_get_irq(pdev, 0);
-	if (ast_jtag->irq < 0) {
+	if (ast_jtag->irq < 0)
+	{
 		dev_err(&pdev->dev, "no irq specified\n");
 		ret = -ENOENT;
 		goto out_region;
 	}
 
 	ast_jtag->reset = devm_reset_control_get_exclusive(&pdev->dev, "jtag");
-	if (IS_ERR(ast_jtag->reset)) {
+	if (IS_ERR(ast_jtag->reset)) 
+	{
 		dev_err(&pdev->dev, "can't get jtag reset\n");
+		JTAG_DBUG("jtagmain : ast_jtag_probe ast_jtag->reset failed\n");
 		return PTR_ERR(ast_jtag->reset);
 	}
 
 	ast_jtag->clk = devm_clk_get(&pdev->dev, NULL);
-	if (IS_ERR(ast_jtag->clk)) {
+	if (IS_ERR(ast_jtag->clk))
+	{
+		JTAG_DBUG("jtagmain : ast_jtag->clk failed\n");
 		dev_err(&pdev->dev, "no clock defined\n");
 		return -ENODEV;
 	}
@@ -863,8 +909,9 @@ static int ast_jtag_probe(struct platform_device *pdev)
 
 	ret = devm_request_irq(&pdev->dev, ast_jtag->irq, ast_jtag_interrupt,
 						   0, dev_name(&pdev->dev), ast_jtag);
-	if (ret) {
-		printk("JTAG Unable to get IRQ");
+	if (ret)
+	{
+		JTAG_DBUG("jtagmain : JTAG Unable to get IRQ\n");
 		goto out_region;
 	}
 
@@ -878,21 +925,24 @@ static int ast_jtag_probe(struct platform_device *pdev)
 	init_waitqueue_head(&ast_jtag->jtag_wq);
 
 	ret = misc_register(&ast_jtag_misc);
-	if (ret) {
-		printk(KERN_ERR "JTAG : failed to request interrupt\n");
+	if (ret) 
+	{
+		JTAG_DBUG("jtagmain : failed to request interrupt\n");
 		goto out_irq;
-	}
+	}	
+
 
 	platform_set_drvdata(pdev, ast_jtag);
 	dev_set_drvdata(ast_jtag_misc.this_device, ast_jtag);
 
 	ret = sysfs_create_group(&pdev->dev.kobj, &jtag_attribute_group);
-	if (ret) {
-		printk(KERN_ERR "ast_jtag: failed to create sysfs device attributes.\n");
+	if (ret)
+	{
+		JTAG_DBUG("jtagmain : failed to create sysfs device attributes.\n");
 		return -1;
 	}
 
-	printk(KERN_INFO "ast_jtag: driver successfully loaded.\n");
+	JTAG_DBUG("jtagmain : driver successfully loaded.\n");
 
 	return 0;
 
@@ -901,7 +951,7 @@ out_irq:
 out_region:
 	release_mem_region(res->start, res->end - res->start + 1);
 out:
-	printk(KERN_WARNING "ast_jtag: driver init failed (ret=%d)!\n", ret);
+	JTAG_DBUG("jtagmain : driver init failed (ret=%d)!\n", ret);
 	return ret;
 }
 
@@ -951,7 +1001,8 @@ static struct platform_driver ast_jtag_driver = {
 	.driver         = {
 //				.name		= KBUILD_MODNAME,
 				.name		= JTAG_DRIVER_NAME,
-				.of_match_table = ast_jtag_of_matches,
+				.owner		= THIS_MODULE,
+//				.of_match_table = ast_jtag_of_matches,
 	},
 };
 /*************************************************************************************/
@@ -964,39 +1015,39 @@ int __init jtag_init(void)
 
 	int ret = -1;
 
-	printk("willen jtag_init\n");
+	JTAG_DBUG("jtagmain : jtag_init\n");
 	chrdev_jtag_major = MAJOR(dev);
 	
 	ret = platform_driver_probe(&ast_jtag_driver, &ast_jtag_probe);
  	if (ret < 0)
    	{
-   		printk("willen jtag Platform Driver probe failed with :%d\n", ret);
-   		return -1;
+   		JTAG_DBUG("jtagmain : jtag Platform Driver probe failed with :%d\n", ret);
+		return -1;
    	}
    	else
    	{
-		ret = alloc_chrdev_region(&dev, 0, num_of_dev, JTAG_DRIVER_NAME);
+		ret = alloc_chrdev_region(&dev, 0, num_of_dev, JTAG_DEVICE_NAME);
 		if (ret < 0)
 		{
 			platform_driver_unregister(&ast_jtag_driver);
-			printk("willen jtag alloc_chrdev_region failed\n");
+			JTAG_DBUG("jtagmain : jtag alloc_chrdev_region failed\n");
 			return -1;
 		}
 		
- 		if ( (chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DRIVER_NAME) ) == NULL)
+ 		if ( (chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DEVICE_NAME)) == NULL)
 		{
   			platform_driver_unregister(&ast_jtag_driver);
   			unregister_chrdev_region(dev, num_of_dev);
-  			printk("willen jtag class_create failed\n");
+  			JTAG_DBUG("jtagmain : jtag class_create failed\n");
 			return -1;
 		}
 		
-		if (device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,"ast-jtag") == NULL)
+		if (device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,JTAG_DEVICE_NAME) == NULL)
 		{
 			platform_driver_unregister(&ast_jtag_driver);
 			class_destroy(chrdev_jtag_class);
 			unregister_chrdev_region(dev, num_of_dev);
-			printk("willen jtag Device creation failed\n" );
+			JTAG_DBUG("jtagmain : jtag device_create failed\n");
 			return -1;
 		}
 		
@@ -1008,7 +1059,7 @@ int __init jtag_init(void)
         		device_destroy(chrdev_jtag_class, dev);
         		class_destroy(chrdev_jtag_class);
 			unregister_chrdev_region(dev, num_of_dev);
-			printk("willen jtag Device addition failed\n" );
+			JTAG_DBUG("jtagmain : jtag Device addition failed\n" );
 			return -1;
     		}
 	}
@@ -1022,7 +1073,7 @@ void __exit jtag_exit(void)
 {
 	dev_t dev = MKDEV(chrdev_jtag_major, 0);
 	
-	printk("willen jtag_exit\n");
+	JTAG_DBUG("jtagmain : jtag_exit\n");
 	platform_driver_unregister(&ast_jtag_driver);
 	cdev_del(&chrdev_jtag_cdev);
  	device_destroy(chrdev_jtag_class, dev);
@@ -1033,15 +1084,9 @@ void __exit jtag_exit(void)
 }
 /*************************************************************************************/
 
-
-
-
-
-
-
 module_init(jtag_init);
 module_exit(jtag_exit);
-module_platform_driver(ast_jtag_driver);
+//module_platform_driver(ast_jtag_driver);
 
 MODULE_AUTHOR("Ryan Chen <ryan_chen@aspeedtech.com>");
 MODULE_DESCRIPTION("AST JTAG LIB Driver");
