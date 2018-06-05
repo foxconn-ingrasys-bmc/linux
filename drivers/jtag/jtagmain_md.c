@@ -960,7 +960,7 @@ static int ast_jtag_remove(struct platform_device *pdev)
 	struct resource *res;
 	struct ast_jtag_info *ast_jtag = platform_get_drvdata(pdev);
 
-	JTAG_DBUG("ast_jtag_remove\n");
+	JTAG_DBUG("jtagmain : ast_jtag_remove\n");
 
 	sysfs_remove_group(&pdev->dev.kobj, &jtag_attribute_group);
 
@@ -1014,7 +1014,7 @@ int __init jtag_init(void)
 	dev_t dev = MKDEV(chrdev_jtag_major, 0);
 
 	int ret = -1;
-
+	printk("willen jtag_init\n");
 	JTAG_DBUG("jtagmain : jtag_init\n");
 	chrdev_jtag_major = MAJOR(dev);
 	
