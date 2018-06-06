@@ -1001,9 +1001,9 @@ static struct platform_driver ast_jtag_driver = {
 #endif
 	.driver         = {
 //				.name		= KBUILD_MODNAME,
-				.name		= JTAG_DRIVER_NAME,
+				.name		= "ast-jtag",
 				.owner		= THIS_MODULE,
-//				.of_match_table = ast_jtag_of_matches,
+				.of_match_table = ast_jtag_of_matches,
 	},
 };
 /*************************************************************************************/
@@ -1030,7 +1030,7 @@ int __init jtag_init(void)
    	else
    	{
 		//ret = alloc_chrdev_region(&dev, 0, num_of_dev, JTAG_DEVICE_NAME);
-		ret = alloc_chrdev_region(&dev, 0, num_of_dev, JTAG_DRIVER_NAME);
+		ret = alloc_chrdev_region(&dev, 0, num_of_dev, "ast-jtag");
 		if (ret < 0)
 		{
 			platform_driver_unregister(&ast_jtag_driver);
@@ -1051,7 +1051,8 @@ int __init jtag_init(void)
 
 		
  		//if ( (chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DEVICE_NAME)) == NULL)
-		chrdev_jtag_class = class_create(THIS_MODULE, JTAG_DRIVER_NAME);
+		//chrdev_jtag_class = class_create(THIS_MODULE, JTAG_DRIVER_NAME);
+		chrdev_jtag_class = class_create(THIS_MODULE, "jtag");
         	
 		if (IS_ERR(chrdev_jtag_class))
         	{
