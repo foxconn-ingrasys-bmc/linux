@@ -143,7 +143,8 @@ static struct file_operations FileOps =
     .unlocked_ioctl        = adc_device_ioctl,
 };
  
-static int sample_wm97xx_init(void)
+//static int sample_wm97xx_init(void)
+int __init sample_wm97xx_init(void)
 {
    init_result = platform_driver_probe(&sample_wm97xx_driver, &sample_wm97xx_probe);
  
@@ -192,7 +193,8 @@ static int sample_wm97xx_init(void)
     return 0;
 }
  
-static void sample_wm97xx_exit(void)
+//static void sample_wm97xx_exit(void)
+void __exit sample_wm97xx_exit(void)
 {
     platform_driver_unregister(&sample_wm97xx_driver);
     cdev_del( &c_dev );
