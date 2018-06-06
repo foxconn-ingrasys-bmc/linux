@@ -7,4 +7,5 @@
 TARGET    := jtag
 #obj-y			+= jtagmain.o
 obj-y			+= jtagmain_md.o
+obj-y			+= adcmain.o
 

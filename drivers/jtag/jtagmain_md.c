@@ -1037,6 +1037,18 @@ int __init jtag_init(void)
 			JTAG_DBUG("jtagmain : jtag alloc_chrdev_region failed\n");
 			return -1;
 		}
+                cdev_init(&chrdev_jtag_cdev, &ast_jtag_fops);
+                
+                if ((cdev_add(&chrdev_jtag_cdev, dev, num_of_dev)) == -1)
+                {
+                        platform_driver_unregister(&ast_jtag_driver);
+                        device_destroy(chrdev_jtag_class, dev);
+                        class_destroy(chrdev_jtag_class);
+                        unregister_chrdev_region(dev, num_of_dev);
+                        JTAG_DBUG("jtagmain : jtag Device addition failed\n" );
+                        return -1;
+                }
+
 		
  		//if ( (chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DEVICE_NAME)) == NULL)
 		chrdev_jtag_class = class_create(THIS_MODULE, JTAG_DRIVER_NAME);
@@ -1064,10 +1076,10 @@ int __init jtag_init(void)
 			JTAG_DBUG("jtagmain : jtag device_create failed\n");
 			return -1;
 		}
-		
+#if 0		
 		cdev_init(&chrdev_jtag_cdev, &ast_jtag_fops);
  		
- 		if (cdev_add(&chrdev_jtag_cdev, dev, num_of_dev) == -1)
+ 		if ((cdev_add(&chrdev_jtag_cdev, dev, num_of_dev)) == -1)
     		{
         		platform_driver_unregister(&ast_jtag_driver);
         		device_destroy(chrdev_jtag_class, dev);
@@ -1076,6 +1088,7 @@ int __init jtag_init(void)
 			JTAG_DBUG("jtagmain : jtag Device addition failed\n" );
 			return -1;
     		}
+#endif
 	}
 	JTAG_DBUG("jtagmain : jtag_init finished\n" );
 	return 0;
