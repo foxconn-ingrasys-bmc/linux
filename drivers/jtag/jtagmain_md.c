@@ -1039,6 +1039,14 @@ int __init jtag_init(void)
 		}
 		
  		//if ( (chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DEVICE_NAME)) == NULL)
+		chrdev_jtag_class = class_create(THIS_MODULE, JTAG_DRIVER_NAME);
+        	
+		if (IS_ERR(chrdev_jtag_class))
+        	{
+			JTAG_DBUG("jtagmain : jtag class_create failed\n");
+                	return -1;
+        	}
+#if 0
  		if ((chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DRIVER_NAME)) == NULL)
 		{
   			platform_driver_unregister(&ast_jtag_driver);
@@ -1046,7 +1054,7 @@ int __init jtag_init(void)
   			JTAG_DBUG("jtagmain : jtag class_create failed\n");
 			return -1;
 		}
-		
+#endif		
 		//if (device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,JTAG_DEVICE_NAME) == NULL)
 		if ((device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,"ast-jtag")) == NULL)
 		{
