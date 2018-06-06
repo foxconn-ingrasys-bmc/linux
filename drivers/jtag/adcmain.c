@@ -6,7 +6,7 @@
 #include <linux/fs.h>
 #include <linux/errno.h>
 #include <asm/uaccess.h>
-#include <linux/wm97xx.h>
+//#include <linux/wm97xx.h>
 #include <linux/kdev_t.h>
 #include <linux/device.h>
 #include <linux/cdev.h>
