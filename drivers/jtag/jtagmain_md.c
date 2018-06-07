@@ -759,6 +759,8 @@ static long jtag_ioctl(struct file *file, unsigned int cmd,unsigned long arg)
 static int jtag_open(struct inode *inode, struct file *file)
 {
 //	struct ast_jtag_info *drvdata;
+#if 0
+	struct ast_jtag_info *ast_jtag = file->private_data;;
 
 	spin_lock(&jtag_state_lock);
 
@@ -775,7 +777,7 @@ static int jtag_open(struct inode *inode, struct file *file)
 	file->private_data = ast_jtag;
 
 	spin_unlock(&jtag_state_lock);
-
+#endif
 	return 0;
 }
 
