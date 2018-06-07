@@ -703,22 +703,22 @@ static struct attribute_group jtag_attribute_group = {
 static long jtag_ioctl(struct file *file, unsigned int cmd,unsigned long arg)
 {
 	int ret = 0;
-#if 0
+
 	struct ast_jtag_info *ast_jtag = file->private_data;
 	void __user *argp = (void __user *)arg;
 	struct sir_xfer sir;
 	struct sdr_xfer sdr;
 	struct runtest_idle run_idle;
 //	unsigned int freq;
-#endif
+
 	JTAG_DBUG("jtagmain : jtag_ioctl\n");
-#if 0
+
 	switch (cmd) {
 	case AST_JTAG_GIOCFREQ:
 		ret = __put_user(ast_jtag_get_freq(ast_jtag), (unsigned int __user *)arg);
 		break;
 	case AST_JTAG_SIOCFREQ:
-//			printk("set freq = %d , pck %d \n",config.freq, ast_get_pclk());
+		printk("set freq = %d , pck %d \n",config.freq, ast_get_pclk());
 		if ((unsigned int)arg > ast_jtag->apb_clk)
 			ret = -EFAULT;
 		else
@@ -752,20 +752,20 @@ static long jtag_ioctl(struct file *file, unsigned int cmd,unsigned long arg)
 	default:
 		return -ENOTTY;
 	}
-#endif
+
 	return ret;
 }
 
 static int jtag_open(struct inode *inode, struct file *file)
 {
 //	struct ast_jtag_info *drvdata;
-#if 0
+
 	spin_lock(&jtag_state_lock);
-#endif
+
 //	drvdata = container_of(inode->i_cdev, struct ast_jtag_info, cdev);
 
 	JTAG_DBUG("jtagmain : jtag_open\n");
-#if 0
+
 	if (ast_jtag->is_open) {
 		spin_unlock(&jtag_state_lock);
 		return -EBUSY;
@@ -775,13 +775,13 @@ static int jtag_open(struct inode *inode, struct file *file)
 	file->private_data = ast_jtag;
 
 	spin_unlock(&jtag_state_lock);
-#endif
+
 	return 0;
 }
 
 static int jtag_release(struct inode *inode, struct file *file)
 {
-#if 0
+
 	struct ast_jtag_info *drvdata = file->private_data;
 
 	spin_lock(&jtag_state_lock);
@@ -789,7 +789,7 @@ static int jtag_release(struct inode *inode, struct file *file)
 	drvdata->is_open = false;
 
 	spin_unlock(&jtag_state_lock);
-#endif
+
 
 	JTAG_DBUG("jtagmain : jtag_release\n");
 	return 0;
