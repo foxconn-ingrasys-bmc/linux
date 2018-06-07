@@ -718,7 +718,7 @@ static long jtag_ioctl(struct file *file, unsigned int cmd,unsigned long arg)
 		ret = __put_user(ast_jtag_get_freq(ast_jtag), (unsigned int __user *)arg);
 		break;
 	case AST_JTAG_SIOCFREQ:
-		printk("set freq = %d , pck %d \n",config.freq, ast_get_pclk());
+		//printk("set freq = %d , pck %d \n",config.freq, ast_get_pclk());
 		if ((unsigned int)arg > ast_jtag->apb_clk)
 			ret = -EFAULT;
 		else
