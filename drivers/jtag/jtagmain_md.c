@@ -1051,34 +1051,24 @@ int __init jtag_init(void)
                 if ((cdev_add(&chrdev_jtag_cdev, dev, num_of_dev)) == -1)
                 {
                         platform_driver_unregister(&ast_jtag_driver);
-                        device_destroy(chrdev_jtag_class, dev);
-                        class_destroy(chrdev_jtag_class);
+                        //device_destroy(chrdev_jtag_class, dev);
+                        //class_destroy(chrdev_jtag_class);
                         unregister_chrdev_region(dev, num_of_dev);
                         JTAG_DBUG("jtagmain : jtag Device addition failed\n" );
                         return -1;
                 }
 
 		
- 		//if ( (chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DEVICE_NAME)) == NULL)
-		//chrdev_jtag_class = class_create(THIS_MODULE, JTAG_DRIVER_NAME);
-#if 0		
 		chrdev_jtag_class = class_create(THIS_MODULE, "jtag");
         	
 		if (IS_ERR(chrdev_jtag_class))
         	{
+                        platform_driver_unregister(&ast_jtag_driver);
+                        unregister_chrdev_region(dev, num_of_dev);
 			JTAG_DBUG("jtagmain : jtag class_create failed\n");
                 	return -1;
         	}
-
- 		if ((chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DRIVER_NAME)) == NULL)
-		{
-  			platform_driver_unregister(&ast_jtag_driver);
-  			unregister_chrdev_region(dev, num_of_dev);
-  			JTAG_DBUG("jtagmain : jtag class_create failed\n");
-			return -1;
-		}
-
-		//if (device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,JTAG_DEVICE_NAME) == NULL)
+#if 0
 		if ((device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,"ast-jtag")) == NULL)
 		{
 			platform_driver_unregister(&ast_jtag_driver);
@@ -1114,7 +1104,7 @@ void __exit jtag_exit(void)
 	dev_t dev = MKDEV(chrdev_jtag_major, 0);
 	
 	JTAG_DBUG("jtagmain : jtag_exit\n");
-//	platform_driver_unregister(&ast_jtag_driver);
+	platform_driver_unregister(&ast_jtag_driver);
 	cdev_del(&chrdev_jtag_cdev);
 #if 0
  	device_destroy(chrdev_jtag_class, dev);
