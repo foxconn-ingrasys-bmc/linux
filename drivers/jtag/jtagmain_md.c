@@ -1023,10 +1023,9 @@ int __init jtag_init(void)
 
 	int ret = 0;
 	JTAG_DBUG("jtagmain : jtag_init start\n");
-	//chrdev_jtag_major = MAJOR(dev);
 	
 	//ret = platform_driver_probe(&ast_jtag_driver, &ast_jtag_probe);
-//	ret = platform_driver_register(&ast_jtag_driver);
+	//ret = platform_driver_register(&ast_jtag_driver);
 	
  	if (ret < 0)
    	{
@@ -1051,8 +1050,6 @@ int __init jtag_init(void)
                 if ((cdev_add(&chrdev_jtag_cdev, dev, num_of_dev)) == -1)
                 {
                         platform_driver_unregister(&ast_jtag_driver);
-                        //device_destroy(chrdev_jtag_class, dev);
-                        //class_destroy(chrdev_jtag_class);
                         unregister_chrdev_region(dev, num_of_dev);
                         JTAG_DBUG("jtagmain : jtag Device addition failed\n" );
                         return -1;
@@ -1068,7 +1065,8 @@ int __init jtag_init(void)
 			JTAG_DBUG("jtagmain : jtag class_create failed\n");
                 	return -1;
         	}
-#if 0
+
+
 		if ((device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,"ast-jtag")) == NULL)
 		{
 			platform_driver_unregister(&ast_jtag_driver);
@@ -1077,7 +1075,6 @@ int __init jtag_init(void)
 			JTAG_DBUG("jtagmain : jtag device_create failed\n");
 			return -1;
 		}
-#endif
 #if 0		
 		cdev_init(&chrdev_jtag_cdev, &ast_jtag_fops);
  		
