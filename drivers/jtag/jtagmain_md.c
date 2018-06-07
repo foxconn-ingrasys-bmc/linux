@@ -703,13 +703,16 @@ static struct attribute_group jtag_attribute_group = {
 static long jtag_ioctl(struct file *file, unsigned int cmd,unsigned long arg)
 {
 	int ret = 0;
+#if 0
 	struct ast_jtag_info *ast_jtag = file->private_data;
 	void __user *argp = (void __user *)arg;
 	struct sir_xfer sir;
 	struct sdr_xfer sdr;
 	struct runtest_idle run_idle;
 //	unsigned int freq;
-
+#endif
+	JTAG_DBUG("jtagmain : jtag_ioctl\n");
+#if 0
 	switch (cmd) {
 	case AST_JTAG_GIOCFREQ:
 		ret = __put_user(ast_jtag_get_freq(ast_jtag), (unsigned int __user *)arg);
@@ -749,18 +752,20 @@ static long jtag_ioctl(struct file *file, unsigned int cmd,unsigned long arg)
 	default:
 		return -ENOTTY;
 	}
-
+#endif
 	return ret;
 }
 
 static int jtag_open(struct inode *inode, struct file *file)
 {
 //	struct ast_jtag_info *drvdata;
-
+#if 0
 	spin_lock(&jtag_state_lock);
-
+#endif
 //	drvdata = container_of(inode->i_cdev, struct ast_jtag_info, cdev);
 
+	JTAG_DBUG("jtagmain : jtag_open\n");
+#if 0
 	if (ast_jtag->is_open) {
 		spin_unlock(&jtag_state_lock);
 		return -EBUSY;
@@ -770,12 +775,13 @@ static int jtag_open(struct inode *inode, struct file *file)
 	file->private_data = ast_jtag;
 
 	spin_unlock(&jtag_state_lock);
-
+#endif
 	return 0;
 }
 
 static int jtag_release(struct inode *inode, struct file *file)
 {
+#if 0
 	struct ast_jtag_info *drvdata = file->private_data;
 
 	spin_lock(&jtag_state_lock);
@@ -783,7 +789,9 @@ static int jtag_release(struct inode *inode, struct file *file)
 	drvdata->is_open = false;
 
 	spin_unlock(&jtag_state_lock);
+#endif
 
+	JTAG_DBUG("jtagmain : jtag_release\n");
 	return 0;
 }
 /*************************************************************************************/
@@ -793,14 +801,14 @@ static const struct file_operations ast_jtag_fops = {
 	.open		= jtag_open,
 	.release	= jtag_release,
 };
-
+#if 0
 struct miscdevice ast_jtag_misc = {
 	.minor  = MISC_DYNAMIC_MINOR,
 	.name   = "ast-jtag",
 //	.name   = JTAG_DEVICE_NAME,
 	.fops   = &ast_jtag_fops,
 };
-
+#endif
 
 
 
@@ -1014,12 +1022,12 @@ int __init jtag_init(void)
 {
 	dev_t dev = MKDEV(chrdev_jtag_major, 0);
 
-	int ret = -1;
+	int ret = 0;
 	JTAG_DBUG("jtagmain : jtag_init start\n");
-	chrdev_jtag_major = MAJOR(dev);
+	//chrdev_jtag_major = MAJOR(dev);
 	
 	//ret = platform_driver_probe(&ast_jtag_driver, &ast_jtag_probe);
-	ret = platform_driver_register(&ast_jtag_driver);
+//	ret = platform_driver_register(&ast_jtag_driver);
 	
  	if (ret < 0)
    	{
@@ -1037,6 +1045,8 @@ int __init jtag_init(void)
 			JTAG_DBUG("jtagmain : jtag alloc_chrdev_region failed\n");
 			return -1;
 		}
+		chrdev_jtag_major = MAJOR(dev);
+
                 cdev_init(&chrdev_jtag_cdev, &ast_jtag_fops);
                 
                 if ((cdev_add(&chrdev_jtag_cdev, dev, num_of_dev)) == -1)
@@ -1052,6 +1062,7 @@ int __init jtag_init(void)
 		
  		//if ( (chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DEVICE_NAME)) == NULL)
 		//chrdev_jtag_class = class_create(THIS_MODULE, JTAG_DRIVER_NAME);
+#if 0		
 		chrdev_jtag_class = class_create(THIS_MODULE, "jtag");
         	
 		if (IS_ERR(chrdev_jtag_class))
@@ -1059,7 +1070,7 @@ int __init jtag_init(void)
 			JTAG_DBUG("jtagmain : jtag class_create failed\n");
                 	return -1;
         	}
-#if 0
+
  		if ((chrdev_jtag_class = class_create( THIS_MODULE, JTAG_DRIVER_NAME)) == NULL)
 		{
   			platform_driver_unregister(&ast_jtag_driver);
@@ -1067,7 +1078,7 @@ int __init jtag_init(void)
   			JTAG_DBUG("jtagmain : jtag class_create failed\n");
 			return -1;
 		}
-#endif		
+
 		//if (device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,JTAG_DEVICE_NAME) == NULL)
 		if ((device_create(chrdev_jtag_class,NULL,MKDEV(chrdev_jtag_major, 0),NULL,"ast-jtag")) == NULL)
 		{
@@ -1077,6 +1088,7 @@ int __init jtag_init(void)
 			JTAG_DBUG("jtagmain : jtag device_create failed\n");
 			return -1;
 		}
+#endif
 #if 0		
 		cdev_init(&chrdev_jtag_cdev, &ast_jtag_fops);
  		
@@ -1103,10 +1115,12 @@ void __exit jtag_exit(void)
 	dev_t dev = MKDEV(chrdev_jtag_major, 0);
 	
 	JTAG_DBUG("jtagmain : jtag_exit\n");
-	platform_driver_unregister(&ast_jtag_driver);
+//	platform_driver_unregister(&ast_jtag_driver);
 	cdev_del(&chrdev_jtag_cdev);
+#if 0
  	device_destroy(chrdev_jtag_class, dev);
 	class_destroy(chrdev_jtag_class);
+#endif
 	unregister_chrdev_region(dev, num_of_dev);
 
 	return;	
