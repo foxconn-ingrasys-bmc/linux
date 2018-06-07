@@ -801,14 +801,13 @@ static const struct file_operations ast_jtag_fops = {
 	.open		= jtag_open,
 	.release	= jtag_release,
 };
-#if 0
+
 struct miscdevice ast_jtag_misc = {
 	.minor  = MISC_DYNAMIC_MINOR,
 	.name   = "ast-jtag",
 //	.name   = JTAG_DEVICE_NAME,
 	.fops   = &ast_jtag_fops,
 };
-#endif
 
 
 
