@@ -866,13 +866,13 @@ static int ast_jtag_probe(struct platform_device *pdev)
 		ret = -ENOENT;
 		goto out_region;
 	}
-
+#if 0
 	ast_jtag->reset = devm_reset_control_get_exclusive(&pdev->dev, "jtag");
 	if (IS_ERR(ast_jtag->reset)) {
 		dev_err(&pdev->dev, "can't get jtag reset\n");
 		return PTR_ERR(ast_jtag->reset);
 	}
-
+#endif
 	ast_jtag->clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(ast_jtag->clk)) {
 		dev_err(&pdev->dev, "no clock defined\n");
