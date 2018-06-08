@@ -1,4 +1,7 @@
 #include "skeleton.dtsi"
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/reset/ast-g5-reset.h>
+#include <dt-bindings/gpio/gpio.h>
 
 / {
 	model = "Aspeed BMC";
@@ -73,6 +76,13 @@
 			syscon: syscon@1e6e2000 {
 				compatible = "aspeed,g4-scu", "syscon", "simple-mfd";
 				reg = <0x1e6e2000 0x1a8>;
+
+				sys_reset: sys_reset@04 {
+					#reset-cells = <1>;
+					compatible = "aspeed,ast-reset";
+					reg = <0x04 0x04>, <0xD4 0x04>;
+					syscon = <&syscon>;
+				};				
 
 				pinctrl: pinctrl@1e6e2000 {
 					compatible = "aspeed,g4-pinctrl";
@@ -826,7 +836,7 @@
 				reg= <0x1e6e4000 0x20>;
 				interrupts = <43>;
 				clocks = <&clk_apb>;
-				/*resets = <&sys_reset SCU_RESET_JTAG>;*/
+				resets = <&sys_reset SCU_RESET_JTAG>;
 				reset-names = "jtag";
 			};
 
