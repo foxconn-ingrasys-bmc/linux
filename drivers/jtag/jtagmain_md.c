@@ -154,7 +154,16 @@ struct ast_jtag_info {
 };
 
 /******************************************************************************/
+truct platform_device jtag_device ={
+    .name= "ast-jtag",
+    .id = 0,
+    .dev = {
+            
+            .platform_data = &s, 
+     },
+};
 
+/******************************************************************************/
 
 static inline u32
 ast_jtag_read(struct ast_jtag_info *ast_jtag, u32 reg)
@@ -703,16 +712,16 @@ static struct attribute_group jtag_attribute_group = {
 static long jtag_ioctl(struct file *file, unsigned int cmd,unsigned long arg)
 {
 	int ret = 0;
-#if 0
+
 	struct ast_jtag_info *ast_jtag = file->private_data;
 	void __user *argp = (void __user *)arg;
 	struct sir_xfer sir;
 	struct sdr_xfer sdr;
 	struct runtest_idle run_idle;
 //	unsigned int freq;
-#endif
+
 	JTAG_DBUG("jtagmain : jtag_ioctl\n");
-#if 0
+
 	switch (cmd) {
 	case AST_JTAG_GIOCFREQ:
 		ret = __put_user(ast_jtag_get_freq(ast_jtag), (unsigned int __user *)arg);
@@ -752,7 +761,6 @@ static long jtag_ioctl(struct file *file, unsigned int cmd,unsigned long arg)
 	default:
 		return -ENOTTY;
 	}
-#endif
 	return ret;
 }
 
@@ -760,7 +768,7 @@ static int jtag_open(struct inode *inode, struct file *file)
 {
 //	struct ast_jtag_info *drvdata;
 
-	struct ast_jtag_info *ast_jtag = file->private_data;
+//	struct ast_jtag_info *ast_jtag = file->private_data;
 
 	spin_lock(&jtag_state_lock);
 
@@ -1012,7 +1020,7 @@ static struct platform_driver ast_jtag_driver = {
 //				.name		= KBUILD_MODNAME,
 				.name		= "ast-jtag",
 				.owner		= THIS_MODULE,
-				.of_match_table = ast_jtag_of_matches,
+//				.of_match_table = ast_jtag_of_matches,
 	},
 };
 /*************************************************************************************/
@@ -1027,7 +1035,7 @@ int __init jtag_init(void)
 	JTAG_DBUG("jtagmain : jtag_init start\n");
 	
 	//ret = platform_driver_probe(&ast_jtag_driver, &ast_jtag_probe);
-	//ret = platform_driver_register(&ast_jtag_driver);
+	ret = platform_driver_register(&ast_jtag_driver);
 	
  	if (ret < 0)
    	{
@@ -1077,19 +1085,7 @@ int __init jtag_init(void)
 			JTAG_DBUG("jtagmain : jtag device_create failed\n");
 			return -1;
 		}
-#if 0		
-		cdev_init(&chrdev_jtag_cdev, &ast_jtag_fops);
- 		
- 		if ((cdev_add(&chrdev_jtag_cdev, dev, num_of_dev)) == -1)
-    		{
-        		platform_driver_unregister(&ast_jtag_driver);
-        		device_destroy(chrdev_jtag_class, dev);
-        		class_destroy(chrdev_jtag_class);
-			unregister_chrdev_region(dev, num_of_dev);
-			JTAG_DBUG("jtagmain : jtag Device addition failed\n" );
-			return -1;
-    		}
-#endif
+		platform_device_register(&jtag_device);
 	}
 	JTAG_DBUG("jtagmain : jtag_init finished\n" );
 	return 0;
@@ -1105,12 +1101,11 @@ void __exit jtag_exit(void)
 	JTAG_DBUG("jtagmain : jtag_exit\n");
 	platform_driver_unregister(&ast_jtag_driver);
 	cdev_del(&chrdev_jtag_cdev);
-#if 0
  	device_destroy(chrdev_jtag_class, dev);
 	class_destroy(chrdev_jtag_class);
-#endif
 	unregister_chrdev_region(dev, num_of_dev);
 
+	platform_device_unregister(&jtag_device);
 	return;	
 }
 /*************************************************************************************/
