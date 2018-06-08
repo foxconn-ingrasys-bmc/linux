@@ -826,12 +826,9 @@
 				reg= <0x1e6e4000 0x20>;
 				interrupts = <43>;
 				clocks = <&clk_apb>;
-				resets = <&sys_reset SCU_RESET_JTAG>;
+				/*resets = <&sys_reset SCU_RESET_JTAG>;*/
 				reset-names = "jtag";
 			};
-
-
-
 
 
 			clk_ahb: clk_ahb@1e6e2070 {
