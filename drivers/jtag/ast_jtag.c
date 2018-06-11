@@ -129,10 +129,11 @@ struct sdr_xfer {
 #define AST_JTAG_SIOCFREQ		_IOW(JTAGIOC_BASE, 3, unsigned int)
 #define AST_JTAG_GIOCFREQ		_IOR(JTAGIOC_BASE, 4, unsigned int)
 /******************************************************************************/
-//#define AST_JTAG_DEBUG
+#define AST_JTAG_DEBUG
 
 #ifdef AST_JTAG_DEBUG
-#define JTAG_DBUG(fmt, args...) printk(KERN_DEBUG "%s() " fmt,__FUNCTION__, ## args)
+//#define JTAG_DBUG(fmt, args...) printk(KERN_DEBUG "%s() " fmt,__FUNCTION__, ## args)
+#define JTAG_DBUG(fmt, args...) printk(KERN_INFO "%s() " fmt,__FUNCTION__, ## args)
 #else
 #define JTAG_DBUG(fmt, args...)
 #endif
@@ -847,6 +848,7 @@ static int ast_jtag_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 
+	JTAG_DBUG("ast_jtag_probe devm_kzalloc\n");
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	if (NULL == res) {
 		dev_err(&pdev->dev, "cannot get IORESOURCE_MEM\n");
@@ -854,30 +856,40 @@ static int ast_jtag_probe(struct platform_device *pdev)
 		goto out;
 	}
 
+	
+	JTAG_DBUG("ast_jtag_probe platform_get_resource\n");
 	ast_jtag->reg_base = devm_ioremap_resource(&pdev->dev, res);
 	if (!ast_jtag->reg_base) {
 		ret = -EIO;
 		goto out_region;
 	}
 
+	
+	JTAG_DBUG("ast_jtag_probe devm_ioremap_resource\n");
 	ast_jtag->irq = platform_get_irq(pdev, 0);
+	
+	
 	if (ast_jtag->irq < 0) {
 		dev_err(&pdev->dev, "no irq specified\n");
 		ret = -ENOENT;
 		goto out_region;
 	}
-#if 0
+
+	JTAG_DBUG("ast_jtag_probe platfrom_get_irq\n");
 	ast_jtag->reset = devm_reset_control_get_exclusive(&pdev->dev, "jtag");
 	if (IS_ERR(ast_jtag->reset)) {
 		dev_err(&pdev->dev, "can't get jtag reset\n");
 		return PTR_ERR(ast_jtag->reset);
 	}
-#endif
+
+	JTAG_DBUG("ast_jtag_probe devm_reset_control_get_exclusive\n");
 	ast_jtag->clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(ast_jtag->clk)) {
 		dev_err(&pdev->dev, "no clock defined\n");
 		return -ENODEV;
 	}
+	
+	JTAG_DBUG("ast_jtag_probe devm_clk_get\n");
 	ast_jtag->apb_clk = clk_get_rate(ast_jtag->clk);
 
 	//scu init
@@ -895,6 +907,7 @@ static int ast_jtag_probe(struct platform_device *pdev)
 		goto out_region;
 	}
 
+	JTAG_DBUG("ast_jtag_probe devm_request_irq\n");
 	ast_jtag_write(ast_jtag, JTAG_INST_PAUSE | JTAG_INST_COMPLETE |
 				   JTAG_DATA_PAUSE | JTAG_DATA_COMPLETE |
 				   JTAG_INST_PAUSE_EN | JTAG_INST_COMPLETE_EN |
@@ -910,6 +923,7 @@ static int ast_jtag_probe(struct platform_device *pdev)
 		goto out_irq;
 	}
 
+	JTAG_DBUG("ast_jtag_probe misc_register\n");
 	platform_set_drvdata(pdev, ast_jtag);
 	dev_set_drvdata(ast_jtag_misc.this_device, ast_jtag);
 
@@ -925,10 +939,16 @@ static int ast_jtag_probe(struct platform_device *pdev)
 
 out_irq:
 	free_irq(ast_jtag->irq, NULL);
+
+	JTAG_DBUG("ast_jtag_probe out_irq\n");
 out_region:
 	release_mem_region(res->start, res->end - res->start + 1);
+	
+	JTAG_DBUG("ast_jtag_probe out_region\n");
 out:
 	printk(KERN_WARNING "ast_jtag: driver init failed (ret=%d)!\n", ret);
+	
+	JTAG_DBUG("ast_jtag_probe out\n");
 	return ret;
 }
 
