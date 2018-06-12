@@ -1,10 +1,10 @@
 #include "skeleton.dtsi"
 #include <dt-bindings/interrupt-controller/irq.h>
-#include <dt-bindings/reset/ast-g4-reset.h>
+#include <dt-bindings/reset/ast-g5-reset.h>
 #include <dt-bindings/gpio/gpio.h>
 
 / {
-	model = "AST2400 SOC";
+	model = "Aspeed BMC";
 	compatible = "aspeed,ast2400";
 	#address-cells = <1>;
 	#size-cells = <1>;
@@ -147,7 +147,7 @@
 			#address-cells = <1>;
 			#size-cells = <1>;
 			compatible = "aspeed,g5-scu", "syscon", "simple-mfd";
-			reg = <0x1e6e2000 0x200>;
+			reg = <0x1e6e2000 0x1a8>;
 			ranges;
 			sys_reset: sys_reset@04 {
 				#reset-cells = <1>;
@@ -398,6 +398,15 @@
 			no-loopback-test;
 			status = "disabled";
 		};
+		
+		
+
+		
+		
+		
+		
+		
+		
 
 		uart5: serial@1e784000 {
 			compatible = "ns16550a";
@@ -405,7 +414,9 @@
 			reg-shift = <2>;
 			interrupts = <10>;
 			clocks = <&clk_uart>;
+			current-speed = <38400>;
 			no-loopback-test;
+			status = "disabled";
 		};
 
 		/* use for sys crash */
