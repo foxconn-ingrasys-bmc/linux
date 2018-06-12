@@ -244,10 +244,10 @@
 				compatible = "aspeed,g4-mac1-clock";
 				enable = <0x0C 0x0>;
 			};
-			clk_uart: clk_uart@2c {
+			clk_uart: clk_uart@1e6e2008 {
 				#clock-cells = <0>;
-				compatible = "aspeed,g4-uart-clock";
-				reg = <0x2c 0x0>;
+				compatible = "aspeed,uart-clock";
+				reg = <0x1e6e202c 0x4>;
 			};
 			hwrng@1e6e2078 {
 				compatible = "timeriomem_rng";
@@ -398,16 +398,33 @@
 			no-loopback-test;
 			status = "disabled";
 		};
-		
-		
 
-		
-		
-		
-		
-		
-		
+		uart2: serial@1e78d000 {
+			compatible = "ns16550a";
+			reg = <0x1e78d000 0x1000>;
+			reg-shift = <2>;
+			interrupts = <32>;
+			clocks = <&clk_uart>;
+			no-loopback-test;
+			status = "disabled";
+		};
 
+		uart3: serial@1e78e000 {
+			compatible = "ns16550a";
+			reg = <0x1e78e000 0x1000>;
+			reg-shift = <2>;
+			interrupts = <33>;
+			clocks = <&clk_uart>;
+			no-loopback-test;
+		};
+                uart4: serial@1e78f000 {
+			compatible = "ns16550a";
+			reg = <0x1e78f000 0x1000>;
+			reg-shift = <2>;
+			interrupts = <34>;
+			clocks = <&clk_uart>;
+			no-loopback-test;
+		};
 		uart5: serial@1e784000 {
 			compatible = "ns16550a";
 			reg = <0x1e784000 0x1000>;
@@ -447,14 +464,13 @@
 		};
 
 		vuart: vuart@1e787000 {
-			compatible = "aspeed,ast-vuart";
-			reg = <0x1e787000 0x200>;
+			compatible = "aspeed,vuart";
+			reg = <0x1e787000 0x1000>;
 			reg-shift = <2>;
-			interrupts = <2>;
+			interrupts = <8>;
 			clocks = <&clk_uart>;
 			no-loopback-test;
-			port_address = <0x3f8>;
-			serial_irq = <4>;
+			status = "disabled";
 		};
 
 		lpc:lpc@1e789000 {
@@ -463,32 +479,7 @@
 			interrupts = <8>;
 		};
 
-		uart2: serial@1e78d000 {
-			compatible = "ns16550a";
-			reg = <0x1e78d000 0x1000>;
-			reg-shift = <2>;
-			interrupts = <32>;
-			clocks = <&clk_uart>;
-			no-loopback-test;
-			status = "disabled";
-		};
 
-		uart3: serial@1e78e000 {
-			compatible = "ns16550a";
-			reg = <0x1e78e000 0x1000>;
-			reg-shift = <2>;
-			interrupts = <33>;
-			clocks = <&clk_uart>;
-			no-loopback-test;
-		};
-                uart4: serial@1e78f000 {
-			compatible = "ns16550a";
-			reg = <0x1e78f000 0x1000>;
-			reg-shift = <2>;
-			interrupts = <34>;
-			clocks = <&clk_uart>;
-			no-loopback-test;
-		};
 
 
 		i2c: i2c@1e78a000 {
