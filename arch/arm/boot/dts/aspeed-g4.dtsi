@@ -72,16 +72,16 @@
 				reg = <0x1e6e2070 0x4>;
 				clocks = <&clk_clkin>;
 			};
-
 			syscon: syscon@1e6e2000 {
-				compatible = "aspeed,g4-scu", "syscon", "simple-mfd";
-				reg = <0x1e6e2000 0x1a8>;
-
+                        	compatible = "aspeed,g4-scu", "syscon", "simple-mfd";
+                        	reg = <0x1e6e2000 0x200>;
+                        	ranges;
+                        	
 				sys_reset: sys_reset@04 {
-					#reset-cells = <1>;
-					compatible = "aspeed,ast-reset";
-					reg = <0x04 0x04>, <0xD4 0x04>;
-					syscon = <&syscon>;
+                                	#reset-cells = <1>;
+                                	compatible = "aspeed,ast-reset";
+                                	reg = <0x04 0x04>, <0xD4 0x04>;
+                                	syscon = <&syscon>;
 				};				
 
 				pinctrl: pinctrl@1e6e2000 {
