@@ -399,7 +399,7 @@
 			status = "disabled";
 		};
 
-		uart0: serial@1e784000 {
+		uart5: serial@1e784000 {
 			compatible = "ns16550a";
 			reg = <0x1e784000 0x1000>;
 			reg-shift = <2>;
