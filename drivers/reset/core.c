@@ -179,23 +179,28 @@ static struct reset_control *__reset_control_get(
 				unsigned int index, int shared)
 {
 	struct reset_control *rstc;
-
+	printk("willen id %d\n",index);
 	lockdep_assert_held(&reset_list_mutex);
 
 	list_for_each_entry(rstc, &rcdev->reset_control_head, list) {
 		if (rstc->id == index) {
 			if (WARN_ON(!rstc->shared || !shared))
+			{
+				printk("willen return ERR_PTR(-EBUSY)\n");
 				return ERR_PTR(-EBUSY);
-
+			}
 			rstc->refcnt++;
+			printk("willen return rstc\n");
 			return rstc;
 		}
 	}
 
 	rstc = kzalloc(sizeof(*rstc), GFP_KERNEL);
 	if (!rstc)
+	{
+		printk("willen 1 return ERR_PTR(-ENOMEM)\n");
 		return ERR_PTR(-ENOMEM);
-
+	}
 	try_module_get(rcdev->owner);
 
 	rstc->rcdev = rcdev;
@@ -204,6 +209,7 @@ static struct reset_control *__reset_control_get(
 	rstc->refcnt = 1;
 	rstc->shared = shared;
 
+	printk("willen 2 return rstc\n");
 	return rstc;
 }
 
