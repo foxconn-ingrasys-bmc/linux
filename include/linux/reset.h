@@ -4,7 +4,7 @@
 #include <linux/device.h>
 
 struct reset_control;
-
+#define CONFIG_RESET_CONTROLLER
 #ifdef CONFIG_RESET_CONTROLLER
 
 int reset_control_reset(struct reset_control *rstc);
