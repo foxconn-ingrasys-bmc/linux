@@ -236,43 +236,56 @@ struct reset_control *__of_reset_control_get(struct device_node *node,
 	int ret;
 
 	if (!node)
+	{
+		printk("willen -EINVAL\n");
 		return ERR_PTR(-EINVAL);
-
-	if (id) {
-		index = of_property_match_string(node,
-						 "reset-names", id);
+	}
+	if (id) 
+	{
+		index = of_property_match_string(node,"reset-names", id);
 		if (index < 0)
+		{
+			printk("willen -ENOENT\n");
 			return ERR_PTR(-ENOENT);
+		}
 	}
 
-	ret = of_parse_phandle_with_args(node, "resets", "#reset-cells",
-					 index, &args);
+	ret = of_parse_phandle_with_args(node, "resets", "#reset-cells",index, &args);
 	if (ret)
+	{
+		printk("willen ret\n");
 		return ERR_PTR(ret);
-
+	}
 	mutex_lock(&reset_list_mutex);
 	rcdev = NULL;
-	list_for_each_entry(r, &reset_controller_list, list) {
-		if (args.np == r->of_node) {
+	list_for_each_entry(r, &reset_controller_list, list) 
+	{
+		if (args.np == r->of_node)
+		{
 			rcdev = r;
 			break;
 		}
 	}
 	of_node_put(args.np);
 
-	if (!rcdev) {
+	if (!rcdev) 
+	{
 		mutex_unlock(&reset_list_mutex);
 		return ERR_PTR(-EPROBE_DEFER);
 	}
 
-	if (WARN_ON(args.args_count != rcdev->of_reset_n_cells)) {
+	if (WARN_ON(args.args_count != rcdev->of_reset_n_cells)) 
+	{
 		mutex_unlock(&reset_list_mutex);
+		printk("willen -EINVAL_1\n");
 		return ERR_PTR(-EINVAL);
 	}
 
 	rstc_id = rcdev->of_xlate(rcdev, &args);
-	if (rstc_id < 0) {
+	if (rstc_id < 0) 
+	{
 		mutex_unlock(&reset_list_mutex);
+		printk("willen rstc_id\n");
 		return ERR_PTR(rstc_id);
 	}
 
@@ -310,7 +323,7 @@ struct reset_control *__devm_reset_control_get(struct device *dev,
 				     const char *id, int index, int shared)
 {
 	struct reset_control **ptr, *rstc;
-	printk("willen __devm_reset_control_get id %c index %d\n",*id,index);
+	printk("willen __devm_reset_control_get id %s index %d\n",*id,index);
 	ptr = devres_alloc(devm_reset_control_release, sizeof(*ptr),
 			   GFP_KERNEL);
 	if (!ptr)
@@ -318,11 +331,11 @@ struct reset_control *__devm_reset_control_get(struct device *dev,
 		printk("willen return !ptr\n");
 		return ERR_PTR(-ENOMEM);
 	}
-	rstc = __of_reset_control_get(dev ? dev->of_node : NULL,
-				      id, index, shared);
+	rstc = __of_reset_control_get(dev ? dev->of_node : NULL, id, index, shared);
+
 	if (!IS_ERR(rstc)) 
 	{
-		printk("willen IS_ERR(rstc)\n");
+		printk("willen !IS_ERR(rstc)\n");
 		*ptr = rstc;
 		devres_add(dev, ptr);
 	} 
