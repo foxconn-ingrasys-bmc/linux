@@ -234,6 +234,7 @@ struct reset_control *__of_reset_control_get(struct device_node *node,
 	struct of_phandle_args args;
 	int rstc_id;
 	int ret;
+	printk("willen __of_reset_control_get\n");
 
 	if (!node)
 	{
@@ -271,6 +272,7 @@ struct reset_control *__of_reset_control_get(struct device_node *node,
 	if (!rcdev) 
 	{
 		mutex_unlock(&reset_list_mutex);
+		printk("willen -EPROBE_DEFER\n");
 		return ERR_PTR(-EPROBE_DEFER);
 	}
 
@@ -293,7 +295,7 @@ struct reset_control *__of_reset_control_get(struct device_node *node,
 	rstc = __reset_control_get(rcdev, rstc_id, shared);
 
 	mutex_unlock(&reset_list_mutex);
-
+	printk("willen __of_reset_control_get done\n");
 	return rstc;
 }
 EXPORT_SYMBOL_GPL(__of_reset_control_get);
@@ -331,6 +333,11 @@ struct reset_control *__devm_reset_control_get(struct device *dev,
 		printk("willen return !ptr\n");
 		return ERR_PTR(-ENOMEM);
 	}
+	if (dev)
+		printk("willen dev is exist\n");
+	else
+		printk("willen dev is null\n");
+
 	rstc = __of_reset_control_get(dev ? dev->of_node : NULL, id, index, shared);
 
 	if (!IS_ERR(rstc)) 
