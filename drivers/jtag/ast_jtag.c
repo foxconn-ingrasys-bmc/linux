@@ -1004,7 +1004,8 @@ static struct platform_driver ast_jtag_driver = {
 	.resume         = ast_jtag_resume,
 #endif
 	.driver         = {
-		.name   = KBUILD_MODNAME,
+//		.name   = KBUILD_MODNAME,
+		.name	= "ast-jtag",
 		.of_match_table = ast_jtag_of_matches,
 	},
 };
