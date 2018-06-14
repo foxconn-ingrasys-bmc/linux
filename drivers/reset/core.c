@@ -234,7 +234,7 @@ struct reset_control *__of_reset_control_get(struct device_node *node,
 	struct of_phandle_args args;
 	int rstc_id;
 	int ret;
-	printk("willen __of_reset_control_get\n");
+	printk("willen __of_reset_control_get name %s fullname %s\n",node->name, node->full_name);
 
 	if (!node)
 	{
@@ -249,6 +249,8 @@ struct reset_control *__of_reset_control_get(struct device_node *node,
 			printk("willen -ENOENT\n");
 			return ERR_PTR(-ENOENT);
 		}
+		else
+			printk("willen index %d\n",index);
 	}
 
 	ret = of_parse_phandle_with_args(node, "resets", "#reset-cells",index, &args);
@@ -332,7 +334,7 @@ struct reset_control *__devm_reset_control_get(struct device *dev,
 {
 	struct reset_control **ptr, *rstc;
 	
-	printk("willen __devm_reset_control_get id %c index %d\n",*id,index);
+	printk("willen __devm_reset_control_get id %*.s index %d\n",*id,index);
 	
 	ptr = devres_alloc(devm_reset_control_release, sizeof(*ptr),GFP_KERNEL);
 
