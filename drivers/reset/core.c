@@ -339,9 +339,6 @@ struct reset_control *__devm_reset_control_get(struct device *dev,
 	if (id == NULL)
 		printk("willen id == NULL\n");
 
-	if (*id == NULL)
-		printk("willen *id == NULL\n");
-		
 	if (!ptr)
 	{
 		printk("willen return !ptr\n");
@@ -350,9 +347,6 @@ struct reset_control *__devm_reset_control_get(struct device *dev,
 	if (dev == NULL)
 		printk("willen dev == NULL\n");
 	
-	if (*dev == NULL)
-		printk("willen *dev == NULL\n");
-
 	rstc = __of_reset_control_get(dev ? dev->of_node : NULL, id, index, shared);
 
 	if (!IS_ERR(rstc)) 
