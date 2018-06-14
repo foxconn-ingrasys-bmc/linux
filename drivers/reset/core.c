@@ -259,6 +259,12 @@ struct reset_control *__of_reset_control_get(struct device_node *node,
 	}
 	mutex_lock(&reset_list_mutex);
 	rcdev = NULL;
+
+
+	//list_for_each_entry(tmp, &mylist.list, list)
+	//printf("to= %d from= %d\n", tmp->to, tmp->from);
+
+
 	list_for_each_entry(r, &reset_controller_list, list) 
 	{
 		if (args.np == r->of_node)
@@ -325,18 +331,27 @@ struct reset_control *__devm_reset_control_get(struct device *dev,
 				     const char *id, int index, int shared)
 {
 	struct reset_control **ptr, *rstc;
-	printk("willen __devm_reset_control_get id %s index %d\n",*id,index);
-	ptr = devres_alloc(devm_reset_control_release, sizeof(*ptr),
-			   GFP_KERNEL);
+	
+	printk("willen __devm_reset_control_get id %c index %d\n",*id,index);
+	
+	ptr = devres_alloc(devm_reset_control_release, sizeof(*ptr),GFP_KERNEL);
+
+	if (id == null)
+		printk("willen id == null\n");
+
+	if (*id == null)
+		printk("willen *id == null\n");
+		
 	if (!ptr)
 	{
 		printk("willen return !ptr\n");
 		return ERR_PTR(-ENOMEM);
 	}
-	if (dev)
-		printk("willen dev is exist\n");
-	else
-		printk("willen dev is null\n");
+	if (dev == null)
+		printk("willen dev == null\n");
+	
+	if (*dev == null)
+		printk("willen *dev == null\n");
 
 	rstc = __of_reset_control_get(dev ? dev->of_node : NULL, id, index, shared);
 
