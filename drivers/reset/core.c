@@ -336,22 +336,22 @@ struct reset_control *__devm_reset_control_get(struct device *dev,
 	
 	ptr = devres_alloc(devm_reset_control_release, sizeof(*ptr),GFP_KERNEL);
 
-	if (id == null)
-		printk("willen id == null\n");
+	if (id == NULL)
+		printk("willen id == NULL\n");
 
-	if (*id == null)
-		printk("willen *id == null\n");
+	if (*id == NULL)
+		printk("willen *id == NULL\n");
 		
 	if (!ptr)
 	{
 		printk("willen return !ptr\n");
 		return ERR_PTR(-ENOMEM);
 	}
-	if (dev == null)
-		printk("willen dev == null\n");
+	if (dev == NULL)
+		printk("willen dev == NULL\n");
 	
-	if (*dev == null)
-		printk("willen *dev == null\n");
+	if (*dev == NULL)
+		printk("willen *dev == NULL\n");
 
 	rstc = __of_reset_control_get(dev ? dev->of_node : NULL, id, index, shared);
 
