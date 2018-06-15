@@ -180,6 +180,7 @@ static struct reset_control *__reset_control_get(
 {
 	struct reset_control *rstc;
 	printk("willen id %d\n",index);
+
 	lockdep_assert_held(&reset_list_mutex);
 
 	list_for_each_entry(rstc, &rcdev->reset_control_head, list) {
@@ -234,7 +235,7 @@ struct reset_control *__of_reset_control_get(struct device_node *node,
 	struct of_phandle_args args;
 	int rstc_id;
 	int ret;
-	printk("willen __of_reset_control_get name %s fullname %s\n",node->name, node->full_name);
+	printk("willen __of_reset_control_get name : %s fullname : %s\n",node->name, node->full_name);
 
 	if (!node)
 	{
@@ -334,7 +335,7 @@ struct reset_control *__devm_reset_control_get(struct device *dev,
 {
 	struct reset_control **ptr, *rstc;
 	
-	printk("willen __devm_reset_control_get id %*.s index %d\n",*id,index);
+	printk("willen __devm_reset_control_get id %s index %d\n",*id,index);
 	
 	ptr = devres_alloc(devm_reset_control_release, sizeof(*ptr),GFP_KERNEL);
 

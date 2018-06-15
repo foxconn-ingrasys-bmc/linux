@@ -842,13 +842,13 @@ static int ast_jtag_probe(struct platform_device *pdev)
 	struct resource *res;
 	int ret = 0;
 
-	JTAG_DBUG("ast_jtag_probe\n");
+	JTAG_DBUG("willen ast_jtag_probe start\n");
 
 	if (!(ast_jtag = devm_kzalloc(&pdev->dev, sizeof(struct ast_jtag_info), GFP_KERNEL))) {
 		return -ENOMEM;
 	}
 
-	JTAG_DBUG("ast_jtag_probe devm_kzalloc\n");
+	JTAG_DBUG("willen devm_kzalloc done\n");
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	if (NULL == res) {
 		dev_err(&pdev->dev, "cannot get IORESOURCE_MEM\n");
@@ -857,15 +857,16 @@ static int ast_jtag_probe(struct platform_device *pdev)
 	}
 
 	
-	JTAG_DBUG("ast_jtag_probe platform_get_resource\n");
+	JTAG_DBUG("willen platform_get_resource done\n");
 	ast_jtag->reg_base = devm_ioremap_resource(&pdev->dev, res);
+	JTAG_DBUG("willen ast_jtag->reg_base 0x%x\n",ast_jtag->reg_base);
 	if (!ast_jtag->reg_base) {
 		ret = -EIO;
 		goto out_region;
 	}
 
 	
-	JTAG_DBUG("ast_jtag_probe devm_ioremap_resource\n");
+	JTAG_DBUG("willen devm_ioremap_resource done\n");
 	ast_jtag->irq = platform_get_irq(pdev, 0);
 	
 	
@@ -875,14 +876,15 @@ static int ast_jtag_probe(struct platform_device *pdev)
 		goto out_region;
 	}
 
-	JTAG_DBUG("ast_jtag_probe platfrom_get_irq\n");
-	ast_jtag->reset = devm_reset_control_get_exclusive(&pdev->dev, "jtag");
+	JTAG_DBUG("willen platfrom_get_irq done\n");
+	//ast_jtag->reset = devm_reset_control_get_exclusive(&pdev->dev, "jtag");
+	ast_jtag->reset = devm_reset_control_get_exclusive(&pdev->dev, "ast-jtag");
 	if (IS_ERR(ast_jtag->reset)) {
 		dev_err(&pdev->dev, "can't get jtag reset\n");
 		return PTR_ERR(ast_jtag->reset);
 	}
 
-	JTAG_DBUG("ast_jtag_probe devm_reset_control_get_exclusive\n");
+	JTAG_DBUG("willen devm_reset_control_get_exclusive done\n");
 	ast_jtag->clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(ast_jtag->clk)) {
 		dev_err(&pdev->dev, "no clock defined\n");
@@ -907,7 +909,7 @@ static int ast_jtag_probe(struct platform_device *pdev)
 		goto out_region;
 	}
 
-	JTAG_DBUG("ast_jtag_probe devm_request_irq\n");
+	JTAG_DBUG("willen devm_request_irq done\n");
 	ast_jtag_write(ast_jtag, JTAG_INST_PAUSE | JTAG_INST_COMPLETE |
 				   JTAG_DATA_PAUSE | JTAG_DATA_COMPLETE |
 				   JTAG_INST_PAUSE_EN | JTAG_INST_COMPLETE_EN |
@@ -923,7 +925,7 @@ static int ast_jtag_probe(struct platform_device *pdev)
 		goto out_irq;
 	}
 
-	JTAG_DBUG("ast_jtag_probe misc_register\n");
+	JTAG_DBUG("willen misc_registe done\n");
 	platform_set_drvdata(pdev, ast_jtag);
 	dev_set_drvdata(ast_jtag_misc.this_device, ast_jtag);
 
