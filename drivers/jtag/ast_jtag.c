@@ -878,7 +878,7 @@ static int ast_jtag_probe(struct platform_device *pdev)
 
 	JTAG_DBUG("willen platfrom_get_irq done\n");
 	//ast_jtag->reset = devm_reset_control_get_exclusive(&pdev->dev, "jtag");
-	ast_jtag->reset = devm_reset_control_get_exclusive(&pdev->dev, "ast-jtag");
+	ast_jtag->reset = devm_reset_control_get_exclusive(&pdev->dev, "jtag");
 	if (IS_ERR(ast_jtag->reset)) {
 		dev_err(&pdev->dev, "can't get jtag reset\n");
 		return PTR_ERR(ast_jtag->reset);
@@ -1007,10 +1007,11 @@ static struct platform_driver ast_jtag_driver = {
 #endif
 	.driver         = {
 //		.name   = KBUILD_MODNAME,
-		.name	= "ast-jtag",
+		.name	= "jtag",
 		.of_match_table = ast_jtag_of_matches,
 	},
 };
+
 
 module_platform_driver(ast_jtag_driver);
 

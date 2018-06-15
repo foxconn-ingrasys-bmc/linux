@@ -2055,6 +2055,7 @@ ast_pwm_tacho_probe(struct platform_device *pdev)
 	}
 
 	ast_pwm_tacho->reg_base = ioremap(res->start, resource_size(res));
+	printk("willen ast_pwm_tacho->reg_base 0x%x\n",ast_pwm_tacho->reg_base);
 	if (!ast_pwm_tacho->reg_base) {
 		ret = -EIO;
 		goto out_region;
