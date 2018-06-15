@@ -856,7 +856,7 @@
                                 interrupts = <43>;
                                 clocks = <&clk_apb>;
                                 resets = <&sys_reset SCU_RESET_JTAG>;
-                                reset-names = "ast-jtag";
+                                reset-names = "jtag";
                         };
 
 			sram@1e720000 {
