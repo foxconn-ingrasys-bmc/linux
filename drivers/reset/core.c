@@ -235,8 +235,10 @@ struct reset_control *__of_reset_control_get(struct device_node *node,
 	struct of_phandle_args args;
 	int rstc_id;
 	int ret;
-	printk("willen __of_reset_control_get name : %s fullname : %s\n",node->name, node->full_name);
-
+	printk("willen __of_reset_control_get node->name : %s node->fullname : %s\n",node->name, node->full_name);
+	printk("willen __of_reset_control_get id s : %s\n",*id);
+	printk("willen __of_reset_control_get id c : %c\n",*id);
+	
 	if (!node)
 	{
 		printk("willen -EINVAL\n");
