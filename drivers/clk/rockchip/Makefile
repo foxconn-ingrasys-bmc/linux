@@ -8,7 +8,8 @@ obj-y	+= clk-pll.o
 obj-y	+= clk-cpu.o
 obj-y	+= clk-inverter.o
 obj-y	+= clk-mmc-phase.o
-obj-$(CONFIG_RESET_CONTROLLER)	+= softrst.o
+#obj-$(CONFIG_RESET_CONTROLLER)	+= softrst.o
+obj-y	+= softrst.o
 
 obj-y	+= clk-rk3036.o
 obj-y	+= clk-rk3188.o

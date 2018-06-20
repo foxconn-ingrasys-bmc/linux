@@ -29,7 +29,7 @@
 #define BP_SRC_SCR_SW_IPU2_RST		12
 #define BP_SRC_SCR_CORE1_RST		14
 #define BP_SRC_SCR_CORE1_ENABLE		22
-
+#define CONFIG_RESET_CONTROLLER		"y"
 static void __iomem *src_base;
 static DEFINE_SPINLOCK(scr_lock);
 
