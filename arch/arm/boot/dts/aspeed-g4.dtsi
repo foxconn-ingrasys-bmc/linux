@@ -850,14 +850,14 @@
 				reg = <0x1e6e202c 0x4>;
 			};
 
-                        jtag: jtag@1e6e4000 {
+                        /*jtag: jtag@1e6e4000 {
                                 compatible = "aspeed,ast-jtag";
                                 reg= <0x1e6e4000 0x20>;
                                 interrupts = <43>;
                                 clocks = <&clk_apb>;
                                 resets = <&sys_reset SCU_RESET_JTAG>;
                                 reset-names = "jtag";
-                        };
+                        };*/
 
 			sram@1e720000 {
 				compatible = "mmio-sram";
@@ -1156,6 +1156,16 @@
 				};
 
 			};
+
+			jtag: jtag@1e6e4000 {
+                        	compatible = "aspeed,ast-jtag";
+                        	reg= <0x1e6e4000 0x20>;
+                        	interrupts = <43>;
+                        	clocks = <&clk_apb>;
+                        	resets = <&sys_reset SCU_RESET_JTAG>;
+                        	reset-names = "jtag";
+                    	};
+
 
 		};
 	};
