@@ -1380,15 +1380,12 @@ int of_property_match_string(const struct device_node *np, const char *propname,
 	int i;
 	const char *p, *end;
 
-	printk("willen propname %s string %s\n",propname,string);
 	if (!prop)
 	{
-		printk("willen of_property_match_string prop is not exist\n");
 		return -EINVAL;
 	}
 	if (!prop->value)
 	{	
-		printk("willen of_property_match_string prop->value is not exist\n");
 		return -ENODATA;
 	}
 	p = prop->value;
@@ -1398,18 +1395,14 @@ int of_property_match_string(const struct device_node *np, const char *propname,
 		l = strnlen(p, end - p) + 1;
 		if (p + l > end)
 		{
-			printk("willen p+l > end\n");
 			return -EILSEQ;
 		}
 		pr_debug("comparing %s with %s\n", string, p);
-		printk("willen comparing %s with %s\n", string, p);
 		if (strcmp(string, p) == 0)
 		{
-			printk("willen Found it return index\n");
 			return i; /* Found it; return index */
 		}
 	}
-	printk("willen of_property_match_string return -ENODATA\n");
 	return -ENODATA;
 }
 EXPORT_SYMBOL_GPL(of_property_match_string);

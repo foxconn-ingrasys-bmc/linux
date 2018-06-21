@@ -622,9 +622,11 @@ static irqreturn_t ast_jtag_interrupt(int this_irq, void *dev_id)
 	}
 
 	if (ast_jtag->flag) {
+		printk("willen interrupt IRQ_HANDLED %d\n",IRQ_HANDLED);
 		wake_up_interruptible(&ast_jtag->jtag_wq);
 		return IRQ_HANDLED;
 	} else {
+		printk("willen interrupt IRQ_NONE %d\n",IRQ_NONE);
 		printk("TODO Check JTAG's interrupt %x\n", status);
 		return IRQ_NONE;
 	}
@@ -644,12 +646,14 @@ static long jtag_ioctl(struct file *file, unsigned int cmd,
 	struct sdr_xfer sdr;
 	struct runtest_idle run_idle;
 //	unsigned int freq;
-
+	printk("willen jtag_ioctl\n");
 	switch (cmd) {
 	case AST_JTAG_GIOCFREQ:
+		printk("willen jtag_ioctl AST_JTAG_GIOCFREQ\n");
 		ret = __put_user(ast_jtag_get_freq(ast_jtag), (unsigned int __user *)arg);
 		break;
 	case AST_JTAG_SIOCFREQ:
+		printk("willen jtag_ioctl AST_JTAG_SIOCFREQ\n");
 //			printk("set freq = %d , pck %d \n",config.freq, ast_get_pclk());
 		if ((unsigned int)arg > ast_jtag->apb_clk)
 			ret = -EFAULT;
@@ -658,12 +662,14 @@ static long jtag_ioctl(struct file *file, unsigned int cmd,
 
 		break;
 	case AST_JTAG_IOCRUNTEST:
+		printk("willen jtag_ioctl AST_JTAG_IOCURNTEST\n");
 		if (copy_from_user(&run_idle, argp, sizeof(struct runtest_idle)))
 			ret = -EFAULT;
 		else
 			ast_jtag_run_test_idle(ast_jtag, &run_idle);
 		break;
 	case AST_JTAG_IOCSIR:
+		printk("willen jtag_ioctl AST_JTAG_IOSIR\n");
 		if (copy_from_user(&sir, argp, sizeof(struct sir_xfer)))
 			ret = -EFAULT;
 		else
@@ -673,6 +679,7 @@ static long jtag_ioctl(struct file *file, unsigned int cmd,
 			ret = -EFAULT;
 		break;
 	case AST_JTAG_IOCSDR:
+		printk("willen jtag_ioctl AST_JTAG_IOSDR\n");
 		if (copy_from_user(&sdr, argp, sizeof(struct sdr_xfer)))
 			ret = -EFAULT;
 		else
@@ -682,6 +689,7 @@ static long jtag_ioctl(struct file *file, unsigned int cmd,
 			ret = -EFAULT;
 		break;
 	default:
+		printk("willen jtag_ioctl default\n");
 		return -ENOTTY;
 	}
 
