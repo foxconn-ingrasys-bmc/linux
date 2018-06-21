@@ -12,6 +12,13 @@ menuconfig RESET_CONTROLLER
 
 	  If unsure, say no.
 
+
+config RESET_ASPEED
+	bool "ASPEED Reset Driver"
+	default y
+	help
+	  This enable the ASPEED SoC reset controller driver
+
 config RESET_OXNAS
 	bool
 
