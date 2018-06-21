@@ -93,42 +93,6 @@ void reset_controller_unregister(struct reset_controller_dev *rcdev)
 }
 EXPORT_SYMBOL_GPL(reset_controller_unregister);
 
-static void devm_reset_controller_release(struct device *dev, void *res)
-{
-	reset_controller_unregister(*(struct reset_controller_dev **)res);
-}
-/**
- * devm_reset_controller_register - resource managed reset_controller_register()
- * @dev: device that is registering this reset controller
- * @rcdev: a pointer to the initialized reset controller device
- *
- * Managed reset_controller_register(). For reset controllers registered by
- * this function, reset_controller_unregister() is automatically called on
- * driver detach. See reset_controller_register() for more information.
- */
-int devm_reset_controller_register(struct device *dev,
-				   struct reset_controller_dev *rcdev)
-{
-	struct reset_controller_dev **rcdevp;
-	int ret;
-
-	rcdevp = devres_alloc(devm_reset_controller_release, sizeof(*rcdevp),
-			      GFP_KERNEL);
-	if (!rcdevp)
-		return -ENOMEM;
-
-	ret = reset_controller_register(rcdev);
-	if (!ret) {
-		*rcdevp = rcdev;
-		devres_add(dev, rcdevp);
-	} else {
-		devres_free(rcdevp);
-	}
-
-	return ret;
-}
-EXPORT_SYMBOL_GPL(devm_reset_controller_register);
-
 /**
  * reset_control_reset - reset the controlled device
  * @rstc: reset controller
@@ -137,8 +101,7 @@ EXPORT_SYMBOL_GPL(devm_reset_controller_register);
  */
 int reset_control_reset(struct reset_control *rstc)
 {
-	if (WARN_ON(IS_ERR_OR_NULL(rstc)) ||
-	    WARN_ON(rstc->shared))
+	if (WARN_ON(rstc->shared))
 		return -EINVAL;
 
 	if (rstc->rcdev->ops->reset)
@@ -161,9 +124,6 @@ EXPORT_SYMBOL_GPL(reset_control_reset);
  */
 int reset_control_assert(struct reset_control *rstc)
 {
-	if (WARN_ON(IS_ERR_OR_NULL(rstc)))
-		return -EINVAL;
-
 	if (!rstc->rcdev->ops->assert)
 		return -ENOTSUPP;
 
@@ -187,9 +147,6 @@ EXPORT_SYMBOL_GPL(reset_control_assert);
  */
 int reset_control_deassert(struct reset_control *rstc)
 {
-	if (WARN_ON(IS_ERR_OR_NULL(rstc)))
-		return -EINVAL;
-
 	if (!rstc->rcdev->ops->deassert)
 		return -ENOTSUPP;
 
@@ -210,9 +167,6 @@ EXPORT_SYMBOL_GPL(reset_control_deassert);
  */
 int reset_control_status(struct reset_control *rstc)
 {
-	if (WARN_ON(IS_ERR_OR_NULL(rstc)))
-		return -EINVAL;
-
 	if (rstc->rcdev->ops->status)
 		return rstc->rcdev->ops->status(rstc->rcdev, rstc->id);
 
@@ -232,17 +186,22 @@ static struct reset_control *__reset_control_get(
 	list_for_each_entry(rstc, &rcdev->reset_control_head, list) {
 		if (rstc->id == index) {
 			if (WARN_ON(!rstc->shared || !shared))
+			{
+				printk("willen return ERR_PTR(-EBUSY)\n");
 				return ERR_PTR(-EBUSY);
-
+			}
 			rstc->refcnt++;
+			printk("willen return rstc\n");
 			return rstc;
 		}
 	}
 
 	rstc = kzalloc(sizeof(*rstc), GFP_KERNEL);
 	if (!rstc)
+	{
+		printk("willen 1 return ERR_PTR(-ENOMEM)\n");
 		return ERR_PTR(-ENOMEM);
-
+	}
 	try_module_get(rcdev->owner);
 
 	rstc->rcdev = rcdev;
@@ -280,20 +239,28 @@ struct reset_control *__of_reset_control_get(struct device_node *node,
 	printk("willen __of_reset_control_get id s : %s\n",id);
 	
 	if (!node)
+	{
+		printk("willen -EINVAL\n");
 		return ERR_PTR(-EINVAL);
-
-	if (id) {
-		index = of_property_match_string(node,
-						 "reset-names", id);
+	}
+	if (id) 
+	{
+		index = of_property_match_string(node,"reset-names", id);
 		if (index < 0)
+		{
+			printk("willen -ENOENT\n");
 			return ERR_PTR(-ENOENT);
+		}
+		else
+			printk("willen index %d\n",index);
 	}
 
-	ret = of_parse_phandle_with_args(node, "resets", "#reset-cells",
-					 index, &args);
+	ret = of_parse_phandle_with_args(node, "resets", "#reset-cells",index, &args);
 	if (ret)
+	{
+		printk("willen ret\n");
 		return ERR_PTR(ret);
-
+	}
 	mutex_lock(&reset_list_mutex);
 	rcdev = NULL;
 
@@ -302,28 +269,33 @@ struct reset_control *__of_reset_control_get(struct device_node *node,
 	//printf("to= %d from= %d\n", tmp->to, tmp->from);
 
 
-	list_for_each_entry(r, &reset_controller_list, list) {
-		if (args.np == r->of_node) {
+	list_for_each_entry(r, &reset_controller_list, list) 
+	{
+		if (args.np == r->of_node)
+		{
 			rcdev = r;
 			break;
 		}
 	}
 	of_node_put(args.np);
 
-	if (!rcdev) {
+	if (!rcdev) 
+	{
 		mutex_unlock(&reset_list_mutex);
 		printk("willen -EPROBE_DEFER\n");
 		return ERR_PTR(-EPROBE_DEFER);
 	}
 
-	if (WARN_ON(args.args_count != rcdev->of_reset_n_cells)) {
+	if (WARN_ON(args.args_count != rcdev->of_reset_n_cells)) 
+	{
 		mutex_unlock(&reset_list_mutex);
 		printk("willen -EINVAL_1\n");
 		return ERR_PTR(-EINVAL);
 	}
 
 	rstc_id = rcdev->of_xlate(rcdev, &args);
-	if (rstc_id < 0) {
+	if (rstc_id < 0) 
+	{
 		mutex_unlock(&reset_list_mutex);
 		printk("willen rstc_id\n");
 		return ERR_PTR(rstc_id);
@@ -366,24 +338,29 @@ struct reset_control *__devm_reset_control_get(struct device *dev,
 	
 	printk("willen __devm_reset_control_get id %s index %d\n",id,index);
 	
-	ptr = devres_alloc(devm_reset_control_release, sizeof(*ptr),
-			   GFP_KERNEL);
+	ptr = devres_alloc(devm_reset_control_release, sizeof(*ptr),GFP_KERNEL);
+
 	if (id == NULL)
 		printk("willen id == NULL\n");
 
 	if (!ptr)
+	{
+		printk("willen return !ptr\n");
 		return ERR_PTR(-ENOMEM);
-
+	}
 	if (dev == NULL)
 		printk("willen dev == NULL\n");
 	
-	rstc = __of_reset_control_get(dev ? dev->of_node : NULL,
-				      id, index, shared);
-	if (!IS_ERR(rstc)) {
+	rstc = __of_reset_control_get(dev ? dev->of_node : NULL, id, index, shared);
+
+	if (!IS_ERR(rstc)) 
+	{
 		printk("willen !IS_ERR(rstc)\n");
 		*ptr = rstc;
 		devres_add(dev, ptr);
-	} else {
+	} 
+	else
+	{
 		printk("willen else\n");
 		devres_free(ptr);
 	}
