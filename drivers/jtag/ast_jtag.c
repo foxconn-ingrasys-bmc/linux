@@ -650,37 +650,44 @@ static long jtag_ioctl(struct file *file, unsigned int cmd,
 	printk("willen jtag_ioctl\n");
 	switch (cmd) {
 	case AST_JTAG_GIOCFREQ:
-		printk("willen jtag_ioctl AST_JTAG_GIOCFREQ\n");
+		printk("willen AST_JTAG_GIOCFREQ\n");
 		ret = __put_user(ast_jtag_get_freq(ast_jtag), (unsigned int __user *)arg);
+		printk("willen AST_JTAG_GIOCFREQ done\n");
 		break;
 	case AST_JTAG_SIOCFREQ:
-		printk("willen jtag_ioctl AST_JTAG_SIOCFREQ\n");
+		printk("willen AST_JTAG_SIOCFREQ\n");
 //			printk("set freq = %d , pck %d \n",config.freq, ast_get_pclk());
 		if ((unsigned int)arg > ast_jtag->apb_clk)
 			ret = -EFAULT;
 		else
 			ast_jtag_set_freq(ast_jtag, (unsigned int)arg);
 
+			printk("willen AST_JTAG_SIOCFREQ done\n");
 		break;
 	case AST_JTAG_IOCRUNTEST:
-		printk("willen jtag_ioctl AST_JTAG_IOCURNTEST\n");
+		printk("willen AST_JTAG_IOCURNTEST\n");
 		if (copy_from_user(&run_idle, argp, sizeof(struct runtest_idle)))
 			ret = -EFAULT;
 		else
 			ast_jtag_run_test_idle(ast_jtag, &run_idle);
+			
+			printk("willen AST_JTAG_IOCURNTEST done\n");
 		break;
 	case AST_JTAG_IOCSIR:
-		printk("willen jtag_ioctl AST_JTAG_IOSIR\n");
+		printk("willen AST_JTAG_IOCSIR\n");
 		if (copy_from_user(&sir, argp, sizeof(struct sir_xfer)))
 			ret = -EFAULT;
 		else
 			ast_jtag_sir_xfer(ast_jtag, &sir);
 
-		if (copy_to_user(argp, &sir, sizeof(struct sdr_xfer)))
+		//if (copy_to_user(argp, &sir, sizeof(struct sdr_xfer)))
+		if (copy_to_user(argp, &sir, sizeof(struct sir_xfer)))
 			ret = -EFAULT;
+		
+		printk("willen AST_JTAG_IOCSIR done\n");
 		break;
 	case AST_JTAG_IOCSDR:
-		printk("willen jtag_ioctl AST_JTAG_IOSDR\n");
+		printk("willen AST_JTAG_IOCSDR\n");
 		if (copy_from_user(&sdr, argp, sizeof(struct sdr_xfer)))
 			ret = -EFAULT;
 		else
@@ -688,6 +695,7 @@ static long jtag_ioctl(struct file *file, unsigned int cmd,
 
 		if (copy_to_user(argp, &sdr, sizeof(struct sdr_xfer)))
 			ret = -EFAULT;
+		printk("willen AST_JTAG_IOCSDR done\n");
 		break;
 	default:
 		printk("willen jtag_ioctl default\n");
