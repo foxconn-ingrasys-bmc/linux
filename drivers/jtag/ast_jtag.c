@@ -463,6 +463,7 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 	JTAG_DBUG("%s mode, len : %d \n", sdr->mode ? "SW" : "HW", sdr->length);
 
 	if (sdr->mode) {
+		printk("willen ast_jtag_sdr_xfer SW mode\n");
 		//SW mode
 		if (ast_jtag->sts) {
 			//from IR/DR Pause
@@ -519,11 +520,13 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 			TCK_Cycle(ast_jtag, 0, 0);		// go to IDLE
 		}
 	} else {
+		printk("willen ast_jtag_sdr_xfer HW mode\n");
 		//HW MODE
 		ast_jtag_write(ast_jtag, 0, AST_JTAG_SW);
 		while (remain_xfer) {
 			if (sdr->direct) {
 				JTAG_DBUG("W dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
+				printk("willen W dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
 				ast_jtag_write(ast_jtag, sdr->tdio[index], AST_JTAG_DATA);
 			} else {
 				ast_jtag_write(ast_jtag, 0, AST_JTAG_DATA);
@@ -533,6 +536,7 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 				shift_bits = 32;
 				// read bytes were not equals to column length ==> Pause-DR
 				JTAG_DBUG("shit bits %d \n", shift_bits);
+				printk("willen shit bits %d \n", shift_bits);
 				ast_jtag_write(ast_jtag,
 							   JTAG_ENG_EN | JTAG_ENG_OUT_EN |
 							   JTAG_DATA_LEN(shift_bits), AST_JTAG_CTRL);
@@ -544,8 +548,10 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 				// read bytes equals to column length => Update-DR
 				shift_bits = remain_xfer;
 				JTAG_DBUG("shit bits %d with last \n", shift_bits);
+				printk("willen shit bits %d with last \n", shift_bits);
 				if (sdr->enddr) {
 					JTAG_DBUG("DR Keep Pause \n");
+					printk("willen DR Keep Pause \n");
 					ast_jtag_write(ast_jtag,
 								   JTAG_ENG_EN | JTAG_ENG_OUT_EN | JTAG_DR_UPDATE |
 								   JTAG_DATA_LEN(shift_bits), AST_JTAG_CTRL);
@@ -555,6 +561,7 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 					ast_jtag_wait_data_pause_complete(ast_jtag);
 				} else {
 					JTAG_DBUG("DR go IDLE \n");
+					printk("willen DR go IDLE \n");
 					ast_jtag_write(ast_jtag,
 								   JTAG_ENG_EN | JTAG_ENG_OUT_EN | JTAG_LAST_DATA |
 								   JTAG_DATA_LEN(shift_bits), AST_JTAG_CTRL);
@@ -572,11 +579,13 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 				else
 					sdr->tdio[index] = ast_jtag_read(ast_jtag, AST_JTAG_DATA);
 				JTAG_DBUG("R dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
+				printk("willen R dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
 			}
 
 			remain_xfer = remain_xfer - shift_bits;
 			index ++;
 			JTAG_DBUG("remain_xfer %d\n", remain_xfer);
+			printk("willen remain_xfer %d\n", remain_xfer);
 		}
 
 #if 1
