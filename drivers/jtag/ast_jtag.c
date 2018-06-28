@@ -130,11 +130,11 @@ struct sdr_xfer {
 #define AST_JTAG_SIOCFREQ		_IOW(JTAGIOC_BASE, 3, unsigned int)
 #define AST_JTAG_GIOCFREQ		_IOR(JTAGIOC_BASE, 4, unsigned int)
 /******************************************************************************/
-//#define AST_JTAG_DEBUG
+#define AST_JTAG_DEBUG
 
 #ifdef AST_JTAG_DEBUG
-#define JTAG_DBUG(fmt, args...) printk(KERN_DEBUG "%s() " fmt,__FUNCTION__, ## args)
-//#define JTAG_DBUG(fmt, args...) printk(KERN_INFO "%s() " fmt,__FUNCTION__, ## args)
+//#define JTAG_DBUG(fmt, args...) printk(KERN_DEBUG "%s() " fmt,__FUNCTION__, ## args)
+#define JTAG_DBUG(fmt, args...) printk(KERN_INFO "%s() " fmt,__FUNCTION__, ## args)
 #else
 #define JTAG_DBUG(fmt, args...)
 #endif
@@ -166,6 +166,8 @@ ast_jtag_read(struct ast_jtag_info *ast_jtag, u32 reg)
 	JTAG_DBUG("reg = 0x%08x, val = 0x%08x\n", reg, val);
 	return val;
 #else
+	
+	printk("willen read ast_jtag->reg_base 0x%08x\n",ast_jtag->reg_base);
 	return readl(ast_jtag->reg_base + reg);;
 #endif
 }
@@ -173,6 +175,7 @@ ast_jtag_read(struct ast_jtag_info *ast_jtag, u32 reg)
 static inline void
 ast_jtag_write(struct ast_jtag_info *ast_jtag, u32 val, u32 reg)
 {
+	printk("willen write ast_jtag->reg_base 0x%08x\n",ast_jtag->reg_base);
 	JTAG_DBUG("reg = 0x%08x, val = 0x%08x\n", reg, val);
 	writel(val, ast_jtag->reg_base + reg);
 }
@@ -589,9 +592,15 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 				printk("willen !sdr->direct\n");
 				//TODO check ....
 				if (shift_bits < 32)
+				{
+					printk("willen if shift_bts < 32\n");
 					sdr->tdio[index] = ast_jtag_read(ast_jtag, AST_JTAG_DATA) >> (32 - shift_bits);
+				}
 				else
+				{
+					printk("willen else shift_bts < 32\n");
 					sdr->tdio[index] = ast_jtag_read(ast_jtag, AST_JTAG_DATA);
+				}
 				JTAG_DBUG("R dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
 				printk("willen R dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
 			}
