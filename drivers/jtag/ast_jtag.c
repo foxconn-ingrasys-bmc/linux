@@ -295,7 +295,8 @@ void ast_jtag_wait_data_pause_complete(struct ast_jtag_info *ast_jtag)
 
 void ast_jtag_wait_data_complete(struct ast_jtag_info *ast_jtag)
 {
-	//wait_event_interruptible(ast_jtag->jtag_wq, (ast_jtag->flag == JTAG_DATA_COMPLETE));
+	wait_event_interruptible(ast_jtag->jtag_wq, (ast_jtag->flag == JTAG_DATA_COMPLETE));
+	printk("willen ast_jtag_wait_data_complete done\n");
 	JTAG_DBUG("\n");
 	ast_jtag->flag = 0;
 }
@@ -580,10 +581,12 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 					ast_jtag_write(ast_jtag, JTAG_ENG_EN | JTAG_ENG_OUT_EN | JTAG_LAST_DATA | JTAG_DATA_LEN(shift_bits) | JTAG_DATA_EN, AST_JTAG_CTRL);
 					ast_jtag_wait_data_complete(ast_jtag);
 				}
+				printk("willen remain_xfer > 32 done\n");
 			}
-
-			if (!sdr->direct) 
+			printk("willen remain_xfer > 32 exit\n");
+			if (!sdr->direct)
 			{
+				printk("willen !sdr->direct\n");
 				//TODO check ....
 				if (shift_bits < 32)
 					sdr->tdio[index] = ast_jtag_read(ast_jtag, AST_JTAG_DATA) >> (32 - shift_bits);
@@ -592,7 +595,7 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 				JTAG_DBUG("R dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
 				printk("willen R dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
 			}
-
+			printk("willen !sdr->direct exit\n");
 			remain_xfer = remain_xfer - shift_bits;
 			index ++;
 			JTAG_DBUG("remain_xfer %d\n", remain_xfer);
