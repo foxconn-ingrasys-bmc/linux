@@ -168,7 +168,7 @@ ast_jtag_read(struct ast_jtag_info *ast_jtag, u32 reg)
 #else
 	
 	printk("willen read ast_jtag->reg_base 0x%08x reg 0x%08x\n",ast_jtag->reg_base,reg);
-	printk("willen sizeof return readl(ast_jtag->reg_base + reg) %d\n",sizeof(readl(ast_jtag->reg_base + reg));
+	printk("willen sizeof return readl(ast_jtag->reg_base + reg) %d\n",sizeof(readl(ast_jtag->reg_base + reg)));
 	return readl(ast_jtag->reg_base + reg);
 #endif
 }
