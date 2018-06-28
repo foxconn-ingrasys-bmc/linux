@@ -167,8 +167,9 @@ ast_jtag_read(struct ast_jtag_info *ast_jtag, u32 reg)
 	return val;
 #else
 	
-	printk("willen read ast_jtag->reg_base 0x%08x\n",ast_jtag->reg_base);
-	return readl(ast_jtag->reg_base + reg);;
+	printk("willen read ast_jtag->reg_base 0x%08x reg 0x%08x\n",ast_jtag->reg_base,reg);
+	printk("willen sizeof return readl(ast_jtag->reg_base + reg) %d\n",sizeof(readl(ast_jtag->reg_base + reg));
+	return readl(ast_jtag->reg_base + reg);
 #endif
 }
 
@@ -563,7 +564,8 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 				// read bytes equals to column length => Update-DR
 				shift_bits = remain_xfer;
 				JTAG_DBUG("shit bits %d with last \n", shift_bits);
-				printk("willen shit bits %d with last \n", shift_bits);
+				printk("willen shift bits %d with last \n", shift_bits);
+				printk("willen sdr->enddr 0x%8x\n",sdr->enddr);
 				if (sdr->enddr) 
 				{
 					JTAG_DBUG("DR Keep Pause \n");
@@ -591,6 +593,7 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 			{
 				printk("willen !sdr->direct\n");
 				//TODO check ....
+				printk("willen shift_bits %d\n",shift_bits);
 				if (shift_bits < 32)
 				{
 					printk("willen if shift_bts < 32\n");
@@ -599,7 +602,8 @@ int ast_jtag_sdr_xfer(struct ast_jtag_info *ast_jtag, struct sdr_xfer *sdr)
 				else
 				{
 					printk("willen else shift_bts < 32\n");
-					sdr->tdio[index] = ast_jtag_read(ast_jtag, AST_JTAG_DATA);
+					//sdr->tdio[index] = ast_jtag_read(ast_jtag, AST_JTAG_DATA);
+					printk("willen sdr->tdio[index] 0x%8x\n",ast_jtag_read(ast_jtag, AST_JTAG_DATA));
 				}
 				JTAG_DBUG("R dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
 				printk("willen R dr->dr_data[%d]: %x\n", index, sdr->tdio[index]);
@@ -669,8 +673,7 @@ static irqreturn_t ast_jtag_interrupt(int this_irq, void *dev_id)
 /*************************************************************************************/
 struct ast_jtag_info *ast_jtag;
 
-static long jtag_ioctl(struct file *file, unsigned int cmd,
-					   unsigned long arg)
+static long jtag_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	int ret = 0;
 	struct ast_jtag_info *ast_jtag = file->private_data;
@@ -721,7 +724,10 @@ static long jtag_ioctl(struct file *file, unsigned int cmd,
 	case AST_JTAG_IOCSDR:
 		printk("willen AST_JTAG_IOCSDR\n");
 		if (copy_from_user(&sdr, argp, sizeof(struct sdr_xfer)))
+		{
+			printk("willen AST_JTAG_IOSDR copy_from_user failed\n");
 			ret = -EFAULT;
+		}
 		else
 			ast_jtag_sdr_xfer(ast_jtag, &sdr);
 
