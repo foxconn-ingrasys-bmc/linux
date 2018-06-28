@@ -132,12 +132,12 @@ struct sdr_xfer {
 /******************************************************************************/
 //#define AST_JTAG_DEBUG
 
-//#ifdef AST_JTAG_DEBUG
-//#define JTAG_DBUG(fmt, args...) printk(KERN_DEBUG "%s() " fmt,__FUNCTION__, ## args)
+#ifdef AST_JTAG_DEBUG
+#define JTAG_DBUG(fmt, args...) printk(KERN_DEBUG "%s() " fmt,__FUNCTION__, ## args)
 //#define JTAG_DBUG(fmt, args...) printk(KERN_INFO "%s() " fmt,__FUNCTION__, ## args)
-//#else
-//#define JTAG_DBUG(fmt, args...)
-//#endif
+#else
+#define JTAG_DBUG(fmt, args...)
+#endif
 
 //#define JTAG_MSG(fmt, args...) printk(fmt, ## args)
 
