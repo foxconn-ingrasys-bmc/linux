@@ -102,24 +102,24 @@ typedef enum jtag_xfer_mode {
 struct runtest_idle {
 	xfer_mode 	mode;		//0 :HW mode, 1: SW mode
 	unsigned char 	reset;		//Test Logic Reset
-	unsigned char 	end;			//o: idle, 1: ir pause, 2: drpause
-	unsigned char 	tck;			//keep tck
+	unsigned char 	end;		//o: idle, 1: ir pause, 2: drpause
+	unsigned char 	tck;		//keep tck
 };
 
 struct sir_xfer {
 	xfer_mode 	mode;		//0 :HW mode, 1: SW mode
-	unsigned short length;	//bits
-	unsigned int tdi;
-	unsigned int tdo;
-	unsigned char endir;	//0: idle, 1:pause
+	unsigned short 	length;		//bits
+	unsigned int 	tdi;
+	unsigned int 	tdo;
+	unsigned char 	endir;		//0: idle, 1:pause
 };
 
 struct sdr_xfer {
 	xfer_mode 	mode;		//0 :HW mode, 1: SW mode
-	unsigned char 	direct; // 0 ; read , 1 : write
-	unsigned short length;	//bits
-	unsigned int *tdio;
-	unsigned char enddr;	//0: idle, 1:pause
+	unsigned char 	direct; 	// 0 ; read , 1 : write
+	unsigned short 	length;		//bits
+	unsigned int 	*tdio;
+	unsigned char 	enddr;		//0: idle, 1:pause
 };
 
 #define JTAGIOC_BASE       'T'
@@ -130,26 +130,26 @@ struct sdr_xfer {
 #define AST_JTAG_SIOCFREQ		_IOW(JTAGIOC_BASE, 3, unsigned int)
 #define AST_JTAG_GIOCFREQ		_IOR(JTAGIOC_BASE, 4, unsigned int)
 /******************************************************************************/
-#define AST_JTAG_DEBUG
+//#define AST_JTAG_DEBUG
 
-#ifdef AST_JTAG_DEBUG
+//#ifdef AST_JTAG_DEBUG
 //#define JTAG_DBUG(fmt, args...) printk(KERN_DEBUG "%s() " fmt,__FUNCTION__, ## args)
-#define JTAG_DBUG(fmt, args...) printk(KERN_INFO "%s() " fmt,__FUNCTION__, ## args)
-#else
-#define JTAG_DBUG(fmt, args...)
-#endif
+//#define JTAG_DBUG(fmt, args...) printk(KERN_INFO "%s() " fmt,__FUNCTION__, ## args)
+//#else
+//#define JTAG_DBUG(fmt, args...)
+//#endif
 
-#define JTAG_MSG(fmt, args...) printk(fmt, ## args)
+//#define JTAG_MSG(fmt, args...) printk(fmt, ## args)
 
 struct ast_jtag_info {
-	void __iomem	*reg_base;
+	void __iomem		*reg_base;
 	u8 			sts;			//0: idle, 1:irpause 2:drpause
-	int 			irq;				//JTAG IRQ number
-	struct reset_control *reset;
-	struct clk 			*clk;
-	u32					apb_clk;
+	int 			irq;			//JTAG IRQ number
+	struct reset_control 	*reset;
+	struct clk 		*clk;
+	u32			apb_clk;
 	u32 			flag;
-	wait_queue_head_t jtag_wq;
+	wait_queue_head_t 	jtag_wq;
 	bool 			is_open;
 };
 
@@ -667,7 +667,7 @@ static long jtag_ioctl(struct file *file, unsigned int cmd,
 	struct sdr_xfer sdr;
 	struct runtest_idle run_idle;
 //	unsigned int freq;
-	printk("willen jtag_ioctl\n");
+	printk("willen jtag_ioctl cmd %d\n",cmd);
 	switch (cmd) {
 	case AST_JTAG_GIOCFREQ:
 		printk("willen AST_JTAG_GIOCFREQ\n");
