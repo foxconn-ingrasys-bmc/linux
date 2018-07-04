@@ -223,11 +223,11 @@ static inline const char *check_heap_object(const void *ptr, unsigned long n,
 	/* Check slab allocator for flags and size. */
 	if (PageSlab(page))
 	{
-		printf("willen __check_heap_object\n");
+		printk("willen __check_heap_object\n");
 		return __check_heap_object(ptr, n, page);
 	}
 	/* Verify object does not incorrectly span multiple pages. */
-	printf("willen check_page_span\n");
+	printk("willen check_page_span\n");
 	return check_page_span(ptr, n, page, to_user);
 }
 
