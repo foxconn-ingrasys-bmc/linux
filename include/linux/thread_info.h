@@ -106,6 +106,16 @@ static inline int test_ti_thread_flag(struct thread_info *ti, int flag)
 #define tif_need_resched() test_thread_flag(TIF_NEED_RESCHED)
 
 #if defined TIF_RESTORE_SIGMASK && !defined HAVE_SET_RESTORE_SIGMASK
+
+#ifndef CONFIG_HAVE_ARCH_WITHIN_STACK_FRAMES
+static inline int arch_within_stack_frames(const void * const stack,
+					   const void * const stackend,
+					   const void *obj, unsigned long len)
+{
+	return 0;
+}
+#endif
+
 /*
  * An arch can define its own version of set_restore_sigmask() to get the
  * job done however works, with or without TIF_RESTORE_SIGMASK.
