@@ -138,6 +138,7 @@ static inline const char *check_bogus_address(const void *ptr, unsigned long n)
 static inline const char *check_page_span(const void *ptr, unsigned long n,
 					  struct page *page, bool to_user)
 {
+#define CONFIG_HARDENED_USERCOPY_PAGESPAN
 #ifdef CONFIG_HARDENED_USERCOPY_PAGESPAN
 	const void *end = ptr + n - 1;
 	struct page *endpage;
@@ -221,9 +222,12 @@ static inline const char *check_heap_object(const void *ptr, unsigned long n,
 
 	/* Check slab allocator for flags and size. */
 	if (PageSlab(page))
+	{
+		printf("willen __check_heap_object\n");
 		return __check_heap_object(ptr, n, page);
-
+	}
 	/* Verify object does not incorrectly span multiple pages. */
+	printf("willen check_page_span\n");
 	return check_page_span(ptr, n, page, to_user);
 }
 
