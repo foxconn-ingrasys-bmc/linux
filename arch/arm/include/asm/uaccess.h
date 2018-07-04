@@ -565,14 +565,14 @@ __clear_user(void __user *addr, unsigned long n)
 #define __clear_user(addr, n)		(memset((void __force *)addr, 0, n), 0)
 #endif
 
-static inline unsigned long __must_check copy_from_user(void *to, const void __user *from, unsigned long n)
-{
-	if (access_ok(VERIFY_READ, from, n))
-		n = __copy_from_user(to, from, n);
-	else /* security hole - plug it */
-		memset(to, 0, n);
-	return n;
-}
+//static inline unsigned long __must_check copy_from_user(void *to, const void __user *from, unsigned long n)
+//{
+//	if (access_ok(VERIFY_READ, from, n))
+//		n = __copy_from_user(to, from, n);
+//	else /* security hole - plug it */
+//		memset(to, 0, n);
+//	return n;
+//}
 
 static inline unsigned long __must_check copy_to_user(void __user *to, const void *from, unsigned long n)
 {
