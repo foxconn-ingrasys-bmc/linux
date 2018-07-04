@@ -493,13 +493,38 @@ do {									\
 extern unsigned long __must_check
 arm_copy_from_user(void *to, const void __user *from, unsigned long n);
 
+//static inline unsigned long __must_check
+//__copy_from_user(void *to, const void __user *from, unsigned long n)
+//{
+//	unsigned int __ua_flags = uaccess_save_and_enable();
+//	n = arm_copy_from_user(to, from, n);
+//	uaccess_restore(__ua_flags);
+//	return n;
+//}
+
 static inline unsigned long __must_check
-__copy_from_user(void *to, const void __user *from, unsigned long n)
+__arch_copy_from_user(void *to, const void __user *from, unsigned long n)
 {
-	unsigned int __ua_flags = uaccess_save_and_enable();
+	unsigned int __ua_flags;
+
+	__ua_flags = uaccess_save_and_enable();
 	n = arm_copy_from_user(to, from, n);
 	uaccess_restore(__ua_flags);
 	return n;
+}
+
+static inline unsigned long __must_check
+copy_from_user(void *to, const void __user *from, unsigned long n)
+{
+	unsigned long res = n;
+
+	check_object_size(to, n, false);
+
+	if (likely(access_ok(VERIFY_READ, from, n)))
+		res = __arch_copy_from_user(to, from, n);
+	if (unlikely(res))
+		memset(to + (n - res), 0, res);
+	return res;
 }
 
 extern unsigned long __must_check
