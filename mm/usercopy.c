@@ -241,24 +241,32 @@ void __check_object_size(const void *ptr, unsigned long n, bool to_user)
 {
 	const char *err;
 
+	printk("willen __check_object_size\n");
 	/* Skip all tests if size is zero. */
 	if (!n)
+	{
+		printk("willen !n\n");
 		return;
-
+	}
 	/* Check for invalid addresses. */
 	err = check_bogus_address(ptr, n);
 	if (err)
+	{
+		printk("willen __check_bogus_address err\n");
 		goto report;
-
+	}
 	/* Check for bad heap object. */
 	err = check_heap_object(ptr, n, to_user);
 	if (err)
+	{
+		printk("willen __check_heap_address err\n");
 		goto report;
-
+	}
 	/* Check for bad stack object. */
 	switch (check_stack_object(ptr, n)) {
 	case NOT_STACK:
 		/* Object is not touching the current process stack. */
+		printk("willen NOT_STACK\n");
 		break;
 	case GOOD_FRAME:
 	case GOOD_STACK:
@@ -267,18 +275,23 @@ void __check_object_size(const void *ptr, unsigned long n, bool to_user)
 		 * is possible to check) or just generally on the
 		 * process stack (when frame checking not available).
 		 */
+		printk("willen GOOD_STACK\n");
 		return;
 	default:
 		err = "<process stack>";
+		printk("willen default\n");
 		goto report;
 	}
 
 	/* Check for object in kernel to avoid text exposure. */
 	err = check_kernel_text_object(ptr, n);
 	if (!err)
+	{
+		printk("willen check_kernel_test_object !err\n");
 		return;
-
+	}
 report:
+	return;
 	report_usercopy(ptr, n, to_user, err);
 }
 EXPORT_SYMBOL(__check_object_size);
