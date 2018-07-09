@@ -1,0 +1,115 @@
+./ast_jtag.c:	val = readl(ast_jtag->reg_base + reg);
+./ast_jtag.c:	printk("willen read ast_jtag->reg_base 0x%08x reg 0x%08x\n",ast_jtag->reg_base,reg);
+./ast_jtag.c:	printk("willen sizeof return readl(ast_jtag->reg_base + reg) %d\n",sizeof(readl(ast_jtag->reg_base + reg)));
+./ast_jtag.c:	return readl(ast_jtag->reg_base + reg);
+./ast_jtag.c:	printk("willen write ast_jtag->reg_base 0x%08x\n",ast_jtag->reg_base);
+./ast_jtag.c:	writel(val, ast_jtag->reg_base + reg);
+./ast_jtag.c:		if ((ast_jtag->apb_clk / (i + 1)) <= freq)
+./ast_jtag.c:	return ast_jtag->apb_clk / (JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1);
+./ast_jtag.c:	wait_event_interruptible(ast_jtag->jtag_wq, (ast_jtag->flag == JTAG_INST_PAUSE));
+./ast_jtag.c:	ast_jtag->flag = 0;
+./ast_jtag.c:	wait_event_interruptible(ast_jtag->jtag_wq, (ast_jtag->flag == JTAG_INST_COMPLETE));
+./ast_jtag.c:	ast_jtag->flag = 0;
+./ast_jtag.c:	wait_event_interruptible(ast_jtag->jtag_wq, (ast_jtag->flag == JTAG_DATA_PAUSE));
+./ast_jtag.c:	ast_jtag->flag = 0;
+./ast_jtag.c:	wait_event_interruptible(ast_jtag->jtag_wq, (ast_jtag->flag == JTAG_DATA_COMPLETE));
+./ast_jtag.c:	ast_jtag->flag = 0;
+./ast_jtag.c:		switch (ast_jtag->sts) {
+./ast_jtag.c:				ast_jtag->sts = 1;
+./ast_jtag.c:				ast_jtag->sts = 1;
+./ast_jtag.c:				ast_jtag->sts = 0;
+./ast_jtag.c:				ast_jtag->sts = 1;
+./ast_jtag.c:				ast_jtag->sts = 1;
+./ast_jtag.c:				ast_jtag->sts = 0;
+./ast_jtag.c:		ast_jtag->sts = 0;
+./ast_jtag.c:		if (ast_jtag->sts) {
+./ast_jtag.c:	ast_jtag->sts = sir->endir;
+./ast_jtag.c:		if (ast_jtag->sts) 
+./ast_jtag.c:	ast_jtag->sts = sdr->enddr;
+./ast_jtag.c:		ast_jtag->flag = JTAG_INST_PAUSE;
+./ast_jtag.c:		ast_jtag->flag = JTAG_INST_COMPLETE;
+./ast_jtag.c:		ast_jtag->flag = JTAG_DATA_PAUSE;
+./ast_jtag.c:		ast_jtag->flag = JTAG_DATA_COMPLETE;
+./ast_jtag.c:	if (ast_jtag->flag) {
+./ast_jtag.c:		wake_up_interruptible(&ast_jtag->jtag_wq);
+./ast_jtag.c:		if ((unsigned int)arg > ast_jtag->apb_clk)
+./ast_jtag.c:	if (ast_jtag->is_open) {
+./ast_jtag.c:	ast_jtag->is_open = true;
+./ast_jtag.c:	return sprintf(buf, "%s\n", ast_jtag->sts ? "Pause" : "Idle");
+./ast_jtag.c:	return sprintf(buf, "Frequency : %d\n", ast_jtag->apb_clk / (JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1));
+./ast_jtag.c:	ast_jtag->reg_base = devm_ioremap_resource(&pdev->dev, res);
+./ast_jtag.c:	JTAG_DBUG("willen ast_jtag->reg_base 0x%x\n",ast_jtag->reg_base);
+./ast_jtag.c:	if (!ast_jtag->reg_base) {
+./ast_jtag.c:	ast_jtag->irq = platform_get_irq(pdev, 0);
+./ast_jtag.c:	if (ast_jtag->irq < 0) {
+./ast_jtag.c:	//ast_jtag->reset = devm_reset_control_get_exclusive(&pdev->dev, "jtag");
+./ast_jtag.c:	ast_jtag->reset = devm_reset_control_get_exclusive(&pdev->dev, "jtag");
+./ast_jtag.c:	if (IS_ERR(ast_jtag->reset)) {
+./ast_jtag.c:		return PTR_ERR(ast_jtag->reset);
+./ast_jtag.c:	ast_jtag->clk = devm_clk_get(&pdev->dev, NULL);
+./ast_jtag.c:	if (IS_ERR(ast_jtag->clk)) {
+./ast_jtag.c:	ast_jtag->apb_clk = clk_get_rate(ast_jtag->clk);
+./ast_jtag.c:	reset_control_assert(ast_jtag->reset);
+./ast_jtag.c:	reset_control_deassert(ast_jtag->reset);
+./ast_jtag.c:	ret = devm_request_irq(&pdev->dev, ast_jtag->irq, ast_jtag_interrupt,
+./ast_jtag.c:	ast_jtag->flag = 0;
+./ast_jtag.c:	init_waitqueue_head(&ast_jtag->jtag_wq);
+./ast_jtag.c:	free_irq(ast_jtag->irq, NULL);
+./ast_jtag.c:	free_irq(ast_jtag->irq, ast_jtag);
+./ast_jtag.c:	iounmap(ast_jtag->reg_base);
+./jtagmain_md.c:	val = readl(ast_jtag->reg_base + reg);
+./jtagmain_md.c:	return readl(ast_jtag->reg_base + reg);
+./jtagmain_md.c:	writel(val, ast_jtag->reg_base + reg);
+./jtagmain_md.c:	return sprintf(buf, "%s\n", ast_jtag->sts ? "Pause" : "Idle");
+./jtagmain_md.c:	return sprintf(buf, "Frequency : %d\n", ast_jtag->apb_clk / (JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1));
+./jtagmain_md.c:	wait_event_interruptible(ast_jtag->jtag_wq, (ast_jtag->flag == JTAG_DATA_COMPLETE));
+./jtagmain_md.c:	ast_jtag->flag = 0;
+./jtagmain_md.c:	wait_event_interruptible(ast_jtag->jtag_wq, (ast_jtag->flag == JTAG_DATA_PAUSE));
+./jtagmain_md.c:	ast_jtag->flag = 0;
+./jtagmain_md.c:	wait_event_interruptible(ast_jtag->jtag_wq, (ast_jtag->flag == JTAG_INST_COMPLETE));
+./jtagmain_md.c:	ast_jtag->flag = 0;
+./jtagmain_md.c:	wait_event_interruptible(ast_jtag->jtag_wq, (ast_jtag->flag == JTAG_INST_PAUSE));
+./jtagmain_md.c:	ast_jtag->flag = 0;
+./jtagmain_md.c:		if ((ast_jtag->apb_clk / (i + 1)) <= freq)
+./jtagmain_md.c:	return ast_jtag->apb_clk / (JTAG_GET_TCK_DIVISOR(ast_jtag_read(ast_jtag, AST_JTAG_TCK)) + 1);
+./jtagmain_md.c:		if (ast_jtag->sts)
+./jtagmain_md.c:	ast_jtag->sts = sir->endir;
+./jtagmain_md.c:		if (ast_jtag->sts)
+./jtagmain_md.c:	ast_jtag->sts = sdr->enddr;
+./jtagmain_md.c:		switch (ast_jtag->sts) {
+./jtagmain_md.c:				ast_jtag->sts = 1;
+./jtagmain_md.c:				ast_jtag->sts = 1;
+./jtagmain_md.c:				ast_jtag->sts = 0;
+./jtagmain_md.c:				ast_jtag->sts = 1;
+./jtagmain_md.c:				ast_jtag->sts = 1;
+./jtagmain_md.c:				ast_jtag->sts = 0;
+./jtagmain_md.c:		ast_jtag->sts = 0;
+./jtagmain_md.c:		if ((unsigned int)arg > ast_jtag->apb_clk)
+./jtagmain_md.c:	if (ast_jtag->is_open) {
+./jtagmain_md.c:	ast_jtag->is_open = true;
+./jtagmain_md.c:		ast_jtag->flag = JTAG_INST_PAUSE;
+./jtagmain_md.c:		ast_jtag->flag = JTAG_INST_COMPLETE;
+./jtagmain_md.c:		ast_jtag->flag = JTAG_DATA_PAUSE;
+./jtagmain_md.c:		ast_jtag->flag = JTAG_DATA_COMPLETE;
+./jtagmain_md.c:	if (ast_jtag->flag) {
+./jtagmain_md.c:		wake_up_interruptible(&ast_jtag->jtag_wq);
+./jtagmain_md.c:	ast_jtag->reg_base = devm_ioremap_resource(&pdev->dev, res);
+./jtagmain_md.c:	if (!ast_jtag->reg_base) 
+./jtagmain_md.c:	ast_jtag->irq = platform_get_irq(pdev, 0);
+./jtagmain_md.c:	if (ast_jtag->irq < 0)
+./jtagmain_md.c:	ast_jtag->reset = devm_reset_control_get_exclusive(&pdev->dev, "jtag");
+./jtagmain_md.c:	if (IS_ERR(ast_jtag->reset)) 
+./jtagmain_md.c:		JTAG_DBUG("jtagmain : ast_jtag_probe ast_jtag->reset failed\n");
+./jtagmain_md.c:		return PTR_ERR(ast_jtag->reset);
+./jtagmain_md.c:	ast_jtag->clk = devm_clk_get(&pdev->dev, NULL);
+./jtagmain_md.c:	if (IS_ERR(ast_jtag->clk))
+./jtagmain_md.c:		JTAG_DBUG("jtagmain : ast_jtag->clk failed\n");
+./jtagmain_md.c:	ast_jtag->apb_clk = clk_get_rate(ast_jtag->clk);
+./jtagmain_md.c:	reset_control_assert(ast_jtag->reset);
+./jtagmain_md.c:	reset_control_deassert(ast_jtag->reset);
+./jtagmain_md.c:	ret = devm_request_irq(&pdev->dev, ast_jtag->irq, ast_jtag_interrupt,
+./jtagmain_md.c:	ast_jtag->flag = 0;
+./jtagmain_md.c:	init_waitqueue_head(&ast_jtag->jtag_wq);
+./jtagmain_md.c:	free_irq(ast_jtag->irq, NULL);
+./jtagmain_md.c:	free_irq(ast_jtag->irq, ast_jtag);
+./jtagmain_md.c:	iounmap(ast_jtag->reg_base);
