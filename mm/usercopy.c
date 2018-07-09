@@ -41,8 +41,8 @@ static noinline int check_stack_object(const void *obj, unsigned long len)
 	const void * const stackend = stack + THREAD_SIZE;
 	int ret;
 
-	printk("willen stack %x stackend %x\n",*stack,*stackend);
-	printk("willen object %x len %x\n",*obj,len);
+	printk("willen stack %x stackend %x\n",stack,stackend);
+	printk("willen object %x len %x\n",obj,len);
 	/* Object is not on the stack at all. */
 	if (obj + len <= stack || stackend <= obj)
 		return NOT_STACK;
