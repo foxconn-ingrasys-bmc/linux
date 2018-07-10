@@ -701,6 +701,7 @@ static long jtag_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		break;
 	case AST_JTAG_IOCRUNTEST:
 		printk("willen AST_JTAG_IOCURNTEST\n");
+		printk("willen ast_jtag\n");
 		if (copy_from_user(&run_idle, argp, sizeof(struct runtest_idle)))
 			ret = -EFAULT;
 		else
@@ -710,6 +711,7 @@ static long jtag_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		break;
 	case AST_JTAG_IOCSIR:
 		printk("willen AST_JTAG_IOCSIR\n");
+		printk("willen ast_jtag\n");
 		if (copy_from_user(&sir, argp, sizeof(struct sir_xfer)))
 			ret = -EFAULT;
 		else
@@ -723,6 +725,7 @@ static long jtag_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		break;
 	case AST_JTAG_IOCSDR:
 		printk("willen AST_JTAG_IOCSDR\n");
+		printk("willen ast_jtag\n");
 		if (copy_from_user(&sdr, argp, sizeof(struct sdr_xfer)))
 		{
 			printk("willen AST_JTAG_IOSDR copy_from_user failed\n");

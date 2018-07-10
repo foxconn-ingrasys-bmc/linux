@@ -984,7 +984,7 @@ static int uart_set_info_user(struct tty_struct *tty, struct uart_state *state,
 	struct serial_struct new_serial;
 	struct tty_port *port = &state->port;
 	int retval;
-
+	printk("willen serial_core.c\n");
 	if (copy_from_user(&new_serial, newinfo, sizeof(new_serial)))
 		return -EFAULT;
 
@@ -1276,7 +1276,8 @@ static int uart_set_rs485_config(struct uart_port *port,
 
 	if (!port->rs485_config)
 		return -ENOIOCTLCMD;
-
+	
+	printk("willen serial_core\n");
 	if (copy_from_user(&rs485, rs485_user, sizeof(*rs485_user)))
 		return -EFAULT;
 

@@ -340,7 +340,8 @@ static long gpio_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	} else if (cmd == GPIO_GET_LINEINFO_IOCTL) {
 		struct gpioline_info lineinfo;
 		struct gpio_desc *desc;
-
+		
+		printk("willen gpiolib\n");
 		if (copy_from_user(&lineinfo, ip, sizeof(lineinfo)))
 			return -EFAULT;
 		if (lineinfo.line_offset > gdev->ngpio)

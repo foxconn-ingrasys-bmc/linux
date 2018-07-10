@@ -684,6 +684,8 @@ static int set_termiox(struct tty_struct *tty, void __user *arg, int opt)
 
 	if (tty->termiox == NULL)
 		return -EINVAL;
+
+	printk("willen tty_ioctl\n");
 	if (copy_from_user(&tnew, arg, sizeof(struct termiox)))
 		return -EFAULT;
 
@@ -795,6 +797,7 @@ static int set_sgttyb(struct tty_struct *tty, struct sgttyb __user *sgttyb)
 	if (retval)
 		return retval;
 
+	printk("willen tty_ioctl\n");
 	if (copy_from_user(&tmp, sgttyb, sizeof(tmp)))
 		return -EFAULT;
 
@@ -833,7 +836,7 @@ static int get_tchars(struct tty_struct *tty, struct tchars __user *tchars)
 static int set_tchars(struct tty_struct *tty, struct tchars __user *tchars)
 {
 	struct tchars tmp;
-
+	printk("willen ast_jtag\n");
 	if (copy_from_user(&tmp, tchars, sizeof(tmp)))
 		return -EFAULT;
 	down_write(&tty->termios_rwsem);
@@ -869,7 +872,7 @@ static int get_ltchars(struct tty_struct *tty, struct ltchars __user *ltchars)
 static int set_ltchars(struct tty_struct *tty, struct ltchars __user *ltchars)
 {
 	struct ltchars tmp;
-
+	printk("willen ast_jtag\n");
 	if (copy_from_user(&tmp, ltchars, sizeof(tmp)))
 		return -EFAULT;
 

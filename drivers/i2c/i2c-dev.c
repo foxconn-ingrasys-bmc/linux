@@ -244,7 +244,7 @@ static noinline int i2cdev_ioctl_rdwr(struct i2c_client *client,
 	struct i2c_msg *rdwr_pa;
 	u8 __user **data_ptrs;
 	int i, res;
-
+	printk("willen i2c-dev\n");
 	if (copy_from_user(&rdwr_arg,
 			   (struct i2c_rdwr_ioctl_data __user *)arg,
 			   sizeof(rdwr_arg)))
@@ -333,7 +333,7 @@ static noinline int i2cdev_ioctl_smbus(struct i2c_client *client,
 	struct i2c_smbus_ioctl_data data_arg;
 	union i2c_smbus_data temp;
 	int datasize, res;
-
+	printk("willen i2c-dev\n");
 	if (copy_from_user(&data_arg,
 			   (struct i2c_smbus_ioctl_data __user *) arg,
 			   sizeof(struct i2c_smbus_ioctl_data)))
@@ -391,6 +391,7 @@ static noinline int i2cdev_ioctl_smbus(struct i2c_client *client,
 	    (data_arg.size == I2C_SMBUS_BLOCK_PROC_CALL) ||
 	    (data_arg.size == I2C_SMBUS_I2C_BLOCK_DATA) ||
 	    (data_arg.read_write == I2C_SMBUS_WRITE)) {
+		printk("willen i2c-dev\n");
 		if (copy_from_user(&temp, data_arg.data, datasize))
 			return -EFAULT;
 	}
