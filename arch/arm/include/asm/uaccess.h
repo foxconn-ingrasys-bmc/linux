@@ -546,6 +546,7 @@ __clear_user(void __user *addr, unsigned long n)
 static inline unsigned long __must_check
 __copy_from_user(void *to, const void __user *from, unsigned long n)
 {
+	printk("willen __copy_from_user\n");
 	check_object_size(to, n, false);
 	return __arch_copy_from_user(to, from, n);
 }
@@ -554,7 +555,7 @@ static inline unsigned long __must_check
 copy_from_user(void *to, const void __user *from, unsigned long n)
 {
 	unsigned long res = n;
-
+	printk("willen copy_from_user\n");
 	check_object_size(to, n, false);
 
 	if (likely(access_ok(VERIFY_READ, from, n)))
