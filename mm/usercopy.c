@@ -41,8 +41,8 @@ static noinline int check_stack_object(const void *obj, unsigned long len)
 	const void * const stackend = stack + THREAD_SIZE;
 	int ret;
 
-	printk("willen stack %x stackend %x\n",stack,stackend);
-	printk("willen object %x len %x\n",obj,len);
+	//printk("willen stack %x stackend %x\n",stack,stackend);
+	//printk("willen object %x len %x\n",obj,len);
 	/* Object is not on the stack at all. */
 	if (obj + len <= stack || stackend <= obj)
 		return NOT_STACK;
@@ -225,11 +225,11 @@ static inline const char *check_heap_object(const void *ptr, unsigned long n,
 	/* Check slab allocator for flags and size. */
 	if (PageSlab(page))
 	{
-		printk("willen __check_heap_object\n");
+		//printk("willen __check_heap_object\n");
 		return __check_heap_object(ptr, n, page);
 	}
 	/* Verify object does not incorrectly span multiple pages. */
-	printk("willen check_page_span\n");
+	//printk("willen check_page_span\n");
 	return check_page_span(ptr, n, page, to_user);
 }
 
@@ -243,32 +243,32 @@ void __check_object_size(const void *ptr, unsigned long n, bool to_user)
 {
 	const char *err;
 
-	printk("willen __check_object_size\n");
+	//printk("willen __check_object_size ptr %x\n",ptr);
 	/* Skip all tests if size is zero. */
 	if (!n)
 	{
-		printk("willen !n\n");
+		//printk("willen !n\n");
 		return;
 	}
 	/* Check for invalid addresses. */
 	err = check_bogus_address(ptr, n);
 	if (err)
 	{
-		printk("willen __check_bogus_address err\n");
+	//	printk("willen __check_bogus_address err\n");
 		goto report;
 	}
 	/* Check for bad heap object. */
 	err = check_heap_object(ptr, n, to_user);
 	if (err)
 	{
-		printk("willen __check_heap_address err\n");
+	//	printk("willen __check_heap_address err\n");
 		goto report;
 	}
 	/* Check for bad stack object. */
 	switch (check_stack_object(ptr, n)) {
 	case NOT_STACK:
 		/* Object is not touching the current process stack. */
-		printk("willen NOT_STACK\n");
+		//printk("willen check_stack_object result is NOT_STACK\n");
 		break;
 	case GOOD_FRAME:
 	case GOOD_STACK:
@@ -277,11 +277,11 @@ void __check_object_size(const void *ptr, unsigned long n, bool to_user)
 		 * is possible to check) or just generally on the
 		 * process stack (when frame checking not available).
 		 */
-		printk("willen GOOD_STACK\n");
+		//printk("willen check_stack_object result is GOOD_STACK\n");
 		return;
 	default:
 		err = "<process stack>";
-		printk("willen default\n");
+		//printk("willen default\n");
 		goto report;
 	}
 
@@ -289,7 +289,7 @@ void __check_object_size(const void *ptr, unsigned long n, bool to_user)
 	err = check_kernel_text_object(ptr, n);
 	if (!err)
 	{
-		printk("willen check_kernel_test_object !err\n");
+//		printk("willen check_kernel_test_object !err\n");
 		return;
 	}
 report:

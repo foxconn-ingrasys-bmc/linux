@@ -836,7 +836,7 @@ static int get_tchars(struct tty_struct *tty, struct tchars __user *tchars)
 static int set_tchars(struct tty_struct *tty, struct tchars __user *tchars)
 {
 	struct tchars tmp;
-	printk("willen ast_jtag\n");
+	printk("willen tty_ioctl\n");
 	if (copy_from_user(&tmp, tchars, sizeof(tmp)))
 		return -EFAULT;
 	down_write(&tty->termios_rwsem);
