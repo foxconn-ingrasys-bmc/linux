@@ -21,6 +21,7 @@
 struct device_node;
 struct hisi_reset_controller;
 
+#define CONFIG_RESET_CONTROLLER
 #ifdef CONFIG_RESET_CONTROLLER
 struct hisi_reset_controller *hisi_reset_init(struct platform_device *pdev);
 void hisi_reset_exit(struct hisi_reset_controller *rstc);

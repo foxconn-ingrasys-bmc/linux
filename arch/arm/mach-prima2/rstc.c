@@ -20,7 +20,7 @@
 #include <asm/system_misc.h>
 
 #define SIRFSOC_RSTBIT_NUM	64
-
+#define CONFIG_RESET_CONTROLLER	"y"
 static void __iomem *sirfsoc_rstc_base;
 static DEFINE_MUTEX(rstc_lock);
 

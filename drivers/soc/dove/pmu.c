@@ -25,6 +25,7 @@
 #define PMU_PWR			0x10
 #define PMU_ISO			0x58
 
+#define CONFIG_RESET_CONTROLLER
 struct pmu_data {
 	spinlock_t lock;
 	struct device_node *of_node;

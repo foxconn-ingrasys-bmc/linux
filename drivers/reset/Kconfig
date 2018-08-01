@@ -39,6 +39,12 @@ config RESET_MESON
 	help
 	  This enables the reset driver for Amlogic Meson SoCs.
 
+config RESET_ASPEED
+	bool "ASPEED Reset Driver"
+	default y
+	help
+	  This enable the ASPEED SoC reset controller driver
+
 config RESET_OXNAS
 	bool
 

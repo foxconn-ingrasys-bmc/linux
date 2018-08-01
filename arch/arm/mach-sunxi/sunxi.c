@@ -16,7 +16,7 @@
 #include <linux/platform_device.h>
 
 #include <asm/mach/arch.h>
-
+#define CONFIG_RESET_CONTROLLER	"y"
 static const char * const sunxi_board_dt_compat[] = {
 	"allwinner,sun4i-a10",
 	"allwinner,sun5i-a10s",

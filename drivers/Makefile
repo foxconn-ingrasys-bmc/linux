@@ -1,4 +1,4 @@
-#
+
 # Makefile for the Linux kernel device drivers.
 #
 # 15 Sep 2000, Christoph Hellwig <hch@infradead.org>
@@ -19,10 +19,8 @@ obj-$(CONFIG_PARISC)		+= parisc/
 obj-$(CONFIG_RAPIDIO)		+= rapidio/
 obj-y				+= video/
 obj-y				+= idle/
-
 # IPMI must come before ACPI in order to provide IPMI opregion support
 obj-y				+= char/ipmi/
-
 obj-$(CONFIG_ACPI)		+= acpi/
 obj-$(CONFIG_SFI)		+= sfi/
 # PnP must come after ACPI since it will eventually need to check if acpi
@@ -45,7 +43,8 @@ obj-$(CONFIG_XEN)		+= xen/
 obj-$(CONFIG_REGULATOR)		+= regulator/
 
 # reset controllers early, since gpu drivers might rely on them to initialize
-obj-$(CONFIG_RESET_CONTROLLER)	+= reset/
+#obj-$(CONFIG_RESET_CONTROLLER)	+= reset/
+obj-y				+= reset/
 
 # tty/ comes before char/ so that the VT console is the boot-time
 # default.
@@ -175,3 +174,6 @@ obj-$(CONFIG_STM)		+= hwtracing/stm/
 obj-$(CONFIG_ANDROID)		+= android/
 obj-$(CONFIG_NVMEM)		+= nvmem/
 obj-$(CONFIG_FPGA)		+= fpga/
+obj-y				+= driver_hal/
+obj-y				+= jtag/
+#obj-y				+= jtag_hw/

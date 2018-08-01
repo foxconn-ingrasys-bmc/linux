@@ -17,7 +17,7 @@ struct mmp_clk_reset_unit {
 	struct reset_controller_dev rcdev;
 	struct mmp_clk_reset_cell *cells;
 };
-
+#define CONFIG_RESET_CONTROLLER
 #ifdef CONFIG_RESET_CONTROLLER
 void mmp_clk_reset_register(struct device_node *np,
 			struct mmp_clk_reset_cell *cells, int nr_resets);
