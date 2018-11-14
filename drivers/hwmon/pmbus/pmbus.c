@@ -26,6 +26,7 @@
 #include <linux/mutex.h>
 #include <linux/i2c.h>
 #include "pmbus.h"
+
 static ssize_t pmbus_show_operation(struct device *dev,
 				struct device_attribute *da, char *buf)
 {

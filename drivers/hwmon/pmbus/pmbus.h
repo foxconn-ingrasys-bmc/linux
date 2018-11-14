@@ -22,7 +22,7 @@
 #ifndef PMBUS_H
 #define PMBUS_H
 
-#include <linux/bitops.h>
+#include <linux/bitops.h> 
 #include <linux/regulator/driver.h>
 
 /*
