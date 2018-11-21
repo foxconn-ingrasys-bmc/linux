@@ -107,7 +107,7 @@ static void pmbus_find_sensor_groups(struct i2c_client *client,
 				     struct pmbus_driver_info *info)
 {
 	int page;
-
+	printk("11111111111111111\n");
 	/* Sensors detected on page 0 only */
 	if (pmbus_check_word_register(client, 0, PMBUS_READ_VIN))
 		info->func[0] |= PMBUS_HAVE_VIN;
@@ -170,7 +170,7 @@ static int pmbus_identify(struct i2c_client *client,
 			  struct pmbus_driver_info *info)
 {
 	int ret = 0;
-	printk("11111111111111111\n");
+	
 	if (!info->pages) {
 		/*
 		 * Check if the PAGE command is supported. If it is,
@@ -191,7 +191,7 @@ static int pmbus_identify(struct i2c_client *client,
 			info->pages = 1;
 		}
 	}
-printk("222222222222222222\n");
+
 	if (pmbus_check_byte_register(client, 0, PMBUS_VOUT_MODE)) {
 		int vout_mode;
 
@@ -213,7 +213,7 @@ printk("222222222222222222\n");
 			}
 		}
 	}
-printk("33333333333333333333333333333\n");
+
 	/*
 	 * We should check if the COEFFICIENTS register is supported.
 	 * If it is, and the chip is configured for direct mode, we can read
@@ -229,7 +229,7 @@ printk("33333333333333333333333333333\n");
 		ret = -ENODEV;
 		goto abort;
 	}
-printk("444444444444444444444444\n");
+
 	/* Try to find sensor groups  */
 	pmbus_find_sensor_groups(client, info);
 	pmbus_add_attr(client, info);

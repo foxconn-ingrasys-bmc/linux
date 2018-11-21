@@ -8,11 +8,11 @@
 	compatible = "ingrasys,hgx1-bmc", "aspeed,ast2400";
 
 	aliases {
-		serial4 = &uart5;
+		serial4 = &uart3;
 	};
 
 	chosen {
-		stdout-path = &uart5;
+		stdout-path = &uart3;
 		bootargs = "console=ttyS4,115200 earlyprintk";
 	};
 
@@ -55,7 +55,7 @@
 	status = "okay";
 };
 
-&uart5 {
+&uart3 {
 	status = "okay";
         current-speed = <115200>;
 };
